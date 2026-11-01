@@ -1,0 +1,96 @@
+{
+  "files": [
+    {
+      "file": "LICENSE-APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "file": "LICENSE-MIT",
+      "sha256": "1a26c1e94401d5d221896c74dd1c58d227edc64516da95aaac6f675567c8af63"
+    },
+    {
+      "file": "NOTICE",
+      "sha256": "09464b0c8f495c9e3c80d93fccf667056d1c2c306445d66101e4bed49494c54d"
+    },
+    {
+      "file": "THIRD-PARTY-LICENSES.txt",
+      "sha256": "2fea8f11569c7596cdc65b3d21801b8d57920c0ccdd3b905da38a071702ce48b"
+    },
+    {
+      "file": "fonts/BIZUDPGothic-Regular.ttf",
+      "sha256": "258d7156c165f2ff774b6efee637c22c3b950de0d8a10e501137061bc8085d01"
+    },
+    {
+      "file": "fonts/CraftUI-SC.otf",
+      "sha256": "ab147a715a3f596f2dcde6e363ae7552cc6aa38d2b38ac521b876fddbbe787f5"
+    },
+    {
+      "file": "fonts/CraftUI-TC.otf",
+      "sha256": "6e0482aa78df0154db060742fd9ab0e0b09a6a2e1e6a708f6bbfa4e0fc50dd5c"
+    },
+    {
+      "file": "fonts/OFL.txt",
+      "sha256": "e753d7155d53c747d037a445e584c8ecfca6dd79846db610417e282a736b28bc"
+    },
+    {
+      "file": "fonts/craft-ui-sc/OFL.txt",
+      "sha256": "feaa534bc7fe8d307903a2cfb0d9ff7aad8e83b1dc8dbb9d41ed7c533d461849"
+    },
+    {
+      "file": "fonts/craft-ui-tc/OFL.txt",
+      "sha256": "f9c74d7fc3d9d7aa6243f3aa257de3e05115a926e6daf07296c2b5bdd8fa6dba"
+    },
+    {
+      "file": "icons/256x256/io.tangencylabs.solidcraft.png",
+      "sha256": "71a3e492720571cf572faa51d86a7ff75e9d7dea0916142b51de835bf857c5af"
+    },
+    {
+      "file": "icons/32x32/io.tangencylabs.solidcraft.png",
+      "sha256": "894552719c6bf8aa91f9d3ab3f1cb61836708f9ba00daf0324175ac82f16dfab"
+    },
+    {
+      "file": "icons/512x512/io.tangencylabs.solidcraft.png",
+      "sha256": "84fde8ef270f5b32afa2d661749b4778a205e7df980dd67795c10f7f4a69e15d"
+    },
+    {
+      "file": "legal/upstream/ATTRIBUTION.md",
+      "sha256": "889cc4fa02053b7c58ed6cf3f3c14363f98b329469b011c85e30d2a8d5d61e2c"
+    },
+    {
+      "file": "legal/upstream/DISCLAIMER.md",
+      "sha256": "84df9edf9a6aff35a4693702671f404435950569813236b6c9973808bb369b15"
+    },
+    {
+      "file": "loading-fa23566dd89fa92b.css",
+      "sha256": "6beeebe803106340480ebee6554cf7c1c33a2ce0410bcb42d7fd4f78e3dee7f2"
+    },
+    {
+      "file": "loading-logo.svg",
+      "sha256": "31d87162bb6a5a189bf60575981a1ef24c245d209783d9ad08b8318f66146e3d"
+    },
+    {
+      "file": "solidcraft-web-4b1d77a936edaef2.js",
+      "sha256": "a1766999f27bac22c11e93e18da9bdba4f4a3e01a412803fe179c9559bee858d"
+    },
+    {
+      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",
+      "sha256": "ebd3a83cc7182aafe28971c06589f7f120192ac9eacdeb26f07a08f1b4f95600"
+    },
+    {
+      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part1.bin",
+      "sha256": "857ef5da9bc25f12c8c46458fc50d628fe6ccb857887a59355b0c2bda676492e"
+    },
+    {
+      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part2.bin",
+      "sha256": "1c81ff57298c2c6c9bf03f92b405e81c655b3c740a14bca39e59dced14b30fc9"
+    },
+    {
+      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part3.bin",
+      "sha256": "85bf84429d9635208eab5f7f6086515a5b404b764f6ff675f6399207621c4141"
+    },
+    {
+      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part4.bin",
+      "sha256": "6260c9bfde1eb7ee0d286d9bf956eab0d2112dff6b0c8ed7d2847de491cd07cc"
+    }
+  ]
+}

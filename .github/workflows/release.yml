@@ -1,0 +1,50 @@
+name: Release draft
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Require a reviewed main-branch commit and matching project version
+        run: |
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+          python3 scripts/release.py check
+          python3 -c 'import json,os; assert os.environ["GITHUB_REF_NAME"] == "v" + json.load(open("project.json"))["version"], "Tag differs from project version"'
+      - name: Validate scripts and packaging
+        run: |
+          node --check touch-nav.js
+          node --check project-version.js
+          node --check sw.js
+          python3 -m unittest discover -s tests -v
+      - name: Verify the pinned official upstream archive
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request
+          from pathlib import Path
+          metadata = json.loads(Path('project.json').read_text())
+          urllib.request.urlretrieve(metadata['upstream']['archive_url'], '/tmp/solidcraft-upstream.zip')
+          PY
+          python3 scripts/release.py verify-upstream --archive /tmp/solidcraft-upstream.zip
+      - name: Package exact version with notices and checksums
+        run: python3 scripts/release.py package --tag "$GITHUB_REF_NAME" --output dist
+      - name: Create a draft for maintainer review (never publish automatically)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=()
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then args+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" dist/solidcraft-ipad-*.zip dist/SHA256SUMS.txt \
+            --draft --verify-tag --target "$GITHUB_SHA" \
+            --title "SolidCraft iPad ${GITHUB_REF_NAME#v} (unofficial)" \
+            --notes-file dist/release-notes.md "${args[@]}"

@@ -1,26 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <!-- Inoffizielle iPad-Anpassung von SolidCraft 0.29.0 (Tangency Labs, MIT/Apache-2.0); geändert: touch-nav.js eingebunden. Siehe IPAD-ANPASSUNG.md -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <title>SolidCraft</title>
-  <meta name="description" content="Open-source parametric CAD built in Rust. Desktop, browser, and MCP for AI agents.">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="SolidCraft">
-  <meta property="og:title" content="SolidCraft: try it in your browser">
-  <meta property="og:description" content="Open-source parametric CAD built in Rust. Desktop, browser, and MCP for AI agents.">
-  <meta property="og:url" content="https://solidcraft.ai/">
-  <meta property="og:image" content="https://docs.solidcraft.io/og.png">
-  <meta property="og:image:width" content="1280">
-  <meta property="og:image:height" content="640">
-  <meta property="og:image:alt" content="SolidCraft: open-source parametric CAD built in Rust">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SolidCraft: try it in your browser">
-  <meta name="twitter:description" content="Open-source parametric CAD built in Rust. Desktop, browser, and MCP for AI agents.">
-  <meta name="twitter:image" content="https://docs.solidcraft.io/og.png">
-  <meta name="twitter:image:alt" content="SolidCraft: open-source parametric CAD built in Rust">
-  
+  <title>SolidCraft iPad — inoffiziell</title>
+  <meta name="description" content="Inoffizielle iPad-/Pencil-Anpassung auf Basis von SolidCraft. Eigenständiges Projekt, nicht von Tangency Labs oder Apple unterstützt.">
+  <script src="project-version.js"></script>
+  <script>document.title = `SolidCraft iPad ${window.SOLIDCRAFT_IPAD_RELEASE.version} — inoffiziell`;</script>
   <!-- iPad: Touch- und Pencil-Steuerung (touch-nav.js) -->
   <style>html,body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}#solidcraft_canvas{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}</style>
   <script src="touch-nav.js"></script>
@@ -56,7 +43,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SolidCraft">
+  <meta name="apple-mobile-web-app-title" content="SolidCraft iPad (inoffiziell)">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/32x32/io.tangencylabs.solidcraft.png">
   <link rel="apple-touch-icon" href="icons/256x256/io.tangencylabs.solidcraft.png">
@@ -66,6 +53,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
   
 <link rel="modulepreload" href="./solidcraft-web-4b1d77a936edaef2.js" crossorigin="anonymous" integrity="sha384-XsmCxPTJqCCOc8le9g0kKd6/CNJH377Gsy2R8eN1z+757movQMwaCPlxDWTFsfcl"></head>
 <body>
+  <a href="about.html" target="_blank" rel="noopener" style="position:fixed;bottom:4px;right:6px;z-index:2147483001;padding:5px 8px;background:#20252b;color:white;border-radius:6px;font:12px system-ui,sans-serif;touch-action:manipulation" id="fork-info">iPad-Ausgabe · inoffiziell · Lizenzen</a>
   <canvas id="solidcraft_canvas"></canvas>
   <div id="solidcraft_loading" role="status"><img src="loading-logo.svg" alt=""><span class="sr-only">Loading SolidCraft&hellip;</span></div>
   <script>
