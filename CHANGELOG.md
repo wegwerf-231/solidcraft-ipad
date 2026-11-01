@@ -4,6 +4,18 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.2.0] - vorbereitet, noch nicht veröffentlicht
+
+- Zeichnen per Pencil-Zug wie in Shapr3D: Aufsetzen setzt den ersten Punkt, Abheben den zweiten
+  (Linie, Rechteck, Kreis, Bogen, Polygon, Langloch, Ellipse, Hilfslinie). Linien lassen sich
+  mit weiteren Zügen am Endpunkt als Kette fortsetzen. Tippen bleibt möglich.
+- Pencil-Hover: Ein über dem Display schwebender Stift bewegt den Zeiger, sodass Hervorhebung
+  und Fangpunkte schon vor dem Aufsetzen erscheinen.
+- Wertfelder beim Zeichnen (Länge, Winkel, Breite, Höhe, Durchmesser) öffnen das Ziffernfeld
+  statt der Bildschirmtastatur; das Ziffernfeld erscheint neben dem bearbeiteten Feld.
+- Ziffernfeld: neue Tasten ⇥ (nächstes Wertfeld) und m.
+- Arbeitspakete AP 1 und AP 2 aus der Anforderungsliste zur Shapr3D-Bedienung.
+
 ## [0.1.0] - vorbereitet, noch nicht veröffentlicht
 
 - Bestehende Finger-/Pencil-Steuerung, Kontextleiste und Ziffernfeld als erste eigene Ausgabe erfasst.

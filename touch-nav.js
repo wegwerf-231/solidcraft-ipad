@@ -512,7 +512,21 @@
   function onPointer(e) {
     if (!synthetic && (e.type === "pointerdown" || e.type === "pointerup")) note(e.type + " " + e.pointerType + (inOverlay(e) ? " overlay" : "") + " " + Math.round(e.clientX) + "," + Math.round(e.clientY));
     if (synthetic || inOverlay(e)) return;
+    // Pencil schwebt über dem Display (iPad mit Hover-Unterstützung): als Zeigerbewegung weitergeben,
+    // damit Fangpunkte, Vorschau und Hervorhebung schon vor dem Aufsetzen erscheinen.
+    if (e.pointerType === "pen" && e.type === "pointermove" && e.buttons === 0 && !stylusStart) {
+      hoverPen(e.clientX, e.clientY);
+    }
     if (e.pointerType === "touch" || e.pointerType === "pen") block(e);
+  }
+  let penHover = null, penHoverFrame = 0;
+  function hoverPen(x, y) {
+    penHover = { x, y };
+    if (!penHoverFrame) penHoverFrame = requestAnimationFrame(() => {
+      penHoverFrame = 0;
+      if (penHover && !stylusStart) hover(penHover.x, penHover.y);
+      penHover = null;
+    });
   }
   function onMouse(e) {
     if (synthetic || inOverlay(e)) return;
@@ -553,11 +567,20 @@
     if (!s.moved && Math.hypot(t.clientX - s.x, t.clientY - s.y) > MOVE_SLOP / 2) {
       s.moved = true;
       clearTimeout(s.timer);
-      hover(s.x, s.y);
-      press(s.x, s.y, 0);
-      s.pressed = true;
+      if (isDrawTool()) {
+        // Zeichnen: erster Punkt als Klick, danach nur Zeigerbewegung (Vorschau), Klick beim Abheben.
+        s.draw = true;
+        const continues = chainEnd && /^sketch\.line/.test(appState.tool) && Math.hypot(s.x - chainEnd.x, s.y - chainEnd.y) < 14;
+        if (!continues) clickAt(s.x, s.y, 0);
+        note("zeichnen " + appState.tool + (continues ? " (kette)" : ""));
+      } else {
+        hover(s.x, s.y);
+        press(s.x, s.y, 0);
+        s.pressed = true;
+      }
     }
-    if (s.pressed) move(t.clientX, t.clientY);
+    if (s.draw) hoverPen(t.clientX, t.clientY);
+    else if (s.pressed) move(t.clientX, t.clientY);
   }
   function onStylusEnd(t, cancelled) {
     const s = stylusStart;
@@ -566,8 +589,21 @@
     clearTimeout(s.timer);
     if (s.menu) return;
     const at = t ? { x: t.clientX, y: t.clientY } : s;
+    if (s.draw) {
+      if (!cancelled) {
+        hover(at.x, at.y);
+        requestAnimationFrame(() => requestAnimationFrame(() => clickAt(at.x, at.y, 0)));
+        chainEnd = /^sketch\.line/.test(appState.tool || "") ? at : null;
+      }
+      setTimeout(pollState, 120);
+      return;
+    }
     if (s.pressed) releaseAfterMoves(at.x, at.y);
-    else if (!cancelled) requestAnimationFrame(() => requestAnimationFrame(() => clickAt(s.x, s.y, 0)));
+    else if (!cancelled) {
+      requestAnimationFrame(() => requestAnimationFrame(() => clickAt(s.x, s.y, 0)));
+      chainEnd = /^sketch\.line/.test(appState.tool || "") ? { x: s.x, y: s.y } : null;
+    }
+    setTimeout(pollState, 120);
     if (!s.moved && !cancelled) {
       const now = performance.now();
       if (lastPencilTap && now - lastPencilTap.t < 400 && Math.hypot(s.x - lastPencilTap.x, s.y - lastPencilTap.y) < 30) {
@@ -582,6 +618,31 @@
   }
 
   let lastPencilTap = null;
+
+  // Aktives Werkzeug, regelmäßig abgefragt: entscheidet, wie ein Pencil-Zug gemeint ist.
+  const appState = { tool: null, dialog: false, home: false, tab: "" };
+  let stateBusy = false;
+  async function pollState() {
+    if (!api() || stateBusy || document.hidden) return;
+    stateBusy = true;
+    try {
+      const info = await req("ui.inspect");
+      appState.tool = info.tool || null;
+      appState.dialog = info.dialog != null;
+      appState.home = !!info.home;
+      appState.tab = (info.ui && info.ui.tab) || "";
+    } catch (_) {
+    } finally {
+      stateBusy = false;
+    }
+  }
+  setInterval(pollState, 400);
+
+  // Zeichenwerkzeuge, bei denen ein Pencil-Zug wie in Shapr3D gezeichnet wird: Aufsetzen setzt den
+  // ersten Punkt, Abheben den zweiten. SolidCraft erwartet dafür zwei Klicks; der Zug wird übersetzt.
+  const DRAW_TOOLS = /^sketch\.(line|rectangle\.|circle\.(center|two_point)|arc\.(center_point|tangent)|polygon\.|slot\.(center_to_center|overall|center_point)|ellipse|construction_line)/;
+  const isDrawTool = () => !!appState.tool && DRAW_TOOLS.test(appState.tool);
+  let chainEnd = null; // letzter Endpunkt einer Linienkette (Bildschirm)
   // Doppeltipp mit dem Pencil auf ein Modell: ganzen Körper auswählen (wie in Shapr3D).
   async function selectBodyAt(x, y) {
     if (!api()) return;
@@ -643,6 +704,7 @@
   let firstKey = true;
   let fieldKey = "";
   let checking = false;
+  let padTab = false;
   let blurredCount = 0;
   async function fieldCheck() {
     const el = agent;
@@ -664,8 +726,11 @@
       if (document.activeElement !== el || textMode) return;
       const dlg = typeof info.dialog === "string" ? info.dialog : "";
       const vf = /value_focus: Some\(([^)]*)\)/.exec(dlg);
-      const numeric = !!(sel.dimension_editing || vf);
-      const k = sel.dimension_editing ? "dim:" + (sel.dimension_selected || []).join(",") : vf ? "dlg:" + vf[1] : "text";
+      // Wertfelder beim Zeichnen (Länge, Winkel, Breite …) gehören zum aktiven Skizzenwerkzeug.
+      const toolBox = !!info.tool && /^sketch\./.test(info.tool) && !/text/.test(info.tool);
+      const numeric = !!(sel.dimension_editing || vf || toolBox);
+      const k = sel.dimension_editing ? "dim:" + (sel.dimension_selected || []).join(",") : vf ? "dlg:" + vf[1] : toolBox ? "tool:" + info.tool : "text";
+      padTab = toolBox;
       if (k !== fieldKey) { fieldKey = k; firstKey = true; }
       debug.lastField = numeric ? "number" : "text";
       debug.fcBranch = numeric ? "pad" : "pill";
@@ -683,7 +748,7 @@
 
   const isMac = /Mac|iPad|iPhone/.test(navigator.userAgent);
   function key(k, mods = {}) {
-    const codes = { Backspace: 8, Enter: 13, Escape: 27, a: 65, Home: 36, End: 35 };
+    const codes = { Backspace: 8, Tab: 9, Enter: 13, Escape: 27, a: 65, Home: 36, End: 35 };
     const init = {
       key: k, code: k.length === 1 ? "Key" + k.toUpperCase() : k, bubbles: true, cancelable: true, composed: true,
       ctrlKey: !!mods.cmd && !isMac, metaKey: !!mods.cmd && isMac,
@@ -709,6 +774,7 @@
     if (k === "esc") { key("Escape"); return; }
     if (k === "back") { key("Backspace"); firstKey = false; return; }
     if (k === "abc") { openKeyboard(); return; }
+    if (k === "tab") { key("Tab"); firstKey = true; return; }
     if (k === "") return;
     if (k === "neg") { key("Home"); typeText("-"); key("End"); firstKey = false; return; }
     if (firstKey) { key("a", { cmd: true }); firstKey = false; } // ersten Wert ersetzen
@@ -771,12 +837,12 @@
     pad = document.createElement("div");
     pad.className = "sc-panel sc-pad";
     const keys = [
-      ["(", "(", "unit"], [")", ")", "unit"], ["mm", " mm", "unit"], ["cm", " cm", "unit"], ["deg", " deg", "unit"],
+      ["(", "(", "unit"], [")", ")", "unit"], ["mm", " mm", "unit"], ["cm", " cm", "unit"], ["m", " m", "unit"],
       ["7"], ["8"], ["9"], ["÷", "/", "op"], ["⌫", "back", "op"],
       ["4"], ["5"], ["6"], ["×", "*", "op"], ["✓", "ok", "ok tall"],
       ["1"], ["2"], ["3"], ["−", "-", "op"],
       ["±", "neg", "op"], ["0"], [".", "."], ["+", "+", "op"],
-      ["⌨︎", "abc", "op"], ["Esc", "esc", "esc"],
+      ["⌨︎", "abc", "op"], ["Esc", "esc", "esc"], ["⇥", "tab", "op tabkey"], ["deg", " deg", "op"],
     ];
     for (const [label, val, cls] of keys) {
       const b = document.createElement("button");
@@ -822,7 +888,11 @@
     if (!on || was) return;
     hideBar();
     // neben das Feld, aber nicht darüber (wie in Shapr3D)
-    const p = fieldPos || lastTap || { x: innerWidth / 2, y: innerHeight / 2 };
+    let p = fieldPos || lastTap || { x: innerWidth / 2, y: innerHeight / 2 };
+    if (agent) {
+      const r = agent.getBoundingClientRect();
+      if (r.left > 2 || r.top > 2) p = { x: r.left, y: r.top };
+    }
     const w = pad.offsetWidth, h = pad.offsetHeight;
     let x = p.x + 130, y = p.y - h / 2;
     if (x + w > innerWidth - 12) x = p.x - w - 130;

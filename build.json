@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0+a20d44f89be68c6b",
+  "version": "0.2.0+112f60612ebb34e8",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "998a063f1de3ef05fb7048a08d98a868c5b483738e14721f6ab88317c11e78ed"
+      "sha256": "d9b4227a73e7e2da2ee88ffe911b0dbdf5dfb0fb3f340b1274f36e57a59caa7c"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "3dbb5db9bb1bbc83e35ae423c867a2074b5ba917b506c89b7176a322e7ec2e0c"
+      "sha256": "3ff1c1b5d5a233331edad38e5933aa8a212f1d496bc9e0824921a2bfb5305822"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -120,11 +120,11 @@
     },
     {
       "file": "project-version.js",
-      "sha256": "7dfdcb03e08ee5398db5bd3827921257df645095b3651986a1ccbecb3a626d1f"
+      "sha256": "d2dca6420484fb30b544a44f3679001fa285f534e6f37563a3e4145f8f44f666"
     },
     {
       "file": "project.json",
-      "sha256": "4b8d7735a11c65e291327a3282e10b7bd7801e899b718d1e8876654db168da6c"
+      "sha256": "3b1749b068ad0988be8a6aa681cf3cb9411f56e432d6b70d59dc1e5f065cc9be"
     },
     {
       "file": "scripts/release.py",
@@ -140,7 +140,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "5b892f715a93648f59c019feeac0aadaafe51f333ea58a78c80efc216aa3f48f"
+      "sha256": "296d3e17c30c1d100751c3d7fba6c0a3216cb3591767ca0edfa781b993c1afea"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",
