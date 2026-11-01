@@ -1,18 +1,27 @@
-# SolidCraft für das iPad (inoffizielle Anpassung)
+# SolidCraft iPad — inoffizielle Anpassung
 
-Diese Seite ist eine **inoffizielle**, private Anpassung der Web-Version von
-[SolidCraft](https://github.com/tangency-labs/solidcraft) 0.29.0 von Tangency Labs. Sie steht in
-keiner Verbindung zu Tangency Labs und wird von dort weder unterstützt noch geprüft.
+Diese Web-Ausgabe ergänzt SolidCraft um Touch- und Pencil-Bedienung.
+Sie ist kein offizielles Produkt von Tangency Labs oder Apple.
+Eigenständige Version: `project.json`; Basis: SolidCraft 0.29.0.
 
-SolidCraft steht unter der MIT- oder Apache-2.0-Lizenz (siehe `LICENSE-MIT`, `LICENSE-APACHE`,
-`NOTICE` und `THIRD-PARTY-LICENSES.txt`). Diese Dateien gelten unverändert weiter.
+- Apple Pencil: auswählen, skizzieren und ziehen.
+- Finger: Ansicht drehen, mit zwei Fingern verschieben/zoomen.
+- Zusatzleiste: kontextabhängige Werkzeuge und große Zahleneingabe.
+- Offline-Modus: nach vollständig abgeschlossenem Erstdownload.
 
-## Änderungen gegenüber dem Original
+Die Browser müssen die nötigen Pointer- und WebAssembly-Funktionen bereitstellen.
+Die Anpassung garantiert keine Unterstützung nativer Pencil-Doppeltipp-/Squeeze-Funktionen.
+Die tatsächliche Bedienbarkeit und der Speicherbedarf hängen vom Gerät und Modell ab.
 
-* `touch-nav.js` (neu): Bedienung mit Fingern und Apple Pencil, Ziffernfeld, Kontextleiste.
-* `index.html` (geändert): bindet `touch-nav.js` ein, Einstellungen für die Nutzung als iPad-App;
-  in der GitHub-Fassung zusätzlich das Zusammensetzen der aufgeteilten Programmdatei.
-* `sw.js`, `build.json` (geändert): Dateiliste für den Offline-Betrieb angepasst.
-* `wasm/*.bin` (nur GitHub-Fassung): die unveränderte Datei `*_bg.wasm`, in Teile zerlegt.
+Eigene Ergänzungen: MIT OR Apache-2.0. Der unveränderte Kern und Materialien Dritter
+behalten ihre Lizenzen. Änderungsliste: `FORK-NOTICE.md`; Herkunft: `docs/LEGAL.md`.
+Der Code dieser Web-Anpassung ist unabhängig von der zuvor lokal entwickelten Rust-Tablet-Variante.
 
-Die Anpassungen stehen unter denselben Lizenzen wie SolidCraft (MIT oder Apache-2.0).
+## Diagnosen
+
+Standardmäßig werden keine Touch-Diagnosen an einen Server gesendet.
+Nur auf einem lokalen Host und mit `?senddiagnostics=1` kann `touch-nav.js` an dessen
+`__log`-Endpunkt senden. Die Daten enthalten Zeit, Browser/Geräteinformationen,
+Viewport-/Bedienzustand und Fehlerprotokolle. Vor Aktivierung Inhalt und eigenen
+Server prüfen. Der CAD-Kern kann unabhängig davon Netzwerkfunktionen besitzen;
+diese Aussage beschreibt ausschließlich den Touch-Adapter.

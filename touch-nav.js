@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: MIT OR Apache-2.0
+// Modified for solidcraft-ipad: version metadata and opt-in diagnostics; see FORK-NOTICE.md.
 /*
- * SolidCraft iPad-Bedienung nach dem Vorbild von Shapr3D
+ * SolidCraft iPad-Bedienung (inoffizielle, eigenständige Erweiterung)
  * ------------------------------------------------------
  * Ergänzung zur offiziellen Web-Version von SolidCraft; die App selbst bleibt unverändert.
  *
@@ -36,7 +38,7 @@
   const UI_ID = "sc-ipad-ui";
 
   const debug = { log: [] };
-  const VERSION = "3.6";
+  const VERSION = window.SOLIDCRAFT_IPAD_RELEASE.version;
   const t0 = performance.now();
   const note = (s) => {
     const line = ((performance.now() - t0) / 1000).toFixed(1) + " " + s;
@@ -57,7 +59,7 @@
   const req = (m, p) => api().request(m, p || {});
   const exec = (c, p) => api().execute(c, p || {});
   const isStylus = (t) => t.touchType === "stylus";
-  const inOverlay = (e) => !!(e.target && e.target.closest && e.target.closest("#" + UI_ID));
+  const inOverlay = (e) => !!(e.target && e.target.closest && e.target.closest("#" + UI_ID + ", #fork-info"));
   const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -1259,7 +1261,7 @@
       if (r.status === 404 || r.status === 405 || r.status === 501) shipOff = true;
     } catch (_) { shipOff = true; }
   }
-  if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|\.local$/.test(location.hostname)) {
+  if (query.get("senddiagnostics") === "1" && /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|\.local$/.test(location.hostname)) {
     setInterval(ship, 1500);
     setTimeout(() => { note("start " + JSON.stringify(snapshot())); }, 3000);
   } else {

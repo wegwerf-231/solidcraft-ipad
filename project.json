@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "name": "SolidCraft iPad (inoffiziell)",
+  "repository": "https://github.com/wegwerf-231/solidcraft-ipad",
+  "version": "0.1.0",
+  "upstream": {
+    "repository": "https://github.com/tangency-labs/solidcraft",
+    "version": "0.29.0",
+    "tag": "v0.29.0",
+    "commit": "3a5195b0a0aa359f6ebf10d890c1f887c70144b1",
+    "source": "https://github.com/tangency-labs/solidcraft/tree/3a5195b0a0aa359f6ebf10d890c1f887c70144b1",
+    "archive_url": "https://github.com/tangency-labs/solidcraft/releases/download/v0.29.0/solidcraft-web-0.29.0.zip",
+    "archive_sha256": "f7149be2e364505d3a3123db3dd5dff1b37faefd4d9cffd2651f21b1ee3e0cbf",
+    "wasm_sha256": "2d7992a1a7f9e4513a66da8b9da5b9bd7d6abd413a9b09bcd3ec0b7ceb166f67",
+    "wasm_bytes": 99739213
+  }
+}
