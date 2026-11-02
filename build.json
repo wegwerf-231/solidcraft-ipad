@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0+0dd8ce53481ad130",
+  "version": "0.6.0+bc652c63b2affe0e",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "43cbef7c0b24dc587e5ee76e2d30e79254ca70929d8279044ef84a6cd4b0bee9"
+      "sha256": "4ae6f021dc13defcdd74cb20f6af184aea4e6dffcc37006e7422a679f479b2d4"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -68,7 +68,7 @@
     },
     {
       "file": "docs/TOUCH-SHELL.md",
-      "sha256": "e29fc9671196cd588769bf4303f1c342e23a44c65b04ab24cf0b9946deefc74f"
+      "sha256": "577c39436544e163d5ac4b57a831d8c821ea96c12cecbb164f1b2bb6cab8f7af"
     },
     {
       "file": "docs/screenshots/ap2-error.png",
@@ -220,7 +220,7 @@
     },
     {
       "file": "touch-shell.js",
-      "sha256": "29c807e70ced4c394eaaffc1b465a4405ce5c830c932e422aff36f2e23e1c57a"
+      "sha256": "4e456ea22252960defc9d7e11e7b6bb271bf954d6c520d9e2f07a02df41664c5"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",

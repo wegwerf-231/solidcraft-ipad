@@ -23,6 +23,8 @@ Rückmeldung aus dem Gerätetest von 0.5.0 („die Schaltfläche ist immer noch 
   größeren Symbole erscheinen nur noch an der Auswahl.
 - Ziffernfeld kleiner und rechts über der Bedingungen-Leiste statt mitten über der Zeichnung.
 - Die halb verdeckte Zustandszeile („… degrees of freedom“) wird in der iPad-Ansicht ausgeblendet.
+- Neuer Knopf „Extrudieren“ direkt unter „Skizze beenden“: Profil mit dem Pencil antippen,
+  „Extrudieren“, Wert im Ziffernfeld eingeben, ✓. SolidCraft beendet die Skizze dabei selbst.
 
 ## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
 

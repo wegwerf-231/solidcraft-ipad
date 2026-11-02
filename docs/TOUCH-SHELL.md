@@ -11,6 +11,9 @@ Werkzeugfamilie einmal: Linie, Bogen, Rechteck, Kreis, Ellipse, Polygon, Langloc
 Spline, Hilfslinie, Beschneiden und Versatz. Rechts bleiben Maße und Bedingungen.
 Mit dem Pencil lässt sich weiterhin ohne Werkzeugwahl automatisch zeichnen.
 
+Unter „Skizze beenden“ steht „Extrudieren“. Ist ein Profil gewählt, wird es übernommen;
+sonst wird es danach angetippt. Die Skizze wird dabei automatisch beendet.
+
 Ein linker Werkzeugknopf startet die zuletzt gewählte Variante dieser Familie und klappt bei
 Werkzeugen mit Varianten (kleines Dreieck) die Variantenwahl direkt daneben auf.
 Die blaue Pille oben zeigt das aktive Werkzeug mit Variante. Antippen öffnet die

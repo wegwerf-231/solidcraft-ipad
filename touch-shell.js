@@ -80,6 +80,9 @@
         await this.refresh();if(!this.touch)throw Error('Zuerst eine Skizze im iPad-Modus öffnen.');
         if(action==='cancel')await this.bridge.request('ui.key',{key:'Escape'});
         else if(action==='finish')await this.bridge.execute('sketch.finish');
+        // Extrudieren direkt aus der Skizze: SolidCraft beendet die Skizze selbst und übernimmt ein
+        // gewähltes Profil; ohne Auswahl wird das Profil anschließend mit dem Pencil angetippt.
+        else if(action==='extrude')await this.bridge.request('ui.start',{command:'solid.extrude'});
         else if(action==='undo')await this.bridge.execute('edit.undo');
         else if(action==='redo')await this.bridge.execute('edit.redo');
         else if(action==='delete'){
@@ -169,6 +172,7 @@
           deck.append(row,hint);
           if(control.error){const err=document.createElement('p');err.className='ts-error';err.setAttribute('role','alert');err.textContent=control.error;deck.append(err);}
           const finish=button('✓','finish','Skizze beenden');const finishLabel=document.createElement('span');finishLabel.className='ts-label';finishLabel.textContent='Skizze beenden';finish.append(finishLabel);finish.disabled=locked;rail.append(finish);
+          const extrude=button('⇧','extrude','Extrudieren');const extrudeLabel=document.createElement('span');extrudeLabel.className='ts-label';extrudeLabel.textContent='Extrudieren';extrude.append(extrudeLabel);extrude.disabled=locked;rail.append(extrude);
           for(const group of TOOLS){
             const b=button('','tool:'+control.state.variants[group.id],group.label);b.disabled=locked;b.setAttribute('aria-pressed',String(active===group));b.dataset.group=group.id;if(group.variants.length>1)b.dataset.variants='1';
             const image=document.createElement('span');image.innerHTML=options.icon(group.id);const label=document.createElement('span');label.className='ts-label';label.textContent=group.label;b.append(image,label);rail.append(b);
