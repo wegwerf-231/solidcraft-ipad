@@ -7,8 +7,10 @@
     constructor(start,time=0){this.points=[{...start,t:time}];this.controls=[start];this.recent=[];this.lastToggle=-Infinity;this.forced=null;this.armed=true;this.dwell={at:start,t:time};this.pressureSeen=false;}
     move(p,time){
       if(!Number.isFinite(p.x)||!Number.isFinite(p.y))return null;
-      if(this.points.length>=4096)throw Error('Strich zu lang. Bitte absetzen.');
-      const last=this.points.at(-1);if(dist(last,p)>=1)this.points.push({...p,t:time});
+      const last=this.points.at(-1);if(dist(last,p)>=1){
+        if(this.points.length>=4096)throw Error('Strich zu lang. Bitte absetzen.');
+        this.points.push({...p,t:time});
+      }
       if(Number.isFinite(p.pressure)&&p.pressure>0){
         this.pressureSeen=true;
         if(p.pressure<.35)this.armed=true;

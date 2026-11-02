@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0+392cf046073938e5",
+  "version": "0.4.0+f0e237b62d0d4fce",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -152,11 +152,11 @@
     },
     {
       "file": "pencil-gestures.js",
-      "sha256": "41990a0d831525fc79fe917e05bc0d75e69c8f66019dea25836ada2bf4a00e5e"
+      "sha256": "49f2a62833faa7cb57f2d0c7387dd5d81b959cef31f0e62d31b7a60b1754a607"
     },
     {
       "file": "pencil-sketch.js",
-      "sha256": "ee5e383d7fd499b6058b4e7397de4dd2c7c1cd859a50a39a3867de641970274d"
+      "sha256": "9f8404e246b81ffa46fdf7bdbf60f6c9665d28ba8b5a3d46c6bddf79b4c0220e"
     },
     {
       "file": "project-version.js",
@@ -172,11 +172,11 @@
     },
     {
       "file": "sketch-tools-view.js",
-      "sha256": "3b476dbcb86d1fc82f02cc6d9836f2611c9af62513d71b1bb1bc3a15fbcc5508"
+      "sha256": "a39a424d779134a145571a66c9259fdb28e860a408af1e83407c9faa49572cb4"
     },
     {
       "file": "sketch-tools.js",
-      "sha256": "2b2dbb23a93dc574920b4fdbcb76b2e8d495117a74ea982db16133b1c24827d2"
+      "sha256": "f960b41636f12e45f17fc616cec6b68ef893c5bb60bbc32d41de5015317666ac"
     },
     {
       "file": "solidcraft-web-4b1d77a936edaef2.js",
@@ -191,20 +191,36 @@
       "sha256": "b0f6169b9eba2a44f839617b18f31c4c428f7108eb0cac1fc50b69defeefbe86"
     },
     {
+      "file": "tests/pencil-ink.test.cjs",
+      "sha256": "2b435810bbc84bd5573bebc0147b87bc368e28bef478a79169ddc521ada01966"
+    },
+    {
       "file": "tests/pencil-integration.test.cjs",
       "sha256": "3df7ed355e1bc1b91511ecaebb04698deeada2790d2e450ad114665637ce3e4f"
     },
     {
       "file": "tests/sketch-browser.html",
-      "sha256": "bbb675dac9879d31d5cd99f5e3fa52ff9b8cd885675e31d8c37c1437ff0de7c9"
+      "sha256": "6cee6380498d1dcfafb0bf4112fb7898d0a08c429cf627c9e9c0aa2900ea45ce"
+    },
+    {
+      "file": "tests/sketch-refresh.test.cjs",
+      "sha256": "43bdcf74d426ada935808d6709fd2a31ad324fc652121589136d451347a5aa6d"
     },
     {
       "file": "tests/sketch-tools.test.cjs",
       "sha256": "32104aefe50404a2b494fadeab2215abdb7d122d00ef0479ed6d987fd00b3c71"
     },
     {
+      "file": "tests/sketch-view.test.cjs",
+      "sha256": "9f3fca1fe717c1e34cecbf2f201929d55f8a9eb68ee31cb693143dc660807a86"
+    },
+    {
       "file": "tests/test_release.py",
       "sha256": "12e5779ada482a3f28be5fa29e36d90b227574547bba148c222d4039e9fa1ad5"
+    },
+    {
+      "file": "tests/touch-refresh.test.cjs",
+      "sha256": "483ac8236b1a685226b7b6183f65e6673246e63825e78b82bfb496dc77bfa858"
     },
     {
       "file": "tests/touch-shell.test.cjs",
@@ -212,7 +228,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "0d6c58472b8e308218817132519acf0061da506d2b04fdfa2eaff2963d7edcb3"
+      "sha256": "fb3c09c82a3d2cbd37c6507f11b72cfdd0676072e509b2fd3f13ad76a838a1dc"
     },
     {
       "file": "touch-shell.js",
