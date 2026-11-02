@@ -2,7 +2,7 @@
   "schema_version": 1,
   "name": "SolidCraft iPad (inoffiziell)",
   "repository": "https://github.com/wegwerf-231/solidcraft-ipad",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "upstream": {
     "repository": "https://github.com/tangency-labs/solidcraft",
     "version": "0.30.0",

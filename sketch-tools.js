@@ -157,6 +157,7 @@
     }
     async refreshOnce(info, selection) {
       try {
+        const passedInfo = !!info;
         info = info || await this.bridge.request("ui.inspect");
         if (info.home || !info.ui || info.ui.tab !== "SKETCH") {
           this.snapshot = null; this.model = null; this.previous = null; this.lastAdded = []; this.cancel();
@@ -177,6 +178,12 @@
           this.changed(); return;
         }
         this.model = null;
+        // Eine mitgegebene Momentaufnahme kann veraltet sein (z. B. hat „Extrudieren“ die Skizze gerade
+        // beendet). SolidCraft 0.30 meldet dann „no sketch is being edited“ als sichtbaren Fehler.
+        if (passedInfo) {
+          const fresh = await this.bridge.request("ui.inspect");
+          if (fresh.home || !fresh.ui || fresh.ui.tab !== "SKETCH" || fresh.dialog) { this.snapshot = null; this.changed(); return; }
+        }
         selection = selection || await this.bridge.request("ui.selection");
         const before = await this.bridge.execute("document.revision");
         const [sketch, options] = await Promise.all([this.bridge.execute("sketch.inspect"), this.bridge.execute("sketch.options")]);

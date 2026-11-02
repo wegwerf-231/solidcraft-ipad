@@ -4,6 +4,12 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.7.1] - vorbereitet, Geräteabnahme ausstehend
+
+- Behoben: Nach „Extrudieren“ aus der Skizze meldete SolidCraft 0.30.0 sichtbar
+  „Sketch Palette Options: no sketch is being edited“. Die Skizzenansicht liest Skizze und
+  Optionen jetzt nur, wenn laut aktuellem Zustand wirklich eine Skizze bearbeitet wird.
+
 ## [0.7.0] - 2026-11-02
 
 Neue Basis: SolidCraft 0.30.0 (Commit `afd81380ab06b0e77e03fdf68185d4b484d0e84e`).
