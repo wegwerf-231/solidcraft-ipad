@@ -26,6 +26,9 @@ jobs:
           node --check touch-nav.js
           node --check project-version.js
           node --check sw.js
+          node --check sketch-tools.js
+          node --check sketch-tools-view.js
+          node --test tests/*.test.cjs
           python3 -m unittest discover -s tests -v
       - name: Verify the pinned official upstream archive
         run: |

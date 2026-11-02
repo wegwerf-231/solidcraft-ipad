@@ -4,6 +4,16 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.3.0] - vorbereitet, Geräteabnahme ausstehend
+
+- AP 3: direkte Maßetiketten mit frei/fest, Längen-/Durchmessermaß und Abstand-/Winkel-Auswahl für zwei Linien.
+- Werte bleiben bis zur Bestätigung ein Entwurf; Fehler bleiben sichtbar, außerhalb tippen verwirft ohne CAD-Änderung.
+- Bestehende Maßparameter bearbeiten und Maßbindung gezielt lösen; Sichtbarkeit aller Maße umschalten.
+- AP 4: rechte, einklappbare Bedingungen-Leiste mit deutschen Knöpfen, passender Auswahl und vergrößerten Symbolen.
+- Bedingungen auswählen/löschen, Zusammenfallend-Verbindung trennen, Elemente sperren/lösen und in Konstruktion umwandeln.
+- Additive Pencil-Linienauswahl; Finger bleiben von der Geometrieauswahl getrennt.
+- Node-Regressionstests, isolierte Browser-Testentwürfe und dokumentierte Geräteabnahme.
+
 ## [0.1.0] - vorbereitet, noch nicht veröffentlicht
 
 - Bestehende Finger-/Pencil-Steuerung, Kontextleiste und Ziffernfeld als erste eigene Ausgabe erfasst.

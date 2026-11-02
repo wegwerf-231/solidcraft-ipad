@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0+a20d44f89be68c6b",
+  "version": "0.3.0+6871cf2471cf1d26",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "998a063f1de3ef05fb7048a08d98a868c5b483738e14721f6ab88317c11e78ed"
+      "sha256": "0521f8eb6844b4006bca155560025e5236b0a1927420dd045efe6262c0883287"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "6b22d1dd403deba8e43a402438f69441db2e5a89917139cb7d2205c23429ac7b"
+      "sha256": "e46d3db346ef188c240c7ca9a456e0de14c5a8e8f3690b2aa98378f1697f3bdf"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "3dbb5db9bb1bbc83e35ae423c867a2074b5ba917b506c89b7176a322e7ec2e0c"
+      "sha256": "275ab7630ec078c463614844b04c1c20196525784181e85e0ec8cb2e51315c7f"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -53,6 +53,10 @@
     {
       "file": "docs/RELEASING.md",
       "sha256": "c40a54882eaa396277f31ce32e1e996baea12b7f06c96665f7056cfaf08b1705"
+    },
+    {
+      "file": "docs/SKETCH-IPAD.md",
+      "sha256": "eba5959b127a676c9132daa64605ddf94a09efe099099b938d99e076b3de2f32"
     },
     {
       "file": "fonts/BIZUDPGothic-Regular.ttf",
@@ -92,7 +96,7 @@
     },
     {
       "file": "index.html",
-      "sha256": "56b237b4cb175507860194795816e0814922c49f03a7f221822d66299ec5e21e"
+      "sha256": "1382072dbe9bd39fc0bfda830f4c0f9d045cc0bd0cf8cb8f6c0189487eed9762"
     },
     {
       "file": "legal/upstream-files.json",
@@ -120,19 +124,35 @@
     },
     {
       "file": "project-version.js",
-      "sha256": "7dfdcb03e08ee5398db5bd3827921257df645095b3651986a1ccbecb3a626d1f"
+      "sha256": "affe059ec435c65d5bd8c7dcc905aab90fbc643136a05f856b38947bf87f24fb"
     },
     {
       "file": "project.json",
-      "sha256": "4b8d7735a11c65e291327a3282e10b7bd7801e899b718d1e8876654db168da6c"
+      "sha256": "e5a950b2e5291c8ef742b92d5d59ed1b6d93cbea6f468ff9ab40b55ddf8c8a9b"
     },
     {
       "file": "scripts/release.py",
-      "sha256": "8cbbfe54345e2f226c1b865303e399d8451f07728a8389a7922c0539e4527b6a"
+      "sha256": "0324ce985f8da061ae95ca1d419b36e5e71a99e1db617bb3be5e3660526d11ad"
+    },
+    {
+      "file": "sketch-tools-view.js",
+      "sha256": "d3938bb0aa4057e9efa504cb86436791f70747eb60bd39a20414c5354c7baa65"
+    },
+    {
+      "file": "sketch-tools.js",
+      "sha256": "7726663a6e6d3dc52f07adddf8c988899637377c299bb3491fb724942ae8546d"
     },
     {
       "file": "solidcraft-web-4b1d77a936edaef2.js",
       "sha256": "a1766999f27bac22c11e93e18da9bdba4f4a3e01a412803fe179c9559bee858d"
+    },
+    {
+      "file": "tests/sketch-browser.html",
+      "sha256": "73af25fff363a278e71e00acb4417426d08a0846132a4eea5b4b0305124af130"
+    },
+    {
+      "file": "tests/sketch-tools.test.cjs",
+      "sha256": "32104aefe50404a2b494fadeab2215abdb7d122d00ef0479ed6d987fd00b3c71"
     },
     {
       "file": "tests/test_release.py",
@@ -140,7 +160,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "5b892f715a93648f59c019feeac0aadaafe51f333ea58a78c80efc216aa3f48f"
+      "sha256": "1eff7872a35f9ec1093cc45637db9f8dfdc0055fb962f0dbd27715fb489c4fc0"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",
