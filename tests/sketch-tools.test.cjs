@@ -200,3 +200,9 @@ test('temporary API failure retains an uncommitted expression and remains write-
   assert.deepEqual(state.writes,[]);
   bridge.request=request; await control.refresh(); assert.equal(control.editor.value,'width + 2 mm');
 });
+test('an over-constraint conflict resolves to the one driving dimension of the same kind',()=>{
+ const sketch={constraints:[{id:'k3',type:'parallel'},{id:'k4',type:'horizontal'},{id:'k6',type:'length',param:'d1',value:32}]};
+ assert.equal(M.drivingDimension(sketch,'that would over-constrain the sketch (conflicts with k3, k4, k6)','length').id,'k6');
+ assert.equal(M.drivingDimension(sketch,'that would over-constrain the sketch (conflicts with k3, k4, k6)','angle'),null);
+ assert.equal(M.drivingDimension(sketch,'some other error','length'),null);
+});

@@ -9,18 +9,21 @@
     const style = document.createElement("style");
     style.textContent = `
 #sc-ipad-ui [hidden]{display:none!important}
-#sc-ipad-ui .sk-panel{position:fixed;right:10px;top:172px;bottom:70px;width:216px;max-width:calc(100vw - 20px);overflow:auto;pointer-events:auto;background:#242830;color:#e8ebf0;border:1px solid #ffffff30;border-radius:14px;padding:8px;box-sizing:border-box;overscroll-behavior:contain;touch-action:pan-y}
-#sc-ipad-ui .sk-panel.closed{width:auto;bottom:auto;padding:4px}
-#sc-ipad-ui .sk-panel button{min-height:44px;height:auto;padding:8px 10px;width:100%;box-sizing:border-box;text-align:left;font:500 15px/1.25 system-ui,sans-serif;margin:2px 0}
+#sc-ipad-ui .sk-panel{position:fixed;right:6px;top:172px;bottom:20px;width:248px;display:grid;grid-template-columns:1fr 1fr;align-content:start;column-gap:3px;max-width:calc(100vw - 20px);overflow:auto;pointer-events:auto;background:#1f242df2;color:#e8ebf0;border:1px solid #333c4a;border-radius:12px;padding:4px;box-sizing:border-box;overscroll-behavior:contain;touch-action:pan-y;z-index:2;scrollbar-width:none}
+#sc-ipad-ui .sk-panel.closed{width:auto;bottom:auto;padding:3px;display:block}
+#sc-ipad-ui .sk-panel>h2,#sc-ipad-ui .sk-panel>.sk-status,#sc-ipad-ui .sk-panel>button[data-sketch-action=toggle-panel],#sc-ipad-ui .sk-panel>button[data-sketch-action^=option]{grid-column:1/-1}
+#sc-ipad-ui .sk-panel button{min-height:30px;height:auto;padding:5px 8px;width:100%;box-sizing:border-box;text-align:left;display:flex;align-items:center;justify-content:flex-start;font:500 13px/1.2 system-ui,sans-serif;margin:1px 0;background:transparent;border:1px solid transparent;border-radius:7px;color:#e8ebf0}
+#sc-ipad-ui .sk-panel button:not(:disabled):active{background:#2a313c}
 #sc-ipad-ui .sk-panel button:disabled{opacity:.42;cursor:default}
-#sc-ipad-ui .sk-panel button[aria-pressed=true]{background:#2465b5}
-#sc-ipad-ui .sk-panel h2{font:600 15px system-ui;margin:10px 4px 5px;color:#c5d4e7}
-#sc-ipad-ui .sk-status{font:14px/1.3 system-ui;color:#ffb7aa;white-space:pre-wrap;margin:6px 3px;overflow-wrap:anywhere}
+#sc-ipad-ui .sk-panel button[aria-pressed=true]{background:#1d3f66;border-color:#3d6ea6}
+#sc-ipad-ui .sk-panel h2{font:600 11px system-ui;margin:8px 6px 3px;color:#8e9db0;text-transform:uppercase;letter-spacing:.04em}
+#sc-ipad-ui .sk-status{font:12px/1.3 system-ui;color:#ffb7aa;white-space:pre-wrap;margin:6px 3px;overflow-wrap:anywhere}
 #sc-ipad-ui .sk-labels{position:fixed;inset:0;pointer-events:none;color:#e8ebf0}
-#sc-ipad-ui .sk-labels button{position:absolute;pointer-events:auto;min-height:44px;height:44px;min-width:44px;max-width:220px;padding:5px 8px;background:#252d39f5;border:1px solid #8094af;border-radius:9px;font:500 14px/1.15 system-ui;box-sizing:border-box;white-space:nowrap;box-shadow:0 2px 8px #0008}
-#sc-ipad-ui .sk-labels .sk-glyph{width:44px;font-size:18px;font-weight:700;border-color:#8094af}
+#sc-ipad-ui .sk-labels button{position:absolute;pointer-events:auto;min-height:24px;height:24px;min-width:24px;max-width:180px;padding:2px 7px;background:#252d39f0;border:1px solid #6d819c;border-radius:6px;font:500 12px/1.1 system-ui;color:#e8ebf0;box-sizing:border-box;white-space:nowrap;box-shadow:0 1px 4px #0007}
+#sc-ipad-ui .sk-labels .sk-glyph{width:22px;min-width:22px;height:22px;min-height:22px;padding:0;font-size:11px;font-weight:700;border-color:#6d819c;justify-content:center;text-align:center;border-radius:5px}
+#sc-ipad-ui .sk-labels .sk-pair{background:#1d3f66;border-color:#5e9be0}
 #sc-ipad-ui .sk-labels button[aria-pressed=true]{background:#2465b5;border:2px solid #a9d4ff}
-#sc-ipad-ui .sk-labels small{font:11px system-ui;color:#afc4dd;margin-left:6px}
+#sc-ipad-ui .sk-labels small{font:10px system-ui;color:#afc4dd;margin-left:6px}
 #sc-ipad-ui .sk-labels svg{position:absolute;inset:0;overflow:visible;width:100%;height:100%;pointer-events:none}
 #sc-ipad-ui .sk-direct{grid-column:1/-1;display:none;max-width:100%;font:15px system-ui;color:#e8ebf0}
 #sc-ipad-ui .sk-direct.on{display:block}
@@ -60,16 +63,17 @@
       if (!M.point(position) || position[0] < 0 || position[1] < 150 || position[0] > innerWidth || position[1] > innerHeight - 50) return null;
       const b = button(record.text, record.action); b.dataset.scene = "1";
       if (record.kind === "glyph") b.className = "sk-glyph";
+      if (record.kind === "pair") { b.className = "sk-pair"; delete b.dataset.scene; } // Bedienknopf, auch per Finger
       b.title = record.title; b.setAttribute("aria-label", record.title); b.setAttribute("aria-pressed", String(!!record.selected));
       b.dataset.record = String(buttons.size); buttons.set(b.dataset.record, record);
-      return { b, position };
+      return { b, position, height: record.kind === "glyph" ? 22 : 24 };
     }
     function placement(item, occupied, maxX) {
-      const { position, width } = item, height = 44;
+      const { position, width, height } = item;
       let x = Math.max(6, Math.min(maxX - width, position[0] - width / 2));
-      let y = Math.max(160, Math.min(innerHeight - 105, position[1] - 22));
-      for (let tries = 0; tries < 8 && occupied.some((r) => x < r.x + r.w + 3 && x + width + 3 > r.x && y < r.y + r.h + 3 && y + height + 3 > r.y); tries++) y -= 48;
-      if (y < 155 || options.isUI(x + width / 2, y + 22)) return null;
+      let y = Math.max(160, Math.min(innerHeight - 105, position[1] - height / 2));
+      for (let tries = 0; tries < 8 && occupied.some((r) => x < r.x + r.w + 3 && x + width + 3 > r.x && y < r.y + r.h + 3 && y + height + 3 > r.y); tries++) y -= height + 4;
+      if (y < 155 || options.isUI(x + width / 2, y + height / 2)) return null;
       occupied.push({ x, y, w: width, h: height });
       return { x, y };
     }
@@ -114,7 +118,8 @@
         }
       }
       const ribbon = (options.handles() || []).filter((h) => /^(tab|toolbar|button|panel|ribbon):/.test(h.name));
-      panel.style.top = Math.max(160, ...ribbon.map((h) => h.y + 28)) + "px";
+      const deckTop = ribbon.length ? Math.max(32, Math.min(...ribbon.map((h) => h.y)) - 24) : 38;
+      panel.style.top = (host.dataset.shellMode === "touch" ? deckTop + 6 : Math.max(160, ...ribbon.map((h) => h.y + 28))) + "px";
       // Symbols and free measurements are projected by SolidCraft, never by a second camera implementation.
       project(s);
     }
@@ -144,6 +149,27 @@
         const determined = !!c.fully_constrained || !!c.fixed;
         records.push({ kind: "free", action: "free", choice: d, at, ends: c.type === "line" ? [M.point(c.start_at), M.point(c.end_at)] : c.center_at ? [[M.point(c.center_at)[0]-c.radius,M.point(c.center_at)[1]], [M.point(c.center_at)[0]+c.radius,M.point(c.center_at)[1]]] : null, text: `${d.key === "diameter" ? "Ø " : "↔ "}${M.formatted(M.measureChoice(s.sketch, d), false, control.units)} · ${determined ? "bestimmt" : "frei"}`, title: determined ? "Bereits bestimmte Geometrie" : d.label + " festlegen", determined });
       }
+
+        // Zwei Linien gewählt: Winkel- bzw. Abstandsmaß direkt an der Geometrie anbieten (wie in Shapr3D).
+        const pairChoices = M.dimensionChoices(s.sketch, chosen).filter((d) => d.entities.length === 2 && d.enabled);
+        for (const d of pairChoices) {
+          const [a, b] = d.entities.map((id) => s.sketch.curves.find((c) => c.id === id));
+          const pa = M.point(a.start_at), pb = M.point(a.end_at), qa = M.point(b.start_at), qb = M.point(b.end_at);
+          let at = null;
+          if (d.key === "angle") {
+            const r = [pb[0] - pa[0], pb[1] - pa[1]], q = [qb[0] - qa[0], qb[1] - qa[1]], den = r[0] * q[1] - r[1] * q[0];
+            if (Math.abs(den) > 1e-9) {
+              const t = ((qa[0] - pa[0]) * q[1] - (qa[1] - pa[1]) * q[0]) / den;
+              const x = [pa[0] + t * r[0], pa[1] + t * r[1]];
+              const ma = M.curvePoint(a), mb = M.curvePoint(b);
+              // Etikett zwischen Schnittpunkt und den Linienmitten, damit es nicht auf dem Schnittpunkt klebt
+              at = [(2 * x[0] + ma[0] + mb[0]) / 4, (2 * x[1] + ma[1] + mb[1]) / 4];
+            }
+          }
+          if (!at) { const ma = M.curvePoint(a), mb = M.curvePoint(b); at = [(ma[0] + mb[0]) / 2, (ma[1] + mb[1]) / 2]; }
+          const value = M.measureChoice(s.sketch, d);
+          records.unshift({ kind: "pair", action: "dimension:" + d.key, at, text: (d.key === "angle" ? "∠ " : "↔ ") + M.formatted(value, d.key === "angle", control.units) + " festlegen", title: d.label + " zwischen den zwei Linien festlegen" });
+        }
       return records;
     }
 
@@ -190,13 +216,13 @@
           const pos = record.screen || points[i];
           if (!M.point(pos)) return;
           const dim = record.ends && dimensionLine(points[record.endIndex], points[record.endIndex+1]);
-          const shifted = dim || (record.screen ? pos : [pos[0], pos[1] - (record.kind === "glyph" ? 22 : 42)]);
+          const shifted = dim || (record.screen ? pos : [pos[0], pos[1] - (record.kind === "glyph" ? 14 : 22)]);
           const item = labelButton(record, shifted); if (item) candidates.push(item);
         });
         // Insert together, measure together, then place together. Interleaving an
         // append/style write and offsetWidth for each label forced repeated layout.
         labels.replaceChildren(svg, ...candidates.map(({ b }) => b));
-        for (const item of candidates) item.width = Math.max(44, item.b.offsetWidth || 100);
+        for (const item of candidates) item.width = Math.max(item.height, item.b.offsetWidth || 80);
         const occupied = [];
         const placements = candidates.map((item) => placement(item, occupied, maxX));
         candidates.forEach(({ b }, i) => {
@@ -262,7 +288,7 @@
         };
         const r=b.getBoundingClientRect();if(options.anchor)options.anchor({x:r.left+r.width/2,y:r.top+r.height/2});
         if (action === "select-constraint") await run(async () => { await prepare(); await control.write("select.set", { items: [{ type: "sketch_constraint", id: record.id }] }); });
-        else if (action === "free") await run(async () => { if (record.determined) throw new Error("Die Geometrie ist bereits vollständig bestimmt."); await prepare(); control.begin(record.choice); });
+        else if (action === "free") await run(async () => { await prepare(); control.begin(record.choice); });
         else if (action === "edit") await run(async () => { await prepare(); control.edit(record.id); });
       }
     }
