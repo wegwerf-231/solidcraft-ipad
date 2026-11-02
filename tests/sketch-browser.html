@@ -2,7 +2,7 @@
 <html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AP 3 / AP 4 · isolierter Browsertest</title>
 <style>body{margin:0;background:#20252b;color:white;font:14px system-ui}header{padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}button{padding:8px;font:inherit}iframe{border:0;width:100%;height:calc(100vh - 100px)}#report{white-space:pre-wrap;margin:0;padding:4px 8px;background:#15191f;max-height:80px;overflow:auto}</style>
-<header><strong>Nur Testdaten im eingebetteten Entwurf</strong><button id="lines">Zwei Linien</button><button id="angle">Winkel</button><button id="single">Einzelne Linie</button><button id="pencil">Pencil-Auswahl simulieren</button><button id="report-button">Status prüfen</button><button id="empty">Testentwurf leeren</button></header>
+<header><strong>Nur Testdaten im eingebetteten Entwurf</strong><button id="lines">Zwei Linien</button><button id="angle">Winkel</button><button id="single">Einzelne Linie</button><button id="pencil">Pencil-Auswahl simulieren</button><button id="report-button">Status prüfen</button><button id="auto-line">Automatische Linie</button><button id="auto-arc">Automatischer Bogen</button><button id="finger">Finger-Auswahl testen</button><button id="empty">Testentwurf leeren</button></header>
 <pre id="report" role="status">Web-App lädt …</pre>
 <iframe id="app" title="CAD-Testinstanz" src="../index.html"></iframe>
 <script>
@@ -10,7 +10,7 @@ const frame = document.getElementById('app'), report = document.getElementById('
 const pause = ms => new Promise(r=>setTimeout(r,ms));
 let api, activeKind;
 const wait = setInterval(()=>{const w=frame.contentWindow;if(w.solidcraft && w.solidcraftTouchNav && w.solidcraftTouchNav.sketch){api=w.solidcraft;clearInterval(wait);report.textContent='Bereit. Testknopf erzeugt ausschließlich einen neuen Testentwurf in dieser Instanz.';}},200);
-async function state(){const sk=await api.execute('sketch.inspect');const sel=await api.request('ui.selection');report.textContent=JSON.stringify({Auswahl:sel.selection,Bedingungen:sk.constraints.map(c=>({id:c.id,type:c.type,value:c.value,param:c.param})),Fehler:frame.contentWindow.solidcraftTouchNav.debug.errors,Editor:!!frame.contentWindow.solidcraftTouchNav.sketch.editing});}
+async function state(){const sk=await api.execute('sketch.inspect');const sel=await api.request('ui.selection');report.textContent=JSON.stringify({Auswahl:sel.selection,Kurven:sk.curves.map(c=>({id:c.id,type:c.type})),Bedingungen:sk.constraints.map(c=>({id:c.id,type:c.type,value:c.value,param:c.param})),Fehler:frame.contentWindow.solidcraftTouchNav.debug.errors,Editor:!!frame.contentWindow.solidcraftTouchNav.sketch.editing});}
 async function fixture(kind){
  if(!api)return;report.textContent='Testentwurf wird vorbereitet …';
  for(let i=0;i<3;i++){const inf=await api.request('ui.inspect');if(!inf.tool)break;await api.request('ui.key',{key:'Escape'});}
@@ -24,14 +24,14 @@ async function fixture(kind){
  else await api.execute('select.set',{items:[{type:'sketch_curve',id:'l1'}]});
  await frame.contentWindow.solidcraftTouchNav.sketch.refresh();activeKind=kind;await pause(300);await state();
 }
-async function pencil(){
+async function pencil(finger=false){
  if(!api || !activeKind || activeKind==='single')return;
  await api.execute('select.clear');await frame.contentWindow.solidcraftTouchNav.sketch.refresh();await pause(300);
  const pts=await api.request('ui.sketchToScreen',{points:activeKind==='angle'?[[8,0],[7.2,10]]:[[8,.6],[8,21]]});
  const w=frame.contentWindow,canvas=w.document.getElementById('solidcraft_canvas');
  for(let i=0;i<pts.length;i++){
   const [x,y]=pts[i];const t=new w.Touch({identifier:i+1,target:canvas,clientX:x,clientY:y,pageX:x,pageY:y,screenX:x,screenY:y});
-  Object.defineProperty(t,'touchType',{value:'stylus'});
+  Object.defineProperty(t,'touchType',{value:finger?'direct':'stylus'});
   canvas.dispatchEvent(new w.TouchEvent('touchstart',{bubbles:true,cancelable:true,touches:[t],targetTouches:[t],changedTouches:[t]}));
   await pause(60);
   canvas.dispatchEvent(new w.TouchEvent('touchend',{bubbles:true,cancelable:true,touches:[],targetTouches:[],changedTouches:[t]}));
@@ -39,7 +39,22 @@ async function pencil(){
  }
  await state();
 }
+async function automatic(arc){
+ await api.execute('file.new',{name:'Automatischer Pencil-Test'});await api.request('ui.home',{open:false});
+ await api.request('ui.set',{showBrowser:false,showTimeline:false});await api.request('ui.view',{view:'top'});await pause(450);
+ const w=frame.contentWindow,canvas=w.document.getElementById('solidcraft_canvas');
+ const pts=arc?[[400,350],[430,320],[460,310],[490,320],[520,350]]:[[400,350],[430,350],[460,350],[490,350],[520,350]];
+ for(let i=0;i<pts.length;i++){
+  const [x,y]=pts[i],t=new w.Touch({identifier:33,target:canvas,clientX:x,clientY:y,pageX:x,pageY:y});Object.defineProperty(t,'touchType',{value:'stylus'});
+  canvas.dispatchEvent(new w.TouchEvent(i?'touchmove':'touchstart',{bubbles:true,cancelable:true,touches:[t],targetTouches:[t],changedTouches:[t]}));await pause(70);
+ }
+ const [x,y]=pts.at(-1),t=new w.Touch({identifier:33,target:canvas,clientX:x,clientY:y});Object.defineProperty(t,'touchType',{value:'stylus'});
+ canvas.dispatchEvent(new w.TouchEvent('touchend',{bubbles:true,cancelable:true,touches:[],targetTouches:[],changedTouches:[t]}));await pause(900);await state();
+}
+document.getElementById('auto-line').onclick=()=>automatic(false).catch(e=>report.textContent=e.stack);
+document.getElementById('auto-arc').onclick=()=>automatic(true).catch(e=>report.textContent=e.stack);
 for(const kind of ['lines','angle','single'])document.getElementById(kind).onclick=()=>fixture(kind).catch(e=>report.textContent=e.stack);
+document.getElementById('finger').onclick=()=>pencil(true).catch(e=>report.textContent=e.stack);
 document.getElementById('pencil').onclick=()=>pencil().catch(e=>report.textContent=e.stack);
 document.getElementById('empty').onclick=async()=>{await api.execute('file.new');report.textContent='Testentwurf geleert.';};
 document.getElementById('report-button').onclick=()=>state().catch(e=>report.textContent=e.stack);

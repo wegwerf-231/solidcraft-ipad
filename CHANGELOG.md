@@ -13,6 +13,31 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 - Bedingungen auswählen/löschen, Zusammenfallend-Verbindung trennen, Elemente sperren/lösen und in Konstruktion umwandeln.
 - Additive Pencil-Linienauswahl; Finger bleiben von der Geometrieauswahl getrennt.
 - Node-Regressionstests, isolierte Browser-Testentwürfe und dokumentierte Geräteabnahme.
+- Gemeinsame Prüfung der Beiträge: Pencil-Zugvorschau korrigiert; automatische Striche und Skizzenende gegen Dokumentwechsel abgesichert; Linienketten bei Dokumentwechsel zurückgesetzt.
+
+- Skizze automatisch (AP 5): Ein Pencil-Strich ohne aktives Werkzeug startet eine Skizze auf der
+  berührten ebenen Fläche, sonst auf der Grundebene. Ein Pencil-Tipp ins Leere beendet die Skizze,
+  wenn nichts ausgewählt ist.
+- Linie/Bogen automatisch (AP 6): Ein gerader Strich wird zur Linie, ein gebogener zum Bogen durch
+  drei Punkte. Endpunkte rasten an vorhandenen Punkten ein; fast waagrechte oder senkrechte Linien
+  werden ausgerichtet und bedingt; ein Bogen, der eine Linie fortsetzt, schließt tangential an.
+  Der Strich ist als Tinte sichtbar, bis er umgewandelt ist.
+- Ein Strich, der auf vorhandener Skizzengeometrie beginnt, zieht diese wie bisher.
+- Pencil gedrückt halten: danach ziehen ergibt eine Bereichsauswahl, ohne Ziehen abheben öffnet
+  das Kontextmenü (wie in Shapr3D).
+- Neue Datei `pencil-sketch.js`; `touch-nav.js` bietet dafür eine kleine Erweiterungsschnittstelle.
+
+## [0.2.0] - vorbereitet, noch nicht veröffentlicht
+
+- Zeichnen per Pencil-Zug wie in Shapr3D: Aufsetzen setzt den ersten Punkt, Abheben den zweiten
+  (Linie, Rechteck, Kreis, Bogen, Polygon, Langloch, Ellipse, Hilfslinie). Linien lassen sich
+  mit weiteren Zügen am Endpunkt als Kette fortsetzen. Tippen bleibt möglich.
+- Pencil-Hover: Ein über dem Display schwebender Stift bewegt den Zeiger, sodass Hervorhebung
+  und Fangpunkte schon vor dem Aufsetzen erscheinen.
+- Wertfelder beim Zeichnen (Länge, Winkel, Breite, Höhe, Durchmesser) öffnen das Ziffernfeld
+  statt der Bildschirmtastatur; das Ziffernfeld erscheint neben dem bearbeiteten Feld.
+- Ziffernfeld: neue Tasten ⇥ (nächstes Wertfeld) und m.
+- Arbeitspakete AP 1 und AP 2 aus der Anforderungsliste zur Shapr3D-Bedienung.
 
 ## [0.1.0] - vorbereitet, noch nicht veröffentlicht
 

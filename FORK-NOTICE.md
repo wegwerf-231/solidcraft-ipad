@@ -18,6 +18,9 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
 - `sketch-tools.js`, `sketch-tools-view.js`: eigene Maßetiketten, Eingabeentwürfe,
   Bedingungen-Leiste und vergrößerte Symbole über die öffentliche CAD-API.
   Keine übernommenen Shapr3D-Quelltexte, Grafiken oder Produkt-Screenshots.
+- `pencil-sketch.js`: Skizzieren mit dem Pencil ohne Werkzeugwahl (Skizze automatisch
+  starten und beenden, Strich als Linie oder Bogen); hängt sich an `touch-nav.js` an;
+  bei der Integration für 0.3.0 um Dokument-/Revisionsprüfungen und Commit-Sperre ergänzt.
 - `index.html`: Touch-Adapter und Projektmetadaten eingebunden; WASM-Teile zusammengefügt;
   Metadaten und sichtbare Projekt-/Lizenzinformation unterscheiden diese Ausgabe vom Original.
 - `manifest.webmanifest`: Name und Beschreibung der inoffiziellen iPad-Ausgabe.

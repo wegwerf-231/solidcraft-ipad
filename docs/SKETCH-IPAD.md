@@ -81,5 +81,12 @@ Auf echtem Gerät noch abzunehmen (Modell/iPadOS/Safari-Version dokumentieren):
 7. Hochformat und Split View: Leiste öffnen, mit Finger bis zum Löschen-Knopf scrollen;
    Ziffernfeld vollständig bedienen. Home-Bildschirm/offline nach vollständigem Update prüfen.
 
-Diese Geräteabnahme ist keine bereits bestandene Prüfung. AP 1, AP 2 und AP 5–8 werden
-mit dieser Änderung nicht als erledigt markiert.
+Diese Geräteabnahme ist keine bereits bestandene Prüfung. AP 1/2 stammen aus PR #2,
+AP 5/6 aus dem separaten PR #3 des zweiten Contributors. Dieser Branch baut auf dessen
+Commit 59ec705 auf; die gemeinsame Version 0.3.0 enthält beide Beiträge. AP 7/8 bleiben offen.
+Nach der Zusammenführung zusätzlich im echten WASM geprüft: automatische Skizze mit
+Linie, automatische Bogenkonvertierung, Finger-Tipps ohne Auswahl und additive Pencil-Auswahl.
+20 Node-Tests einschließlich Dokumentwechsel beim automatischen Zeichnen und 6 Python-Tests
+bestanden. Hochformat 768 × 1024 CSS-Pixel geprüft; neue Leistenknöpfe und Szenensymbole
+haben mindestens 44 CSS-Pixel Bedienhöhe. Das ersetzt keine vollständige Geräteabnahme
+von AP 1/2 oder AP 5/6.

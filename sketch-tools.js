@@ -201,6 +201,7 @@
     cancel() { if (this.editor) { this.editor = null; this.changed(); } }
     key(key) {
       const e = this.editor; if (!e || this.busy) return;
+      if (key === "tab") return;
       if (key === "ok") return this.commit();
       if (key === "esc") return this.cancel();
       if (key === "back") { e.value = e.first ? "" : Array.from(e.value).slice(0, -1).join(""); e.first = false; }

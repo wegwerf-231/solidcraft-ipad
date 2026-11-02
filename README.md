@@ -16,7 +16,8 @@ Die Versionsnummer im eingebetteten CAD-Programm bezeichnet weiterhin das Origin
 die iPad-Version steht im Seitentitel, auf der Infoseite und in den Release-Metadaten.
 
 Dieses Repository enthält die fertige Web-Ausgabe und den lesbaren Quellcode der
-Erweiterung in [touch-nav.js](touch-nav.js), [sketch-tools.js](sketch-tools.js) und [sketch-tools-view.js](sketch-tools-view.js), **keinen Rust-Quellbaum**.
+Erweiterung in [touch-nav.js](touch-nav.js), [pencil-sketch.js](pencil-sketch.js),
+[sketch-tools.js](sketch-tools.js) und [sketch-tools-view.js](sketch-tools-view.js), **keinen Rust-Quellbaum**.
 Der CAD-Kern und seine JavaScript-Bindings sind unverändert aus dem offiziellen
 Release übernommen; das WASM liegt für GitHub in fünf Teilen vor.
 Die ursprüngliche Touch-Kennung `3.6` war keine veröffentlichte Projektversion.
@@ -39,6 +40,7 @@ python3 scripts/release.py prepare
 python3 scripts/release.py check
 python3 -m unittest discover -s tests -v
 node --check touch-nav.js
+node --check pencil-sketch.js
 node --check project-version.js
 node --check sketch-tools.js
 node --check sketch-tools-view.js
