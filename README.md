@@ -10,13 +10,13 @@ Eine eigenständige Touch-/Pencil-Erweiterung der Web-Ausgabe von
 
 ## Versionen
 
-Die **iPad-Ausgabe 0.2.0** basiert auf **SolidCraft 0.29.0**.
+Die **iPad-Ausgabe 0.3.0** basiert auf **SolidCraft 0.29.0**.
 Die verbindlichen Angaben stehen in [project.json](project.json).
 Die Versionsnummer im eingebetteten CAD-Programm bezeichnet weiterhin das Original;
 die iPad-Version steht im Seitentitel, auf der Infoseite und in den Release-Metadaten.
 
 Dieses Repository enthält die fertige Web-Ausgabe und den lesbaren Quellcode der
-Erweiterung in [touch-nav.js](touch-nav.js), **keinen Rust-Quellbaum**.
+Erweiterung in [touch-nav.js](touch-nav.js) und [pencil-sketch.js](pencil-sketch.js), **keinen Rust-Quellbaum**.
 Der CAD-Kern und seine JavaScript-Bindings sind unverändert aus dem offiziellen
 Release übernommen; das WASM liegt für GitHub in fünf Teilen vor.
 Die ursprüngliche Touch-Kennung `3.6` war keine veröffentlichte Projektversion.
@@ -38,6 +38,7 @@ python3 scripts/release.py prepare
 python3 scripts/release.py check
 python3 -m unittest discover -s tests -v
 node --check touch-nav.js
+node --check pencil-sketch.js
 node --check project-version.js
 python3 -m http.server 8080 --bind 127.0.0.1
 ```

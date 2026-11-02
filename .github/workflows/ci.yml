@@ -15,6 +15,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check touch-nav.js
+          node --check pencil-sketch.js
           node --check project-version.js
           node --check sw.js
       - name: Verify offline inventory and release packaging regressions

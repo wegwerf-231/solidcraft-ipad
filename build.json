@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0+112f60612ebb34e8",
+  "version": "0.3.0+d5b687cc92b9e808",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "d9b4227a73e7e2da2ee88ffe911b0dbdf5dfb0fb3f340b1274f36e57a59caa7c"
+      "sha256": "d99055dce2d95ebb8d0a31ad0211871e74caf6b9e513af5c75f64342ce33aef3"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "6b22d1dd403deba8e43a402438f69441db2e5a89917139cb7d2205c23429ac7b"
+      "sha256": "67b4ba6956721ae02206fbf0dddf3c64b862b84e7c878b411e662ec8f4727a47"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "3ff1c1b5d5a233331edad38e5933aa8a212f1d496bc9e0824921a2bfb5305822"
+      "sha256": "8f88b4c4ddb4721e93e1b19c48d52b9218247fc283959ba021b2a46965f28ded"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -92,7 +92,7 @@
     },
     {
       "file": "index.html",
-      "sha256": "56b237b4cb175507860194795816e0814922c49f03a7f221822d66299ec5e21e"
+      "sha256": "3ace1602971afb4687645f5e0eb345cb977954f78f41b457832f70b4242e495d"
     },
     {
       "file": "legal/upstream-files.json",
@@ -119,12 +119,16 @@
       "sha256": "417c55cbb57b892163d93ca29dba599c47b4d610513cce825b39c7fb7fcac4ba"
     },
     {
+      "file": "pencil-sketch.js",
+      "sha256": "68e191b6788de3a80479ba161fbc3e7d9bfeef862a62630e1d1d8c16db9723af"
+    },
+    {
       "file": "project-version.js",
-      "sha256": "d2dca6420484fb30b544a44f3679001fa285f534e6f37563a3e4145f8f44f666"
+      "sha256": "affe059ec435c65d5bd8c7dcc905aab90fbc643136a05f856b38947bf87f24fb"
     },
     {
       "file": "project.json",
-      "sha256": "3b1749b068ad0988be8a6aa681cf3cb9411f56e432d6b70d59dc1e5f065cc9be"
+      "sha256": "e5a950b2e5291c8ef742b92d5d59ed1b6d93cbea6f468ff9ab40b55ddf8c8a9b"
     },
     {
       "file": "scripts/release.py",
@@ -140,7 +144,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "296d3e17c30c1d100751c3d7fba6c0a3216cb3591767ca0edfa781b993c1afea"
+      "sha256": "caab2b623081b7927dadca9a59725adc167b71dde339351b15a46487dd764118"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",

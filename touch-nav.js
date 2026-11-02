@@ -552,22 +552,35 @@
     menuMaybeOpen = false;
     hideBar();
     hover(s.x, s.y);
+    const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+    if (extension && extension.prefetch) extension.prefetch(s);
+    // Gedrückt halten (wie in Shapr3D): danach ziehen = Bereichsauswahl, ohne Ziehen abheben = Kontextmenü.
     s.timer = setTimeout(() => {
       if (stylusStart !== s || s.moved || s.pressed) return;
-      s.menu = true;
-      clickAt(s.x, s.y, 2);
-      menuMaybeOpen = true;
-      hideBar();
-      note("pencil kontextmenü");
+      s.held = true;
+      ripple(s.x, s.y);
+      note("pencil gehalten");
     }, LONG_PRESS_MS);
   }
   function onStylusMove(t) {
     const s = stylusStart;
     if (!t || !s || s.menu) return;
+    if (s.ext) { s.ext.move(s, t); return; }
     if (!s.moved && Math.hypot(t.clientX - s.x, t.clientY - s.y) > MOVE_SLOP / 2) {
       s.moved = true;
       clearTimeout(s.timer);
-      if (isDrawTool()) {
+      const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+      if (s.held) {
+        // Bereichsauswahl: Rahmen von der Startstelle aus aufziehen
+        hover(s.x, s.y);
+        press(s.x, s.y, 0);
+        s.pressed = true;
+        note("bereichsauswahl");
+      } else if (extension && extension.claim(s)) {
+        s.ext = extension;
+        s.ext.move(s, t);
+        return;
+      } else if (isDrawTool()) {
         // Zeichnen: erster Punkt als Klick, danach nur Zeigerbewegung (Vorschau), Klick beim Abheben.
         s.draw = true;
         const continues = chainEnd && /^sketch\.line/.test(appState.tool) && Math.hypot(s.x - chainEnd.x, s.y - chainEnd.y) < 14;
@@ -589,6 +602,14 @@
     clearTimeout(s.timer);
     if (s.menu) return;
     const at = t ? { x: t.clientX, y: t.clientY } : s;
+    if (s.ext) { s.ext.end(s, at, cancelled); setTimeout(scheduleSelectionCheck, 120); return; }
+    if (s.held && !s.moved && !cancelled) {
+      clickAt(s.x, s.y, 2);
+      menuMaybeOpen = true;
+      hideBar();
+      note("pencil kontextmenü");
+      return;
+    }
     if (s.draw) {
       if (!cancelled) {
         hover(at.x, at.y);
@@ -601,6 +622,8 @@
     if (s.pressed) releaseAfterMoves(at.x, at.y);
     else if (!cancelled) {
       requestAnimationFrame(() => requestAnimationFrame(() => clickAt(s.x, s.y, 0)));
+      const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+      if (extension && extension.tap) setTimeout(() => extension.tap(s), 150);
       chainEnd = /^sketch\.line/.test(appState.tool || "") ? { x: s.x, y: s.y } : null;
     }
     setTimeout(pollState, 120);
@@ -1339,7 +1362,10 @@
   }
 
   window.solidcraftTouchNav = {
-    version: VERSION, debug, toggleHud, zones, refreshZones, zoneAt, fieldCheck,
+    version: VERSION, debug, toggleHud,
+    // Schnittstelle für Erweiterungen (pencil-sketch.js)
+    internal: { hover, press, move, releaseAfterMoves, clickAt, note, pickAt, zoneAt, appState, pollState },
+    extension: null, zones, refreshZones, zoneAt, fieldCheck,
     get padOn() { return !!(pad && pad.classList.contains("on")); },
     get state() { return state; },
   };

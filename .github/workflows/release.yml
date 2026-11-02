@@ -24,6 +24,7 @@ jobs:
       - name: Validate scripts and packaging
         run: |
           node --check touch-nav.js
+          node --check pencil-sketch.js
           node --check project-version.js
           node --check sw.js
           python3 -m unittest discover -s tests -v
