@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- Inoffizielle iPad-Anpassung von SolidCraft 0.29.0 (Tangency Labs, MIT/Apache-2.0); geändert: touch-nav.js eingebunden. Siehe IPAD-ANPASSUNG.md -->
+  <!-- Inoffizielle iPad-Anpassung von SolidCraft 0.30.0 (Tangency Labs, MIT/Apache-2.0); geändert: touch-nav.js eingebunden. Siehe IPAD-ANPASSUNG.md -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>SolidCraft iPad — inoffiziell</title>
@@ -20,9 +20,9 @@
   <script src="pencil-gestures.js"></script>
   <script src="pencil-sketch.js"></script>
 <script type="module">
-import init, * as bindings from './solidcraft-web-4b1d77a936edaef2.js';
+import init, * as bindings from './solidcraft-web-eddd050bdb20187.js';
 const wasm = await init({ module_or_path: await (async () => {
-  const parts = ["./wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin", "./wasm/solidcraft-web-4b1d77a936edaef2_bg.part1.bin", "./wasm/solidcraft-web-4b1d77a936edaef2_bg.part2.bin", "./wasm/solidcraft-web-4b1d77a936edaef2_bg.part3.bin", "./wasm/solidcraft-web-4b1d77a936edaef2_bg.part4.bin"];
+  const parts = ["./wasm/solidcraft-web-eddd050bdb20187_bg.part0.bin", "./wasm/solidcraft-web-eddd050bdb20187_bg.part1.bin", "./wasm/solidcraft-web-eddd050bdb20187_bg.part2.bin", "./wasm/solidcraft-web-eddd050bdb20187_bg.part3.bin", "./wasm/solidcraft-web-eddd050bdb20187_bg.part4.bin"];
   const blobs = await Promise.all(parts.map(async (u) => {
     const r = await fetch(u);
     if (!r.ok) throw new Error(u + ': HTTP ' + r.status);
@@ -59,7 +59,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
   
   
   
-<link rel="modulepreload" href="./solidcraft-web-4b1d77a936edaef2.js" crossorigin="anonymous" integrity="sha384-XsmCxPTJqCCOc8le9g0kKd6/CNJH377Gsy2R8eN1z+757movQMwaCPlxDWTFsfcl"></head>
+<link rel="modulepreload" href="./solidcraft-web-eddd050bdb20187.js" crossorigin="anonymous" integrity="sha384-aIZfJb+/ArMY5M2HxAqTKBYwHLpwAdJeJinp0vQg93z7DKqcxPN+6e/Hjr19crmL"></head>
 <body>
   <a href="about.html" target="_blank" rel="noopener" style="position:fixed;bottom:4px;right:6px;z-index:2147483001;padding:5px 8px;background:#20252b;color:white;border-radius:6px;font:12px system-ui,sans-serif;touch-action:manipulation" id="fork-info">iPad-Ausgabe · inoffiziell · Lizenzen</a>
   <canvas id="solidcraft_canvas"></canvas>

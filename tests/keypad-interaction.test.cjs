@@ -17,6 +17,19 @@ test('non-numeric controls, drag handles, expired taps and cancelled intent do n
   intent.tap(500,300,[{name:'dialog:length:Distance',x:500,y:300}],1000);assert.equal(intent.consume(2300),false);
   intent.tap(500,300,[{name:'dialog:Distance',x:500,y:300}],1000);intent.clear();assert.equal(intent.consume(1100),false);
 });
+test('SolidCraft 0.30 object dialogs: the tapped field is remembered without consuming the keypad intent',()=>{
+  const intent=new FieldIntent();assert.equal(intent.tapped(1000),null);
+  const handles=[{name:'dialog:row:Distance',x:446,y:452},{name:'dialog:Distance',x:500,y:452},{name:'dialog:card',x:446,y:471}];
+  intent.tap(505,452,handles,1000);
+  assert.deepEqual(intent.tapped(1100),{field:'Distance',numeric:true});
+  assert.equal(intent.consume(1100),true);
+  assert.deepEqual(intent.tapped(1150),{field:'Distance',numeric:true});assert.equal(intent.tapped(2300),null);
+  intent.tap(500,300,[{name:'dialog:Name',x:500,y:300}],3000);
+  assert.deepEqual(intent.tapped(3100),{field:'Name',numeric:false});assert.equal(intent.consume(3100),false);
+  for(const name of ['dialog:card','dialog:ok','dialog:row:Distance','dialog:section:Options','dialog:clear:Profiles']){
+    intent.tap(500,300,[{name,x:500,y:300}],4000);assert.equal(intent.tapped(4100),null,name);
+  }
+});
 test('initial placement avoids the extrusion dialog and clamping keeps the grip reachable after resize',()=>{
   const size={width:372,height:500},v={width:1024,height:768};
   const p=placePad({x:550,y:180},size,v,[{x0:700,y0:100,x1:1010,y1:740}]);

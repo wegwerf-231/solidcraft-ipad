@@ -54,7 +54,7 @@
     },
     {
       "file": "legal/upstream/ATTRIBUTION.md",
-      "sha256": "889cc4fa02053b7c58ed6cf3f3c14363f98b329469b011c85e30d2a8d5d61e2c"
+      "sha256": "1925b70a67c3f89444a53659854de6601e0066195f8ce9f2b535e32bfd86f0c6"
     },
     {
       "file": "legal/upstream/DISCLAIMER.md",
@@ -69,28 +69,28 @@
       "sha256": "31d87162bb6a5a189bf60575981a1ef24c245d209783d9ad08b8318f66146e3d"
     },
     {
-      "file": "solidcraft-web-4b1d77a936edaef2.js",
-      "sha256": "a1766999f27bac22c11e93e18da9bdba4f4a3e01a412803fe179c9559bee858d"
+      "file": "solidcraft-web-eddd050bdb20187.js",
+      "sha256": "412b87234c34dd39db55683d6de2b3ef26905fd9132073396c462edb9071045c"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",
-      "sha256": "ebd3a83cc7182aafe28971c06589f7f120192ac9eacdeb26f07a08f1b4f95600"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part0.bin",
+      "sha256": "8bc57b622af1dc3b8b73583c3b3083348d79f6f3adeb0683d01d07a31e40cb27"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part1.bin",
-      "sha256": "857ef5da9bc25f12c8c46458fc50d628fe6ccb857887a59355b0c2bda676492e"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part1.bin",
+      "sha256": "e48d57fbc20dfe23d265e0d4bf4cbd7b4a777018e74a7ddd7d9ad1afb447b583"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part2.bin",
-      "sha256": "1c81ff57298c2c6c9bf03f92b405e81c655b3c740a14bca39e59dced14b30fc9"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part2.bin",
+      "sha256": "02d96ea250ca510be181a85baf6e54f28a94c7654bbd0051eb269d2eea5bb6d7"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part3.bin",
-      "sha256": "85bf84429d9635208eab5f7f6086515a5b404b764f6ff675f6399207621c4141"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part3.bin",
+      "sha256": "fce23c8ca850534f9a80384d9306f28d1e434d671cd16115259bb54801a8a5c5"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part4.bin",
-      "sha256": "6260c9bfde1eb7ee0d286d9bf956eab0d2112dff6b0c8ed7d2847de491cd07cc"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part4.bin",
+      "sha256": "72b986b77820ac031f22c5e08bff609615da6e47450e4fc9134f2afebbda2782"
     }
   ]
 }

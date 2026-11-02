@@ -2,7 +2,7 @@
 
 Diese Web-Ausgabe ergänzt SolidCraft um Touch- und Pencil-Bedienung.
 Sie ist kein offizielles Produkt von Tangency Labs oder Apple.
-Eigenständige Version: `project.json`; Basis: SolidCraft 0.29.0.
+Eigenständige Version: `project.json`; Basis: SolidCraft 0.30.0.
 
 - Apple Pencil: auswählen, skizzieren und ziehen.
 - Finger: Ansicht drehen, mit zwei Fingern verschieben/zoomen.

@@ -2,16 +2,16 @@
   "schema_version": 1,
   "name": "SolidCraft iPad (inoffiziell)",
   "repository": "https://github.com/wegwerf-231/solidcraft-ipad",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "upstream": {
     "repository": "https://github.com/tangency-labs/solidcraft",
-    "version": "0.29.0",
-    "tag": "v0.29.0",
-    "commit": "3a5195b0a0aa359f6ebf10d890c1f887c70144b1",
-    "source": "https://github.com/tangency-labs/solidcraft/tree/3a5195b0a0aa359f6ebf10d890c1f887c70144b1",
-    "archive_url": "https://github.com/tangency-labs/solidcraft/releases/download/v0.29.0/solidcraft-web-0.29.0.zip",
-    "archive_sha256": "f7149be2e364505d3a3123db3dd5dff1b37faefd4d9cffd2651f21b1ee3e0cbf",
-    "wasm_sha256": "2d7992a1a7f9e4513a66da8b9da5b9bd7d6abd413a9b09bcd3ec0b7ceb166f67",
-    "wasm_bytes": 99739213
+    "version": "0.30.0",
+    "tag": "v0.30.0",
+    "commit": "afd81380ab06b0e77e03fdf68185d4b484d0e84e",
+    "source": "https://github.com/tangency-labs/solidcraft/tree/afd81380ab06b0e77e03fdf68185d4b484d0e84e",
+    "archive_url": "https://github.com/tangency-labs/solidcraft/releases/download/v0.30.0/solidcraft-web-0.30.0.zip",
+    "archive_sha256": "32204c7cb8160961d476fdc72b2614973f1a1d5f0cdcb9d1255142a5e09798d3",
+    "wasm_sha256": "5cc4a0802c6ace95520e52469be572c053290971ae30fd38782443296ecb1b7e",
+    "wasm_bytes": 100351406
   }
 }

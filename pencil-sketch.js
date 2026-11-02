@@ -262,7 +262,7 @@
         if (chainDocument !== info.context.document_id) chain = null;
         s.spline=/^sketch\.spline\.(fit_point|control_point|control_point_5)$/.test(info.tool||'')?info.tool:null;
         if(info.tool&&!s.spline){s.mode='off';inkFade(s.ink);return;}
-        const onSketchGeometry = !s.spline && info && info.tab === "SKETCH" && info.hover && /^Sketch/.test(String(info.hover));
+        const onSketchGeometry = !s.spline && info && info.tab === "SKETCH" && info.hover && (typeof info.hover === "object" ? /^sketch_/.test(String(info.hover.type)) : /^Sketch/.test(String(info.hover))); // ab 0.30 Objekt, davor Text
         const onChainEnd = chain && performance.now() - chain.t < CHAIN_MS && dist(chain.at, s) < SNAP_PX * 1.4;
         if (onSketchGeometry && !onChainEnd) {
           // vorhandene Skizzengeometrie ziehen wie bisher

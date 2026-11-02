@@ -4,6 +4,24 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-02
+
+Neue Basis: SolidCraft 0.30.0 (Commit `afd81380ab06b0e77e03fdf68185d4b484d0e84e`).
+Laufzeitdateien bytegleich mit dem offiziellen Web-Archiv; Lizenzen, Drittanbieterhinweise,
+Fonts und Icons unverändert, `legal/upstream/ATTRIBUTION.md` um neue Original-Grafiken ergänzt.
+
+- **Dateiformat:** Mit 0.7.0 gespeicherte Entwürfe nutzen das Format 47 und lassen sich mit
+  0.6.x und älteren Ausgaben nicht öffnen. Ältere Entwürfe öffnen weiterhin.
+- Neu aus SolidCraft 0.30.0 unter anderem: große Entwürfe öffnen im Browser schrittweise mit
+  Fortschrittsanzeige und Abbrechen, Ebene durch Achse und Punkt, Versatz mit mehreren Kopien,
+  Konstruktionslinien mit Länge, Renderings vergleichen. Vollständige Liste in den
+  [Original-Release-Notizen](https://github.com/tangency-labs/solidcraft/releases/tag/v0.30.0).
+- Anpassung an die geänderte Steuerschnittstelle: `ui.inspect` liefert Dialog und Hover als
+  Objekte. Ziffernfeld, Werkzeugleiste und Pencil-Kurvenerkennung lesen beide Formate.
+- Ziffernfeld in Dialogen: Der Kern nennt das fokussierte Feld nicht mehr. Ziffernfeld bzw.
+  Tastatur-Pille öffnen daher in allen Dialogen erst nach einem Tipp auf das Feld, wie bisher
+  schon beim Extrudieren.
+
 ## [0.6.2] - 2026-11-02
 
 - Numpad auf iPadOS: versteckten nativen Texteingang bis zur ausdrücklich angeforderten Systemtastatur schreibgeschützt halten.

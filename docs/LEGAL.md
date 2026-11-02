@@ -2,8 +2,8 @@
 
 ## Verifizierte Basis
 
-Die offizielle [Web-Ausgabe v0.29.0](https://github.com/tangency-labs/solidcraft/releases/tag/v0.29.0)
-ist auf Commit `3a5195b0a0aa359f6ebf10d890c1f887c70144b1` festgelegt.
+Die offizielle [Web-Ausgabe v0.30.0](https://github.com/tangency-labs/solidcraft/releases/tag/v0.30.0)
+ist auf Commit `afd81380ab06b0e77e03fdf68185d4b484d0e84e` festgelegt.
 Archive und WASM sind mit SHA-256 in `project.json` identifiziert.
 Die zusammengefügten WASM-Teile, JavaScript-Bindings, mitgelieferten Fonts, Icons,
 Ladegrafiken und Original-Lizenzhinweise wurden gegen dieses Archiv verglichen.

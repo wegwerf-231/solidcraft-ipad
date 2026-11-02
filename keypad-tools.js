@@ -22,16 +22,25 @@
   // Native dialogs focus their first number automatically; only a short tap on
   // a numeric control may open the overlay. Consumed intent cannot reopen it.
   class FieldIntent {
-    constructor(){this.pending=null;}
-    clear(){this.pending=null;}
+    constructor(){this.pending=null;this.last=null;}
+    clear(){this.pending=null;this.last=null;}
     tap(x,y,handles,now=Date.now()){
       this.clear();
       const numeric=/^dialog:(?:length:|angle:|scalar:|vector:|(?:control:)?(?:Distance(?: [12XY])?|Length|Width|Height|Depth|Diameter|Radius|Angle|Draft Angle|Offset|Thickness|Scale|Count|Abstand|Länge|Breite|Höhe|Radius|Winkel)$)/i;
-      const hits=(handles||[]).filter(h=>numeric.test(h.name)&&Number.isFinite(h.x)&&Number.isFinite(h.y));
-      if(hits.some(h=>Math.abs(x-h.x)<=80&&Math.abs(y-h.y)<=18))this.pending={at:now};
+      const chrome=/^dialog:(?:(?:row|section|clear):.*|title|close|card|ok|OK|cancel|Cancel)$/;
+      const near=h=>Number.isFinite(h.x)&&Number.isFinite(h.y)&&Math.abs(x-h.x)<=80&&Math.abs(y-h.y)<=18;
+      const hits=(handles||[]).filter(h=>/^dialog:/.test(h.name)&&near(h)).sort((a,b)=>Math.hypot(x-a.x,y-a.y)-Math.hypot(x-b.x,y-b.y));
+      const field=hits.find(h=>numeric.test(h.name));
+      if(field)this.pending={at:now};
+      // From SolidCraft 0.30 ui.inspect no longer names the focused dialog field: remember the tapped one.
+      const tapped=field||hits.find(h=>!chrome.test(h.name));
+      if(tapped)this.last={at:now,field:tapped.name.slice(7),numeric:!!field};
+    }
+    tapped(now=Date.now()){
+      const t=this.last;return t&&now-t.at>=0&&now-t.at<1200?{field:t.field,numeric:t.numeric}:null;
     }
     consume(now=Date.now()){
-      const p=this.pending;this.clear();return !!p&&now-p.at>=0&&now-p.at<1200;
+      const p=this.pending;this.pending=null;return !!p&&now-p.at>=0&&now-p.at<1200;
     }
   }
   function clampPosition(p,size,v){

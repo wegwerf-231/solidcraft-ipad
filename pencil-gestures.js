@@ -48,6 +48,10 @@
     const other=[c[0]+r*Math.cos(u+sweep/2+Math.PI),c[1]+r*Math.sin(u+sweep/2+Math.PI)];
     return Math.hypot(q[0]-near[0],q[1]-near[1])<=Math.hypot(other[0]-near[0],other[1]-near[1])?q:other;
   }
-  function hoverCurve(text){const match=/^SketchCurve \{ sketch: (\d+), id: ("(?:\\.|[^"\\])*"),/.exec(text||'');if(!match)return null;try{return {sketch:Number(match[1]),id:JSON.parse(match[2])};}catch(_){return null;}}
+  // SolidCraft up to 0.29 reports hover as Debug text, 0.30 as an object {type, sketch, id, ...}.
+  function hoverCurve(hover){
+    if(hover&&typeof hover==='object')return hover.type==='sketch_curve'&&Number.isInteger(hover.sketch)&&typeof hover.id==='string'?{sketch:hover.sketch,id:hover.id}:null;
+    const match=/^SketchCurve \{ sketch: (\d+), id: ("(?:\\.|[^"\\])*"),/.exec(hover||'');if(!match)return null;try{return {sketch:Number(match[1]),id:JSON.parse(match[2])};}catch(_){return null;}
+  }
   return {Stroke,tangentThrough,hoverCurve};
 });

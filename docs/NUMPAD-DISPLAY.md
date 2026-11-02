@@ -9,6 +9,11 @@ Ein Zug am Extrusionsgriff und ein Tipp auf Auswahl-/Richtungs-/Operationsknöpf
 gelten nicht als Zahlenfeldeingabe. Die bewusste Tippabsicht wird nur einmal und
 kurzzeitig verwendet; nach Abbrechen öffnet Autofokus den Entwurf nicht erneut.
 
+Seit SolidCraft 0.30.0 (iPad-Ausgabe 0.7.0) meldet der Kern den offenen Dialog als Objekt
+ohne Angabe des fokussierten Felds. Deshalb gilt die Tipp-Regel jetzt in allen Dialogen:
+Das Ziffernfeld öffnet nach einem Tipp auf ein Zahlenfeld, die Tastatur-Pille nach einem
+Tipp auf ein Textfeld. Der automatische Fokus beim Öffnen eines Dialogs zeigt keines von beiden.
+
 Oben steht ein Griff „Ziffernfeld verschieben“. Dort anfassen und ziehen; die
 Zifferntasten bleiben normale Eingabeknöpfe. Die eigene Position bleibt während
 der Sitzung auch beim erneuten Öffnen erhalten. Nach Fenster-/Tastaturgrößenwechsel
@@ -123,3 +128,20 @@ auf diesem Gerät positiv geprüft. iPad-Modell und iPadOS-/Safari-Version wurde
 nicht erfasst; eine vollständige Geräteabnahme aller übrigen Funktionen ist
 dadurch nicht ersetzt. Die genaue ursprüngliche Ursache lässt sich aus dieser
 Rückmeldung allein nicht abschließend bestimmen.
+
+## Prüfung mit SolidCraft 0.30.0
+
+Chromium-In-App-Browser mit dem echten 0.30.0-WASM, nur isolierte Testentwürfe.
+Vor der Anpassung öffnete ein Tipp auf „Abstand“ nur die Tastatur-Pille, weil
+`ui.inspect.dialog` jetzt ein Objekt ist. Nach der Anpassung:
+
+- Extrudieren startet ohne Ziffernfeld; Finger- und Pencil-Tipp auf „Abstand“ öffnen es
+  auch bei schreibgeschütztem nativen Texteingang. 25 mm bestätigt ergibt einen Körper
+  30 × 20 × 25 mm; Esc schließt das Ziffernfeld, Dialog und Wert 10 mm bleiben.
+- Tipp auf „Richtung“ zeigt weder Ziffernfeld noch Tastatur-Pille.
+- Pencil-Zug am Extrusionsgriff ändert 10 auf 20 mm, ohne das Ziffernfeld zu öffnen.
+- Werkzeuge (38, keine fehlend), Rechteck-Zeichenwerte, Druck-Spline, Wackel-Bogen,
+  Spline-Punkt halten, Winkel, automatische Linie/Bogen und Pencil-Auswahl liefern im
+  Prüfstand dieselben Ergebnisse wie der unveränderte 0.29.0-Stand.
+
+Desktop-Browserprüfung, keine physische iPad-Abnahme.

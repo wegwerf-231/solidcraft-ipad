@@ -782,6 +782,7 @@
   let checking = false;
   let padTab = false;
   let blurredCount = 0;
+  let dialogTap = null; // {field, numeric}: angetipptes Feld eines Objekt-Dialogs (ab SolidCraft 0.30)
   async function fieldCheck(info, sel) {
     if (document.hidden || nativeDragActive) return;
     if (sketchTools && sketchTools.editing) return;
@@ -795,6 +796,7 @@
       // Die App gibt den Fokus beim Feldwechsel kurz an die Zeichenfläche ab: erst beim zweiten
       // Mal hintereinander ausblenden, damit das Ziffernfeld nicht flackert.
       if (++blurredCount < 2) return;
+      dialogTap = null;
       if (fieldKey) { fieldKey = ""; textMode = false; nativeTextMode(el,false); showPad(false); showKeyboardPill(false); }
       return;
     }
@@ -805,7 +807,12 @@
       if (!info || !sel) [sel, info] = await Promise.all([req("ui.selection"), req("ui.inspect")]);
       if (document.activeElement !== el || textMode || document.hidden) return;
       const dlg = typeof info.dialog === "string" ? info.dialog : "";
-      const vf = /value_focus: Some\(([^)]*)\)/.exec(dlg);
+      // Ab SolidCraft 0.30 ist der Dialog ein Objekt ohne fokussiertes Feld: dann gilt das zuletzt
+      // angetippte Dialogfeld, bis der Fokus den Dialog verlässt.
+      const dialogObject = !!info.dialog && typeof info.dialog === "object";
+      if (!dialogObject) dialogTap = null;
+      else { const t = numericIntent && numericIntent.tapped(); if (t) dialogTap = t; }
+      const vf = dialogObject ? (dialogTap && dialogTap.numeric ? [, dialogTap.field] : null) : /value_focus: Some\(([^)]*)\)/.exec(dlg);
       // Wertfelder beim Zeichnen (Länge, Winkel, Breite …) gehören zum aktiven Skizzenwerkzeug.
       const toolBox = !!info.tool && /^sketch\./.test(info.tool) && !/text/.test(info.tool);
       const numeric = !!(sel.dimension_editing || vf || toolBox);
@@ -817,10 +824,12 @@
       if (numeric) {
         showKeyboardPill(false);
         // Opening a command or dragging a handle must never open the keypad.
-        const manualDialog = !!vf && /\bExtrude\s*\{/.test(dlg);
+        const manualDialog = !!vf && (dialogObject ? info.dialog.command === "solid.extrude" : /\bExtrude\s*\{/.test(dlg));
         if (manualDialog && (!numericIntent || !numericIntent.consume())) { fieldKey=""; showPad(false); return; }
         if (keypadTools) await keypadTools.native.begin(info,k,fieldPos,manualDialog); else showPad(true);
       }
+      // Automatischer Fokus beim Öffnen eines Dialogs (ab 0.30 ohne Feldangabe): nichts anbieten.
+      else if (dialogObject && !dialogTap) { showPad(false); showKeyboardPill(false); }
       else { showPad(false); showKeyboardPill(true); }
     } catch (err) {
       debug.fcBranch = "error " + err;
@@ -1265,7 +1274,7 @@
     const bo = !!(info.ui && info.ui.showBrowser);
     if (bo !== railBrowserOpen) { railBrowserOpen = bo; railKey = ""; refreshZones(); }
     const items = railItems(info, sel);
-    const active = info.tool || (typeof info.dialog === "string" ? info.dialog : "");
+    const active = info.tool || (typeof info.dialog === "string" ? info.dialog : (info.dialog && info.dialog.command) || "");
     const k = JSON.stringify([items, active && String(active).slice(0, 40), railCollapsed, info.ui && info.ui.showBrowser, info.ui && info.ui.showTimeline]);
     if (k === railKey) { layoutRail(items.length); return; }
     railKey = k;

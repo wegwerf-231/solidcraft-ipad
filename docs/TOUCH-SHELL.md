@@ -1,6 +1,6 @@
 # AP 7 – iPad-Skizzenansicht
 
-Vorbereitet für 0.4.0, Zeichenfläche ohne Kopfband seit 0.6.0. Der unveränderte SolidCraft-Kern bleibt Version 0.29.0.
+Vorbereitet für 0.4.0, Zeichenfläche ohne Kopfband seit 0.6.0. Der unveränderte SolidCraft-Kern ist seit 0.7.0 Version 0.30.0 (zuvor 0.29.0).
 Diese Änderung behandelt AP 7 aus der bereitgestellten Anforderungsliste vom
 2. November 2026. Restpunkte aus AP 2/6 und der eigene Rust-Build (AP 8) sind getrennt.
 

@@ -5,7 +5,7 @@ Lizenz eigener Ergänzungen: MIT OR Apache-2.0.
 Urheberrechte am übernommenen Original verbleiben bei dessen Rechteinhabern.
 
 Original: https://github.com/tangency-labs/solidcraft, Tangency Labs und SolidCraft contributors.
-Basis: v0.29.0, Commit 3a5195b0a0aa359f6ebf10d890c1f887c70144b1.
+Basis: v0.30.0, Commit afd81380ab06b0e77e03fdf68185d4b484d0e84e (zuvor v0.29.0, Commit 3a5195b0a0aa359f6ebf10d890c1f887c70144b1).
 Ausgangsimport dieses Repositories: 23c79605dd3ceb3d041a24f6d0ad6b6b8bb60735.
 Keine Zugehörigkeit zu oder Unterstützung durch Tangency Labs oder Apple.
 SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompatibilität genannt.
@@ -16,11 +16,13 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
   Ziffernfeld, Layout und Diagnosefunktionen; Projektversion vereinheitlicht;
   gemeinsame Zustandsaktualisierung ohne parallele Polling-Schleifen; bewusste Zahlenfeld-Tipps,
   verzögerungsärmere Dialogzüge, lokale Auflösungsdiagnose und abgesicherter iPad-Texteingang;
-  Versand von Diagnosen nur mit ausdrücklichem `?senddiagnostics=1` auf lokalen Hosts.
+  Versand von Diagnosen nur mit ausdrücklichem `?senddiagnostics=1` auf lokalen Hosts;
+  liest das Dialog- und Hover-Format von SolidCraft 0.30 (Objekte) wie das ältere Textformat.
 - `keypad-tools.js`: eigene Eingabeentwürfe, Fehleranzeige und Parameter-Auswahl über
   den unveränderten Ausdrucksauswerter; verschiebbarer Griff, Positionierung, Eingabeabsicht,
   begrenzte Öffnungsabfragen und idempotente Viewport-Anpassung.
-- `pencil-gestures.js`: eigene begrenzte Wackel-, Druck- und Verweil-Erkennung.
+- `pencil-gestures.js`: eigene begrenzte Wackel-, Druck- und Verweil-Erkennung;
+  erkennt Skizzenkurven unter dem Pencil in beiden Hover-Formaten (bis 0.29 Text, ab 0.30 Objekt).
 - `touch-shell.js`: eigene gruppierte Skizzenwerkzeuge, Variantenwahl und umschaltbare
   Bedienebene vor dem unveränderten Canvas; keine Grafik-/Quellübernahme aus Shapr3D.
 - `canvas-shift.js`: Größenwechsel neu messen, veraltete Moduswechsel verwerfen und
