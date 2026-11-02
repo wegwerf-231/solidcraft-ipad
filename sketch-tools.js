@@ -138,12 +138,24 @@
   class Controller {
     constructor(bridge, changed = () => {}) {
       this.bridge = bridge; this.changed = changed; this.snapshot = null;
-      this.editor = null; this.model = null; this.error = ""; this.busy = false; this.refreshing = false;
-      this.lastAdded = []; this.previous = null; this.units = "mm";
+      this.editor = null; this.model = null; this.error = ""; this.busy = false; this.refreshing = null; this.refreshAgain = false;
+      this.lastAdded = []; this.previous = null; this.units = "mm"; this.unitsContext = null;
     }
-    async refresh(info, selection) {
-      if (this.refreshing) return;
-      this.refreshing = true;
+    refresh(info, selection) {
+      // Overlapping UI events share one refresh and at most one fresh follow-up per
+      // in-flight pass. In particular, actions must await the latest selection;
+      // returning early here used the previous poll's selection instead.
+      if (this.refreshing) { this.refreshAgain = true; return this.refreshing; }
+      this.refreshing = Promise.resolve().then(async () => {
+        do {
+          this.refreshAgain = false;
+          await this.refreshOnce(info, selection);
+          info = undefined; selection = undefined;
+        } while (this.refreshAgain);
+      }).finally(() => { this.refreshing = null; });
+      return this.refreshing;
+    }
+    async refreshOnce(info, selection) {
       try {
         info = info || await this.bridge.request("ui.inspect");
         if (info.home || !info.ui || info.ui.tab !== "SKETCH") {
@@ -168,12 +180,15 @@
         selection = selection || await this.bridge.request("ui.selection");
         const before = await this.bridge.execute("document.revision");
         const [sketch, options] = await Promise.all([this.bridge.execute("sketch.inspect"), this.bridge.execute("sketch.options")]);
+        // Units can change while the same sketch stays open. Read them only when
+        // the design changes, and include that read in the revision guard.
+        const doc = sameContext(this.unitsContext, before) ? null : await this.bridge.request("document.inspect");
         const after = await this.bridge.execute("document.revision");
         if (!sameContext(before, after)) return;
+        if (doc) { this.units = doc.units || "mm"; this.unitsContext = before; }
         if (!this.previous || this.previous.document_id !== before.document_id || this.previous.id !== sketch.id) {
           this.previous = { document_id: before.document_id, id: sketch.id, ids: new Set(sketch.curves.map((c) => c.id)) };
           this.lastAdded = [];
-          const doc = await this.bridge.request("document.inspect"); this.units = doc.units || "mm";
         } else {
           const added = sketch.curves.filter((c) => !this.previous.ids.has(c.id));
           if (added.length) this.lastAdded = added.slice(-16).map((c) => c.id);
@@ -185,7 +200,6 @@
         }
         this.changed();
       } catch (error) { this.snapshot = null; this.model = null; this.error = "CAD-Verbindung unterbrochen. Erneut versuchen."; this.changed(); }
-      finally { this.refreshing = false; }
     }
     async guard(context, sketch) {
       const current = await this.bridge.execute("document.revision");

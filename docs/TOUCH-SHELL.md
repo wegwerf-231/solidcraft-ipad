@@ -96,3 +96,29 @@ Die Prüfbilder zeigen ausschließlich erzeugte Testdaten, keine eigenen Designs
 ![iPad-Ansicht mit Variantenwahl](screenshots/ap7-touch.png)
 
 ![Erweiterte Originaloberfläche](screenshots/ap7-advanced.png)
+
+
+## Gemeinsame Abnahme von PR #8 und #9
+
+Der Branch enthält den Hauptstand nach PR #9 und bereitet weiterhin Version 0.6.0
+vor. Gebündelte Zustandsabfragen, Tintenvorschau, gesammelte Etikettenplatzierung,
+aktuelle Pencil-Treffflächen und der Scrollschutz bleiben enthalten.
+
+82 Node-Tests einschließlich acht ergänzter Integrations-/Koordinatenfälle sowie
+sechs Python-Tests prüfen den gemeinsamen Stand. Die Koordinatentests decken
+CSS-Pixel, physische Pick-Pixel bei Pixelverhältnis 1/2/3, viewport-lokale Picks,
+Moduswechsel, Opt-out und eine nach Größenwechsel neu gemessene Befehlsleiste ab.
+Im ausgeblendeten Tab werden keine Messabfragen gestartet. Ein während einer
+Messung verlassener iPad-Modus aktiviert keine veraltete Verschiebung.
+
+Die native Zeichnung und API-Treffzonen werden nach einem Canvas-Umbau neu
+abgeglichen. Freie Maße bleiben auf die Auswahl bzw. zuletzt erzeugte Geometrie
+begrenzt; doppelte parallele Seiten werden unterdrückt. Die gemeinsame Projektion
+berücksichtigt den Formmittelpunkt und die native Grenze von 1000 Punkten.
+
+Im gemeinsamen Chromium-/WASM-Test wurde der Winkelvorschlag geöffnet und über
+das Ziffernfeld auf 45 deg gebunden (`d1`, im Kern π/4). Erweitert entfernte die
+Canvas-Verschiebung, iPad-Ansicht aktivierte sie wieder; das Maß blieb erhalten.
+Das ist eine Desktop-Browserprüfung, keine physische iPad-Abnahme.
+
+![Gemeinsame Vollflächenansicht mit 45-Grad-Maß](screenshots/pr8-pr9-integrated.png)
