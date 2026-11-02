@@ -55,10 +55,18 @@
   let keypadTools = null, padDrag = null;
   const numericIntent = window.SolidCraftKeypad ? new window.SolidCraftKeypad.FieldIntent() : null;
   let numericTapGeneration = 0;
-  function clearNumericTap(){numericTapGeneration++;numericIntent?.clear();}
-  async function armNumericTap(x,y){
+  function clearNumericTap(){numericTapGeneration++;numericIntent?.clear();keypadTools?.native.abortOpen?.();}
+  function armNumericTap(x,y){
     const generation=++numericTapGeneration;
-    try{const result=await req("ui.handles");if(generation===numericTapGeneration)numericIntent?.tap(x,y,Array.isArray(result)?result:result.handles);}catch(_){}
+    // Prefer already measured controls: no CAD request inside touchend/focus.
+    numericIntent?.tap(x,y,zones.handles||[]);
+    if(numericIntent?.pending)return;
+    setTimeout(async()=>{
+      try{
+        const result=await window.SolidCraftKeypad.readWithTimeout(req("ui.handles"));
+        if(generation===numericTapGeneration)numericIntent?.tap(x,y,Array.isArray(result)?result:result.handles);
+      }catch(error){if(generation===numericTapGeneration)showFieldError(error);}
+    },0);
   }
   let synthetic = false;
   let lastFingerTime = 0;
@@ -739,6 +747,16 @@
   // =====================================================================================
   let agent = null;
   let textMode = false; // Nutzer will die Systemtastatur
+  function nativeTextMode(el,on){
+    // inputmode=none alone does not guarantee keyboard suppression on iPadOS.
+    const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+    el.readOnly=ios&&!on;el.setAttribute("inputmode",on?"text":"none");
+  }
+  function showFieldError(error){
+    buildUI();let alert=root.querySelector('.sc-field-error');
+    if(!alert){alert=document.createElement('p');alert.className='sc-field-error';alert.setAttribute('role','alert');alert.style.cssText='position:absolute;left:12px;bottom:16px;max-width:420px;padding:12px;border:1px solid #d98572;border-radius:10px;background:#302726;color:#ffd1c6;font:15px system-ui;pointer-events:none';root.append(alert);}
+    alert.textContent=String(error.message||error);clearTimeout(alert.hideTimer);alert.hideTimer=setTimeout(()=>alert.remove(),6000);
+  }
   function textAgent() {
     if (agent && agent.isConnected) return agent;
     const c = canvas();
@@ -746,7 +764,7 @@
     if (!el) el = document.querySelector("body > input[type=text]");
     if (el && el !== agent) {
       agent = el;
-      el.setAttribute("inputmode", "none");
+      nativeTextMode(el,false);
       el.setAttribute("autocomplete", "off");
       el.setAttribute("autocorrect", "off");
       el.setAttribute("spellcheck", "false");
@@ -777,7 +795,7 @@
       // Die App gibt den Fokus beim Feldwechsel kurz an die Zeichenfläche ab: erst beim zweiten
       // Mal hintereinander ausblenden, damit das Ziffernfeld nicht flackert.
       if (++blurredCount < 2) return;
-      if (fieldKey) { fieldKey = ""; textMode = false; el.setAttribute("inputmode", "none"); showPad(false); showKeyboardPill(false); }
+      if (fieldKey) { fieldKey = ""; textMode = false; nativeTextMode(el,false); showPad(false); showKeyboardPill(false); }
       return;
     }
     blurredCount = 0;
@@ -806,6 +824,8 @@
       else { showPad(false); showKeyboardPill(true); }
     } catch (err) {
       debug.fcBranch = "error " + err;
+      debug.lastKeypadError=String(err.message||err);
+      showFieldError(err);
     } finally {
       checking = false;
     }
@@ -868,7 +888,7 @@
     textMode = true;
     showPad(false);
     showKeyboardPill(false);
-    el.setAttribute("inputmode", "text");
+    nativeTextMode(el,true);
     el.blur();
     el.focus({ preventScroll: true });
   }
@@ -1434,6 +1454,7 @@
           "zonen " + (zones.count || 0) + " / rects " + zones.rects.length + "  viewport " + vp + (zones.error ? "  FEHLER " + zones.error : ""),
           "zustand " + state + "  stift " + stylusDown + "  finger " + fingers.size + "  dpr " + devicePixelRatio + "  " + innerWidth + "x" + innerHeight,
           display ? "Canvas " + display.pixels.join("x") + " px / CSS " + display.css.map(Math.round).join("x") + " / DPR " + display.dpr + (display.nativeResolution ? " passend" : " AUFLÖSUNG ABWEICHEND") + " / Seitenzoom " + display.pageScale : "Canvas noch nicht vermessen",
+          "Ziffernfeld: " + (keypadTools?.native.opening ? "öffnet" : keypadTools?.active ? "offen" : "geschlossen") + (debug.lastKeypadError ? " / " + debug.lastKeypadError : ""),
           "feld " + (debug.lastField || "-") + "  fokus " + (document.activeElement ? document.activeElement.tagName : "-"),
           "fehler: " + (debug.errors.slice(-3).join(" | ") || "keine"),
           "",

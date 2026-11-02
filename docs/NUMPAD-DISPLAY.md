@@ -79,3 +79,47 @@ Chromium-In-App-Browser mit echtem WASM, nur isolierte Testgeometrie:
 ![Extrusionszug ohne Numpad](screenshots/extrude-drag-no-keypad.png)
 
 ![Am Griff verschobenes Ziffernfeld](screenshots/keypad-dragged.png)
+
+
+## Absicherung nach Freeze-Meldung
+
+Gemeldet für Finger und Pencil auf der GitHub-Seite/Home-Bildschirm-App:
+„Abstand“ wird angetippt, Numpad erscheint nicht, App reagiert nicht mehr.
+Im Chromium-Test öffnete auch die bisherige Version mit simuliertem Fingertipp;
+der konkrete iPad-Freeze ist deshalb noch nicht eindeutig reproduziert.
+
+Die Korrektur sichert folgende mögliche Hänger und Rückkopplungen ab:
+
+- Nativer versteckter Texteingang auf iPad/iPhone bzw. iPadOS mit Macintosh-UA
+  schreibgeschützt, solange die Systemtastatur nicht ausdrücklich angefordert ist.
+  Eigene Eingabeentwürfe und programmatische CAD-Eingaben funktionieren weiterhin.
+- Viewport-Scroll-Ereignisse lösen keine Positionsänderungen aus. Identische
+  Viewport-Größen werden nicht erneut vermessen; unveränderte Styles nicht geschrieben.
+- Vorhandene Zahlenfeld-Treffer werden ohne neue CAD-Abfrage im Touch-Handler benutzt.
+  Eine nötige Nachabfrage läuft erst in einem folgenden Ereignisblock.
+- Gleichzeitige Öffnungen teilen eine Anfrage. Ausbleibende Leseantworten laufen nach
+  zwei Sekunden aus; die Öffnungssperre wird freigegeben und eine Meldung angezeigt.
+  Abbrechen/neue Berührung verwerfen wartende Öffnungen; späte Antworten öffnen nichts.
+- Nur Leseanfragen erhalten eine Frist. Schreibbefehle werden nicht als abgebrochen
+  ausgegeben, während sie möglicherweise noch den Entwurf verändern.
+
+97 Node- und sechs Python-Tests prüfen den Stand. Neue Fälle: ausbleibende und späte
+Antworten, parallele Öffnungen, Abbruch, 100 identische Viewport-Ereignisse ohne
+zusätzliche Layoutarbeit sowie die iPadOS-Texteingangsregel. Im echten Chromium-/WASM-
+Test öffneten simulierte Finger- und Pencil-Tipps das Numpad, Esc schloss es und die
+Eingabe von 25 mm ließ sich bei schreibgeschütztem nativen Texteingang bestätigen.
+Das ersetzt keine Safari-Abnahme auf dem betroffenen iPad.
+
+`tests/sketch-browser.html?case=extrude` startet einen separaten Testentwurf mit
+Extrusionsdialog. „Abstand“ antippen; der Zähler oben zeigt, ob der Browser weiterläuft,
+und nennt Öffnungszustand bzw. Fehlermeldung. Die Testseite lädt den CAD-Kern im
+Sample-Modus und verwendet ausschließlich erzeugte Testgeometrie.
+
+
+Geräterückmeldung zur Korrektur (02.11.2026): Der betroffene Nutzer hat den
+isolierten Teststand auf seinem iPad geöffnet und ausdrücklich bestätigt:
+„Ja, Numpad öffnet sich und reagiert“. Damit ist der gemeldete Öffnungsablauf
+auf diesem Gerät positiv geprüft. iPad-Modell und iPadOS-/Safari-Version wurden
+nicht erfasst; eine vollständige Geräteabnahme aller übrigen Funktionen ist
+dadurch nicht ersetzt. Die genaue ursprüngliche Ursache lässt sich aus dieser
+Rückmeldung allein nicht abschließend bestimmen.
