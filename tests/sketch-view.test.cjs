@@ -43,7 +43,7 @@ function fixture() {
     begin() { state.edits++; }
     cancel() { this.editor = null; }
   }
-  const document = { head: new Element('head'), createElement: tag => new Element(tag), createElementNS: (namespaceURI, tag) => Object.assign(new Element(tag), { namespaceURI }) };
+  const document = { body: { classList: { contains: () => !!state.shifted } }, head: new Element('head'), createElement: tag => new Element(tag), createElementNS: (namespaceURI, tag) => Object.assign(new Element(tag), { namespaceURI }) };
   const host = new Element('div'), pad = new Element('div'); host.append(pad);
   const context = { SolidCraftSketch: { ...Model, Controller }, document, innerWidth: 1280, innerHeight: 900, localStorage: { getItem: () => null, setItem() {} } };
   vm.createContext(context);
@@ -54,13 +54,13 @@ function fixture() {
       if (method === 'ui.inspect') return {};
       if (method !== 'ui.sketchToScreen') throw Error(method);
       const gate = state.gate; state.gate = null; if (gate) await gate;
-      return params.points.slice(0, 1000).map(p => [p[0] + 300 + state.offset, p[1] + 300]);
+      return params.points.slice(0, 1000).map(p => [p[0] + 300 + state.offset, p[1] + 300 + (state.yOffset || 0)]);
     },
   });
   const snapshot = (document_id = 'a', revision = 1, count = 1, show = false) => ({
     info: { ui: { tab: 'SKETCH' } }, context: { document_id, revision },
     sketch: { id: 7, points: [], constraints: [], curves: Array.from({ length: count }, (_, i) => ({ id: 'l' + i, type: 'line', start_at: [0, i * 60], end_at: [100, i * 60] })) },
-    selection: { selection: [], dimensions: [] }, options: { show_dimensions: show },
+    selection: { selection: show ? Array.from({ length: count }, (_, i) => ({ type: "sketch_curve", id: "l" + i })) : [], dimensions: [] }, options: { show_dimensions: show },
   });
   const show = s => { view.controller.snapshot = s; view.controller.changed(); };
   return { state, view, snapshot, show, panel: host.children.find(n => n.className === 'sk-panel'), labels: host.children.find(n => n.className === 'sk-labels') };
@@ -148,4 +148,25 @@ test('large sketches respect the native 1000-point cap without losing final Penc
   assert.equal(f.state.calls.length, 2);
   assert.ok(f.state.calls.every(c => c.params.points.length <= 1000));
   assert.equal(f.view.additiveAt(350, 380), true);
+});
+
+
+test('full sketch mode permits labels near the top edge and mode changes invalidate label layout', async () => {
+  const f = fixture(); f.state.yOffset=-250;
+  f.show(f.snapshot('a',1,1,true)); await settle();
+  assert.equal(f.labels.children.filter(n => n.dataset.scene).length,0);
+  f.state.shifted=true; f.show(f.snapshot('a',1,1,true)); await settle();
+  assert.equal(f.labels.children.filter(n => n.dataset.scene).length,1);
+});
+
+test('free dimensions prefer explicit selection and suppress duplicate newly drawn parallel sides', async () => {
+  const f=fixture(), s=f.snapshot('a',1,3);
+  f.view.controller.lastAdded=['l0','l1','l2'];
+  f.show(s); await settle();
+  assert.equal(f.labels.children.filter(n => n.dataset.scene).length,1);
+  s.selection.selection=[{type:'sketch_curve',id:'l2'}];
+  f.show({...s}); await settle();
+  const records=f.labels.children.filter(n => n.dataset.scene);
+  assert.equal(records.length,1);
+  assert.ok(parseFloat(records[0].style.top)>350,'only the selected third line should retain its free label');
 });

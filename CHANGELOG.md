@@ -4,12 +4,39 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.6.0] - vorbereitet, Geräteabnahme ausstehend
+
+Rückmeldung aus dem Gerätetest von 0.5.0 („die Schaltfläche ist immer noch riesig“):
+
+- Das dunkle Kopfband entfällt. In der iPad-Skizzenansicht wird die Zeichenfläche um die Höhe
+  von Kopfzeile und Original-Befehlsleiste nach oben verschoben (neue Datei `canvas-shift.js`);
+  diese Bereiche liegen außerhalb des Bildschirms, das Modell nutzt die ganze Höhe.
+- Oben bleiben nur kleine Knöpfe: Rückgängig, Werkzeug-Pille, Wiederholen und „Erweitert“.
+  Rückgängig und Wiederholen sind nötig, weil die Original-Kopfzeile verdeckt ist.
+- Alle Bildschirmkoordinaten der Browser-Schnittstelle werden umgerechnet, sodass Pencil,
+  Ziffernfeld, Maßetiketten und Auswahl unverändert treffen.
+- „Erweitert“, Verlassen der Skizze und `?fullsketch=off` zeigen die unveränderte Oberfläche.
+- Weniger Maße an der Geometrie: freie Maße erscheinen nur noch an gewählter oder gerade
+  gezeichneter Geometrie, gegenüberliegende gleich lange Seiten nur einmal, Maßlinien außerhalb
+  der Form. Bisher erhielt jede Kante dauerhaft ein Etikett mit Maßlinie.
+- Keine doppelten Bedingungssymbole mehr: SolidCraft zeichnet die Symbole selbst; die eigenen,
+  größeren Symbole erscheinen nur noch an der Auswahl.
+- Ziffernfeld kleiner und rechts über der Bedingungen-Leiste statt mitten über der Zeichnung.
+- Die halb verdeckte Zustandszeile („… degrees of freedom“) liegt in der iPad-Ansicht außerhalb des
+  Bildschirms (Versatz 40 Pixel größer, da sich die Zeile nicht abschalten lässt).
+- Neuer Knopf „Extrudieren“ direkt unter „Skizze beenden“: Profil mit dem Pencil antippen,
+  „Extrudieren“, Wert im Ziffernfeld eingeben, ✓. SolidCraft beendet die Skizze dabei selbst.
+
 - Gemeinsame, überlappungsfreie Aktualisierung für Werkzeugstatus, Auswahl, Leisten und Zeichenfelder; Hintergrundabfragen während Finger-/Pencil-Gesten und in ausgeblendeten Tabs pausieren.
 - Pencil-Tinte höchstens einmal pro Bildschirmbild aktualisieren, vorhandene Koordinatentexte wiederverwenden und den letzten Punkt beim Abheben sofort darstellen.
 - Maßetiketten gesammelt einfügen/vermessen/platzieren; Projektion gemeinsam mit Pencil-Treffflächen in begrenzten Paketen abfragen.
 - Veraltete Pencil-Treffflächen nach Kamera-/Dokumentwechsel verwerfen; Scrollen in der Bedingungen-Leiste löst keine Aktion aus.
 - Gleichzeitige Skizzenabfragen warten auf aktuelle Auswahl; geänderte Dokumenteinheiten werden auch in einer geöffneten Skizze berücksichtigt.
 - Messverfahren und Geräteprüfliste: `docs/IPAD-PERFORMANCE.md`.
+
+
+- Zusammenführung mit den Performance-Verbesserungen aus PR #9; Koordinaten-Tests für Pixelverhältnis 1/2/3, Erweitert, Opt-out und Größenwechsel ergänzt.
+- Vollflächenversatz nach Größenwechsel neu messen und Treffzonen nach dem Canvas-Umbau aktualisieren.
 
 ## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
 

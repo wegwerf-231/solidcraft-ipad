@@ -80,6 +80,9 @@
         await this.refresh();if(!this.touch)throw Error('Zuerst eine Skizze im iPad-Modus öffnen.');
         if(action==='cancel')await this.bridge.request('ui.key',{key:'Escape'});
         else if(action==='finish')await this.bridge.execute('sketch.finish');
+        // Extrudieren direkt aus der Skizze: SolidCraft beendet die Skizze selbst und übernimmt ein
+        // gewähltes Profil; ohne Auswahl wird das Profil anschließend mit dem Pencil angetippt.
+        else if(action==='extrude')await this.bridge.request('ui.start',{command:'solid.extrude'});
         else if(action==='undo')await this.bridge.execute('edit.undo');
         else if(action==='redo')await this.bridge.execute('edit.redo');
         else if(action==='delete'){
@@ -123,6 +126,9 @@
 #sc-ipad-ui button:focus-visible{outline:2px solid #a9d4ff;outline-offset:1px}
 #sc-ipad-ui .sc-pad{z-index:5;max-height:calc(100vh - 88px);max-height:calc(100dvh - 88px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
 #sc-ipad-ui .sc-pad .unit{height:36px}
+#sc-ipad-ui[data-shell-mode=touch] .sc-pad{grid-template-columns:repeat(5,46px);gap:6px;padding:8px}
+#sc-ipad-ui[data-shell-mode=touch] .sc-pad button{height:44px;border-radius:10px}
+#sc-ipad-ui[data-shell-mode=touch] .sc-pad .unit{height:32px}
 @media(max-width:560px){#sc-ipad-ui .ts-rail{width:46px}#sc-ipad-ui .ts-rail .ts-label{display:none}#sc-ipad-ui .ts-rail button{justify-content:center;padding:6px 4px}#sc-ipad-ui .ts-history{flex-direction:column}#sc-ipad-ui .ts-hint{display:none}}
 `;
     document.head.appendChild(style);
@@ -159,11 +165,14 @@
           const title=document.createElement('span');title.className='ts-title';title.textContent='Skizze · iPad';
           const pill=button(active?active.label+(active.variants.length>1?' · '+activeVariant.label:'')+' ▾':control.info.tool?'Werkzeug aktiv ▾':'Automatisch · Pencil ▾','variants',active?active.label+' · '+activeVariant.label+' · Varianten wählen':'Werkzeug wählen');pill.className='ts-pill';pill.setAttribute('aria-expanded',String(menuOpen));pill.disabled=locked;
           const toggle=button('Erweitert','toggle','Erweiterte Befehlsleiste anzeigen');toggle.className='ts-toggle';toggle.disabled=locked;
-          row.append(title,pill,toggle);
+          const undo=button('↶','undo','Rückgängig');undo.className='ts-toggle';undo.disabled=locked;
+          const redo=button('↷','redo','Wiederholen');redo.className='ts-toggle';redo.disabled=locked;
+          row.append(title,undo,pill,redo,toggle);
           const hint=document.createElement('p');hint.className='ts-hint';hint.textContent=control.info.tool?'Mit Pencil zeichnen · Esc beendet das Werkzeug':'Mit Pencil zeichnen oder ein Werkzeug wählen · Finger bewegen die Ansicht';
           deck.append(row,hint);
           if(control.error){const err=document.createElement('p');err.className='ts-error';err.setAttribute('role','alert');err.textContent=control.error;deck.append(err);}
           const finish=button('✓','finish','Skizze beenden');const finishLabel=document.createElement('span');finishLabel.className='ts-label';finishLabel.textContent='Skizze beenden';finish.append(finishLabel);finish.disabled=locked;rail.append(finish);
+          const extrude=button('⇧','extrude','Extrudieren');const extrudeLabel=document.createElement('span');extrudeLabel.className='ts-label';extrudeLabel.textContent='Extrudieren';extrude.append(extrudeLabel);extrude.disabled=locked;rail.append(extrude);
           for(const group of TOOLS){
             const b=button('','tool:'+control.state.variants[group.id],group.label);b.disabled=locked;b.setAttribute('aria-pressed',String(active===group));b.dataset.group=group.id;if(group.variants.length>1)b.dataset.variants='1';
             const image=document.createElement('span');image.innerHTML=options.icon(group.id);const label=document.createElement('span');label.className='ts-label';label.textContent=group.label;b.append(image,label);rail.append(b);

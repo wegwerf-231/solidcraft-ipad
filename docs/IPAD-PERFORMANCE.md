@@ -2,8 +2,8 @@
 
 Die Optimierungen ergänzen den Hauptstand 0.5.0 (`58e2189`). Das Gerätefeedback
 zu kompakten Leisten, Werkzeugvarianten und Bemaßungsfehlern bleibt enthalten.
-Der offene PR zur Vollflächenansicht wird separat weiterentwickelt.
-Die Änderungen stehen unter „Unreleased“; eine neue Release-Version wird hier nicht vorweggenommen.
+In der vorbereiteten 0.6.0 sind sie mit der Vollflächenansicht aus PR #8 kombiniert.
+Die folgende Vergleichsmessung bezieht sich auf den zuvor separat geprüften Performance-Branch.
 
 ## Was sich ändert
 
@@ -34,7 +34,7 @@ Ein Cache nur anhand dieser Nummer würde falsche Geometrie anzeigen können.
 
 ## Nachweise und Wiederholung
 
-`node --test tests/*.test.cjs` enthält 74 Tests; zusätzlich bestehen die sechs
+`node --test tests/*.test.cjs` enthält nach Integration der Vollflächenansicht 82 Tests; zusätzlich bestehen die sechs
 Python-Prüfungen für Herkunft, Offline-Inventar und Release-Pakete. Neue Fälle
 prüfen gleichzeitige Abfragen, Dokument-/Einheitenwechsel, Kameraprojektionen,
 große Skizzen, Scrollgesten und abgebrochene oder sehr kurze Pencil-Striche.

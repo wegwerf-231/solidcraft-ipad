@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SEMVER = re.compile(r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?')
 BUILD_LINE = re.compile(r'^/\* @build \*/ const VERSION = .*?;$', re.M)
-REQUIRED = ['keypad-tools.js', 'pencil-gestures.js', 'touch-shell.js', 'sketch-tools.js', 'sketch-tools-view.js', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE', 'FORK-NOTICE.md',
+REQUIRED = ['canvas-shift.js', 'keypad-tools.js', 'pencil-gestures.js', 'touch-shell.js', 'sketch-tools.js', 'sketch-tools-view.js', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE', 'FORK-NOTICE.md',
             'THIRD-PARTY-LICENSES.txt', 'IPAD-ANPASSUNG.md', 'README.md', 'CHANGELOG.md',
             'project.json', 'project-version.js', 'about.html', 'legal/upstream-files.json',
             'legal/upstream/ATTRIBUTION.md', 'legal/upstream/DISCLAIMER.md',

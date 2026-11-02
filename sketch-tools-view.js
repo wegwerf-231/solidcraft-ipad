@@ -59,8 +59,9 @@
     function contextKey(s) {
       return s ? JSON.stringify([s.context.document_id, s.context.revision, s.sketch.id]) : "";
     }
+    const topLimit = () => document.body.classList.contains("sc-shift") ? 8 : 150;
     function labelButton(record, position) {
-      if (!M.point(position) || position[0] < 0 || position[1] < 150 || position[0] > innerWidth || position[1] > innerHeight - 50) return null;
+      if (!M.point(position) || position[0] < 0 || position[1] < topLimit() || position[0] > innerWidth || position[1] > innerHeight - 50) return null;
       const b = button(record.text, record.action); b.dataset.scene = "1";
       if (record.kind === "glyph") b.className = "sk-glyph";
       if (record.kind === "pair") { b.className = "sk-pair"; delete b.dataset.scene; } // Bedienknopf, auch per Finger
@@ -71,9 +72,9 @@
     function placement(item, occupied, maxX) {
       const { position, width, height } = item;
       let x = Math.max(6, Math.min(maxX - width, position[0] - width / 2));
-      let y = Math.max(160, Math.min(innerHeight - 105, position[1] - height / 2));
+      let y = Math.max(topLimit() + 10, Math.min(innerHeight - 105, position[1] - height / 2));
       for (let tries = 0; tries < 8 && occupied.some((r) => x < r.x + r.w + 3 && x + width + 3 > r.x && y < r.y + r.h + 3 && y + height + 3 > r.y); tries++) y -= height + 4;
-      if (y < 155 || options.isUI(x + width / 2, y + height / 2)) return null;
+      if (y < topLimit() + 5 || options.isUI(x + width / 2, y + height / 2)) return null;
       occupied.push({ x, y, w: width, h: height });
       return { x, y };
     }
@@ -93,7 +94,7 @@
           const out = document.createElement("output");
           out.textContent = M.formatted(control.model.value, false, control.units) + " · gemessen";
           out.setAttribute("aria-label", "Gemessene Kantenlänge, nicht gebunden");
-          out.style.cssText = `position:absolute;left:${Math.max(8,Math.min(innerWidth-180,control.model.screen[0]))}px;top:${Math.max(160,control.model.screen[1]-50)}px;background:#242830;color:#e8ebf0;padding:10px;border:1px solid #8094af;border-radius:8px;font:15px system-ui`;
+          out.style.cssText = `position:absolute;left:${Math.max(8,Math.min(innerWidth-180,control.model.screen[0]))}px;top:${Math.max(topLimit()+10,control.model.screen[1]-50)}px;background:#242830;color:#e8ebf0;padding:10px;border:1px solid #8094af;border-radius:8px;font:15px system-ui`;
           labels.appendChild(out);
         }
         return;
@@ -134,15 +135,25 @@
           const native = (s.selection.dimensions || []).find((d) => d.id === c.id || d.id === c.param);
           const value = M.ANGLES.has(c.type) ? c.value * 180 / Math.PI : c.value;
           records.push({ kind: "dimension", action: "edit", id: c.id, at: a[0], screen: native && [native.x, native.y], text: `${c.param ? "🔒 " : ""}${c.type === "radius" ? "R " : c.type === "diameter" ? "Ø " : ""}${M.formatted(value, M.ANGLES.has(c.type), control.units)} · ${c.param ? "fest" : "Referenz"}`, title: c.param ? "Festes Maß ändern" : "Referenzmaß: durch andere Bedingungen bestimmt" });
-        } else if (glyphNames[c.type] && (s.options.show_constraints || M.related(s.sketch, c, chosen))) {
+        } else if (glyphNames[c.type] && chosen.length && M.related(s.sketch, c, chosen)) {
           const a = M.anchors(s.sketch, c); if (!a.length) continue;
           records.push({ kind: "glyph", action: "select-constraint", id: c.id, at: a[0], text: glyphNames[c.type][0], title: glyphNames[c.type][1] + " auswählen", selected: chosen.some((x) => x.type === "sketch_constraint" && x.id === c.id) });
         }
       }
       const selectedIds = new Set(chosen.filter((x) => x.type === "sketch_curve").map((x) => x.id));
       const dimensioned = new Set(s.sketch.constraints.filter((k) => M.isDimension(k) && ["length", "radius", "diameter", "arc_length"].includes(k.type)).flatMap(M.constraintCurveIndices));
-      for (const c of s.sketch.curves.filter((x) => s.options.show_dimensions || selectedIds.has(x.id) || control.lastAdded.includes(x.id)).slice(0, 200)) {
+      // Freie Maße wie in Shapr3D nur an gewählter oder gerade gezeichneter Geometrie, nicht an allem.
+      // Gleich lange parallele Linien (z. B. gegenüberliegende Rechteckseiten) erhalten nur ein Etikett.
+      const shown = [];
+      const twin = (c) => c.type === "line" && shown.some((o) => {
+        const a = [c.end_at[0] - c.start_at[0], c.end_at[1] - c.start_at[1]], b = [o.end_at[0] - o.start_at[0], o.end_at[1] - o.start_at[1]];
+        const la = Math.hypot(...a), lb = Math.hypot(...b);
+        return la > 1e-9 && lb > 1e-9 && Math.abs(la - lb) < 1e-6 * Math.max(1, la) && Math.abs(a[0] * b[1] - a[1] * b[0]) < 1e-6 * la * lb;
+      });
+      const freeCurves = s.sketch.curves.filter((x) => selectedIds.has(x.id) || (!selectedIds.size && control.lastAdded.includes(x.id)));
+      for (const c of freeCurves.slice(0, 200)) {
         const idx = s.sketch.curves.indexOf(c);
+        if (!selectedIds.has(c.id) && c.type === "line" && M.point(c.start_at) && M.point(c.end_at)) { if (twin(c)) continue; shown.push(c); }
         if (dimensioned.has(idx)) continue;
         const choices = M.dimensionChoices(s.sketch, [{ type: "sketch_curve", id: c.id, sketch: s.sketch.id }]);
         const d = choices[0], at = M.curvePoint(c); if (!d || !at) continue;
@@ -170,16 +181,20 @@
           const value = M.measureChoice(s.sketch, d);
           records.unshift({ kind: "pair", action: "dimension:" + d.key, at, text: (d.key === "angle" ? "∠ " : "↔ ") + M.formatted(value, d.key === "angle", control.units) + " festlegen", title: d.label + " zwischen den zwei Linien festlegen" });
         }
-      return records;
+      const corners = freeCurves.filter(c => c.type === "line" && M.point(c.start_at)).map(c => M.point(c.start_at));
+      const centre = corners.length >= 3 ? [corners.reduce((t,p) => t+p[0],0)/corners.length, corners.reduce((t,p) => t+p[1],0)/corners.length] : null;
+      return { records, centre };
     }
 
     async function project(s) {
       if (projectionBusy || labels.hidden) return;
       projectionBusy = true;
       try {
-        const records = recordsFor(s);
+        const { records, centre } = recordsFor(s);
         const inputs = records.map((r) => r.at);
         for (const r of records) if (r.ends) { r.endIndex = inputs.length; inputs.push(...r.ends); }
+        const centreIndex = centre ? inputs.length : -1;
+        if (centre) inputs.push(centre);
         // Share projection batches between visible labels and Pencil hit tests.
         // Hit geometry refreshes even when labels are absent or unchanged.
         const lines = s.sketch.curves.filter((c) => c.type === "line").slice(0, 256);
@@ -193,7 +208,7 @@
         projected = lines.map((c, i) => ({ a: points[lineStart + i * 2], b: points[lineStart + i * 2 + 1] }));
         projectionContext = contextKey(s);
         const maxX = open && !panel.hidden ? Math.min(innerWidth - 6, panel.getBoundingClientRect().left - 6) : innerWidth - 6;
-        const sig = JSON.stringify([projectionContext, records, points.slice(0, lineStart), innerWidth, innerHeight, maxX]);
+        const sig = JSON.stringify([projectionContext, records, points.slice(0, lineStart), innerWidth, innerHeight, maxX, topLimit()]);
         if (sig === labelKey) return;
         labelKey = sig; buttons.clear();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -205,7 +220,10 @@
         const dimensionLine = (a,b) => {
           if(!M.point(a)||!M.point(b))return null;
           const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy);if(len<1)return null;
-          const sign=dx<0?-1:1,n=[sign*dy/len*30,-sign*dx/len*30],u=[dx/len,dy/len],v=[-u[1],u[0]];
+          let sign=dx<0?-1:1;
+          const screenCentre=centreIndex>=0&&M.point(points[centreIndex]);
+          if(screenCentre){const mx=(a[0]+b[0])/2-screenCentre[0],my=(a[1]+b[1])/2-screenCentre[1];sign=(dy*mx-dx*my)>=0?1:-1;}
+          const n=[sign*dy/len*30,-sign*dx/len*30],u=[dx/len,dy/len],v=[-u[1],u[0]];
           const p=[a[0]+n[0],a[1]+n[1]],q=[b[0]+n[0],b[1]+n[1]];
           line(a,p);line(b,q);line(p,q);
           for(const [tip,s] of [[p,1],[q,-1]])for(const side of [-1,1])line(tip,[tip[0]+u[0]*s*7+v[0]*side*3,tip[1]+u[1]*s*7+v[1]*side*3]);
