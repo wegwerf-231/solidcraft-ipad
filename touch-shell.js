@@ -123,6 +123,9 @@
 #sc-ipad-ui button:focus-visible{outline:2px solid #a9d4ff;outline-offset:1px}
 #sc-ipad-ui .sc-pad{z-index:5;max-height:calc(100vh - 88px);max-height:calc(100dvh - 88px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
 #sc-ipad-ui .sc-pad .unit{height:36px}
+#sc-ipad-ui[data-shell-mode=touch] .sc-pad{grid-template-columns:repeat(5,46px);gap:6px;padding:8px}
+#sc-ipad-ui[data-shell-mode=touch] .sc-pad button{height:44px;border-radius:10px}
+#sc-ipad-ui[data-shell-mode=touch] .sc-pad .unit{height:32px}
 @media(max-width:560px){#sc-ipad-ui .ts-rail{width:46px}#sc-ipad-ui .ts-rail .ts-label{display:none}#sc-ipad-ui .ts-rail button{justify-content:center;padding:6px 4px}#sc-ipad-ui .ts-history{flex-direction:column}#sc-ipad-ui .ts-hint{display:none}}
 `;
     document.head.appendChild(style);

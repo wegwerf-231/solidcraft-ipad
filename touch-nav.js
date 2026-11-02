@@ -932,6 +932,13 @@
       if (r.left > 2 || r.top > 2) p = { x: r.left, y: r.top };
     }
     const w = pad.offsetWidth, h = pad.offsetHeight;
+    // iPad-Skizzenansicht: rechts über der Bedingungen-Leiste, damit die Zeichnung frei bleibt (wie in Shapr3D)
+    const shell = document.getElementById(UI_ID);
+    if (shell && shell.dataset.shellMode === "touch") {
+      const panel = shell.querySelector(".sk-panel"), pr = panel && !panel.hidden && panel.getBoundingClientRect();
+      pad.style.left = Math.max(8, innerWidth - w - 6) + "px"; pad.style.top = Math.max(8, pr && pr.height ? pr.top : 8) + "px"; pad.style.bottom = "auto";
+      return;
+    }
     let x = p.x + 130, y = p.y - h / 2;
     if (x + w > innerWidth - 12) x = p.x - w - 130;
     x = Math.max(railWidth() + 12, Math.min(innerWidth - w - 12, x));

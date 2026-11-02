@@ -16,6 +16,13 @@ Rückmeldung aus dem Gerätetest von 0.5.0 („die Schaltfläche ist immer noch 
 - Alle Bildschirmkoordinaten der Browser-Schnittstelle werden umgerechnet, sodass Pencil,
   Ziffernfeld, Maßetiketten und Auswahl unverändert treffen.
 - „Erweitert“, Verlassen der Skizze und `?fullsketch=off` zeigen die unveränderte Oberfläche.
+- Weniger Maße an der Geometrie: freie Maße erscheinen nur noch an gewählter oder gerade
+  gezeichneter Geometrie, gegenüberliegende gleich lange Seiten nur einmal, Maßlinien außerhalb
+  der Form. Bisher erhielt jede Kante dauerhaft ein Etikett mit Maßlinie.
+- Keine doppelten Bedingungssymbole mehr: SolidCraft zeichnet die Symbole selbst; die eigenen,
+  größeren Symbole erscheinen nur noch an der Auswahl.
+- Ziffernfeld kleiner und rechts über der Bedingungen-Leiste statt mitten über der Zeichnung.
+- Die halb verdeckte Zustandszeile („… degrees of freedom“) wird in der iPad-Ansicht ausgeblendet.
 
 ## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
 

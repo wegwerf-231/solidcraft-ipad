@@ -105,6 +105,20 @@ body.sc-shift #sc-ipad-ui .ts-menu:not(.flyout){top:48px!important}`;
     }
   }
 
+  // Die Zustandszeile des Ansichtsfensters („Sketch1 — 1 degree of freedom“) läge sonst halb unter der
+  // Werkzeugleiste. Während der Verschiebung ausblenden, danach den vorherigen Wert wiederherstellen.
+  let savedSummary = null;
+  async function summary(off) {
+    try {
+      if (off) {
+        const prefs = await raw.request("ui.prefs", {});
+        if (prefs && prefs.viewport_status_summary) { savedSummary = true; await raw.request("ui.prefs", { viewport_status_summary: false }); }
+      } else if (savedSummary) {
+        savedSummary = null; await raw.request("ui.prefs", { viewport_status_summary: true });
+      }
+    } catch (_) {}
+  }
+
   let busy = false;
   async function tick() {
     if (DISABLED || busy || !raw) return;
@@ -118,10 +132,12 @@ body.sc-shift #sc-ipad-ui .ts-menu:not(.flyout){top:48px!important}`;
         shift = s;
         document.body.style.setProperty("--sc-shift", s + "px");
         document.body.classList.add("sc-shift");
+        await summary(true);
       } else {
         shift = 0;
         document.body.classList.remove("sc-shift");
         document.body.style.removeProperty("--sc-shift");
+        await summary(false);
       }
     } finally {
       busy = false;

@@ -130,14 +130,26 @@
             const native = (s.selection.dimensions || []).find((d) => d.id === c.id || d.id === c.param);
             const value = M.ANGLES.has(c.type) ? c.value * 180 / Math.PI : c.value;
             records.push({ kind: "dimension", action: "edit", id: c.id, at: a[0], screen: native && [native.x, native.y], text: `${c.param ? "🔒 " : ""}${c.type === "radius" ? "R " : c.type === "diameter" ? "Ø " : ""}${M.formatted(value, M.ANGLES.has(c.type), control.units)} · ${c.param ? "fest" : "Referenz"}`, title: c.param ? "Festes Maß ändern" : "Referenzmaß: durch andere Bedingungen bestimmt" });
-          } else if (glyphNames[c.type] && (s.options.show_constraints || M.related(s.sketch, c, chosen))) {
+          } else if (glyphNames[c.type] && chosen.length && M.related(s.sketch, c, chosen)) {
+            // Bedingungssymbole zeichnet SolidCraft selbst; eigene (größere) Symbole nur für die Auswahl,
+            // damit nichts doppelt erscheint.
             const a = M.anchors(s.sketch, c); if (!a.length) continue;
             records.push({ kind: "glyph", action: "select-constraint", id: c.id, at: a[0], text: glyphNames[c.type][0], title: glyphNames[c.type][1] + " auswählen", selected: chosen.some((x) => x.type === "sketch_constraint" && x.id === c.id) });
           }
         }
         const selectedIds = chosen.filter((x) => x.type === "sketch_curve").map((x) => x.id);
-        for (const c of s.sketch.curves.filter((x) => s.options.show_dimensions || selectedIds.includes(x.id) || control.lastAdded.includes(x.id)).slice(0, 200)) {
+        // Freie Maße wie in Shapr3D nur an gewählter oder gerade gezeichneter Geometrie, nicht an allem.
+        // Gleich lange parallele Linien (z. B. gegenüberliegende Rechteckseiten) erhalten nur ein Etikett.
+        const shown = [];
+        const twin = (c) => c.type === "line" && shown.some((o) => {
+          const a = [c.end_at[0] - c.start_at[0], c.end_at[1] - c.start_at[1]], b = [o.end_at[0] - o.start_at[0], o.end_at[1] - o.start_at[1]];
+          const la = Math.hypot(...a), lb = Math.hypot(...b);
+          return la > 1e-9 && lb > 1e-9 && Math.abs(la - lb) < 1e-6 * Math.max(1, la) && Math.abs(a[0] * b[1] - a[1] * b[0]) < 1e-6 * la * lb;
+        });
+        const freeCurves = s.sketch.curves.filter((x) => selectedIds.includes(x.id) || (!selectedIds.length && control.lastAdded.includes(x.id)));
+        for (const c of freeCurves.slice(0, 200)) {
           const idx = s.sketch.curves.indexOf(c);
+          if (!selectedIds.includes(c.id) && c.type === "line" && M.point(c.start_at) && M.point(c.end_at)) { if (twin(c)) continue; shown.push(c); }
           if (s.sketch.constraints.some((k) => M.isDimension(k) && ["length", "radius", "diameter", "arc_length"].includes(k.type) && M.constraintCurveIndices(k).includes(idx))) continue;
           const choices = M.dimensionChoices(s.sketch, [{ type: "sketch_curve", id: c.id, sketch: s.sketch.id }]);
           const d = choices[0], at = M.curvePoint(c); if (!d || !at) continue;
@@ -166,6 +178,10 @@
         }
         const inputs = records.map((r) => r.at);
         for (const r of records) if (r.ends) { r.endIndex = inputs.length; inputs.push(...r.ends); }
+        // Schwerpunkt der gezeigten Geometrie: Maßlinien liegen außerhalb der Form (wie in Shapr3D).
+        const corners = freeCurves.filter((c) => c.type === "line" && M.point(c.start_at)).map((c) => M.point(c.start_at));
+        const centreIndex = corners.length >= 3 ? inputs.length : -1;
+        if (centreIndex >= 0) inputs.push([corners.reduce((t, p) => t + p[0], 0) / corners.length, corners.reduce((t, p) => t + p[1], 0) / corners.length]);
         const points = await options.request("ui.sketchToScreen", { points: inputs });
         if (control.snapshot !== s || control.editor) return;
         const sig = JSON.stringify([records, points, innerWidth, innerHeight, open]);
@@ -180,7 +196,10 @@
         const dimensionLine = (a,b) => {
           if(!M.point(a)||!M.point(b))return null;
           const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy);if(len<1)return null;
-          const sign=dx<0?-1:1,n=[sign*dy/len*30,-sign*dx/len*30],u=[dx/len,dy/len],v=[-u[1],u[0]];
+          let sign=dx<0?-1:1;
+          const centre=centreIndex>=0&&M.point(points[centreIndex]);
+          if(centre){const mx=(a[0]+b[0])/2-centre[0],my=(a[1]+b[1])/2-centre[1];sign=(dy*mx-dx*my)>=0?1:-1;}
+          const n=[sign*dy/len*30,-sign*dx/len*30],u=[dx/len,dy/len],v=[-u[1],u[0]];
           const p=[a[0]+n[0],a[1]+n[1]],q=[b[0]+n[0],b[1]+n[1]];
           line(a,p);line(b,q);line(p,q);
           for(const [tip,s] of [[p,1],[q,-1]])for(const side of [-1,1])line(tip,[tip[0]+u[0]*s*7+v[0]*side*3,tip[1]+u[1]*s*7+v[1]*side*3]);

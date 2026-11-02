@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0+d73f72f24f82cd44",
+  "version": "0.6.0+d4fb211ae3b40b66",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -48,7 +48,7 @@
     },
     {
       "file": "canvas-shift.js",
-      "sha256": "a972917d58453b13e4d06ef711f3ce91a7769e3fadb68b8106950aa980eb4470"
+      "sha256": "17646b64af7fce5918f110c94fd541e489b9c290b8f9175cb092d2751171d1c6"
     },
     {
       "file": "docs/KEYPAD-PENCIL.md",
@@ -176,7 +176,7 @@
     },
     {
       "file": "sketch-tools-view.js",
-      "sha256": "e88a46ac8098c14b9dc9e39d54a470b5cc899f085ce6aa80f4e1815ae4196af5"
+      "sha256": "5df81d884fc1ac36c8baf48e07a7f43a52fd72b8da3c6747a4f95bd90592197d"
     },
     {
       "file": "sketch-tools.js",
@@ -216,11 +216,11 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "0d6c58472b8e308218817132519acf0061da506d2b04fdfa2eaff2963d7edcb3"
+      "sha256": "89a9f45014ca658c1985138a8f3438df91c16f7b7c888655697f20039991efb5"
     },
     {
       "file": "touch-shell.js",
-      "sha256": "f5185bfd7646cd38c66c4dc3e0a48bdfc666aec42031b1fe07603a62c01cdf2f"
+      "sha256": "29c807e70ced4c394eaaffc1b465a4405ce5c830c932e422aff36f2e23e1c57a"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",
