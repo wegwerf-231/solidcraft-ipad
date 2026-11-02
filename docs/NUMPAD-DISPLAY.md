@@ -114,3 +114,12 @@ Das ersetzt keine Safari-Abnahme auf dem betroffenen iPad.
 Extrusionsdialog. „Abstand“ antippen; der Zähler oben zeigt, ob der Browser weiterläuft,
 und nennt Öffnungszustand bzw. Fehlermeldung. Die Testseite lädt den CAD-Kern im
 Sample-Modus und verwendet ausschließlich erzeugte Testgeometrie.
+
+
+Geräterückmeldung zur Korrektur (02.11.2026): Der betroffene Nutzer hat den
+isolierten Teststand auf seinem iPad geöffnet und ausdrücklich bestätigt:
+„Ja, Numpad öffnet sich und reagiert“. Damit ist der gemeldete Öffnungsablauf
+auf diesem Gerät positiv geprüft. iPad-Modell und iPadOS-/Safari-Version wurden
+nicht erfasst; eine vollständige Geräteabnahme aller übrigen Funktionen ist
+dadurch nicht ersetzt. Die genaue ursprüngliche Ursache lässt sich aus dieser
+Rückmeldung allein nicht abschließend bestimmen.

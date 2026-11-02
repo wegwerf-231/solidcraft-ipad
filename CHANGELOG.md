@@ -4,11 +4,13 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-02
+
 - Numpad auf iPadOS: versteckten nativen Texteingang bis zur ausdrücklich angeforderten Systemtastatur schreibgeschützt halten.
 - Viewport-Anpassung ohne Scroll-Abonnement, wiederholte Layout-Schreibzugriffe oder erneutes Vermessen unveränderter Größen.
 - Zahlenfeld-Tipps bevorzugen vorhandene Trefferpositionen; weitere Abfragen erfolgen außerhalb des Touch-Ereignisses.
 - Numpad-Öffnung gegen parallele Aufrufe, ausbleibende Leseantworten und verspätete Antworten nach Abbruch absichern; Zeitüberschreitung sichtbar melden.
-- Isolierter Finger-/Pencil-Test und vereinfachter Geräteprüfstand ergänzt. Der gemeldete iPad-Freeze ist im Desktop nicht reproduziert; Gerätebestätigung steht aus.
+- Isolierter Finger-/Pencil-Test und vereinfachter Geräteprüfstand ergänzt. Der gemeldete iPad-Freeze war im Desktop nicht reproduziert; der Nutzer bestätigt im korrigierten Geräteprüfstand, dass das Numpad auf seinem iPad öffnet und reagiert.
 
 ## [0.6.1] - 2026-11-02
 
