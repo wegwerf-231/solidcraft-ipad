@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0+d4fb211ae3b40b66",
+  "version": "0.6.0+0dd8ce53481ad130",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "65811ff2003d85091cc79f25546c4fc5f6f58fa187afabf3af4378198bef75da"
+      "sha256": "43cbef7c0b24dc587e5ee76e2d30e79254ca70929d8279044ef84a6cd4b0bee9"
     },
     {
       "file": "CONTRIBUTING.md",
