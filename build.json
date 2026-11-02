@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0+0dd8ce53481ad130",
+  "version": "0.6.0+95fed94799de3922",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "43cbef7c0b24dc587e5ee76e2d30e79254ca70929d8279044ef84a6cd4b0bee9"
+      "sha256": "6784f9d1a4e0348fa8736c8c3ecf96c0f1cbf69a43059f222056daa6e49b5d25"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "c6aa7e899f23a4fcf96d25b44cdc51e5940f2befb620ef38847890c594357217"
+      "sha256": "91819f5c9f1096cc1b247154e6beb05e92976ce273f72d85d629eeef661638d0"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "0b57bc2f596e5d96f05d31211a0284f9dd7c861ce449469d40b3c883290922bd"
+      "sha256": "8f88ca0212e7b834d29809a4328b6371ea5928f0e8b4e2204558fe421c122a5c"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -48,7 +48,11 @@
     },
     {
       "file": "canvas-shift.js",
-      "sha256": "17646b64af7fce5918f110c94fd541e489b9c290b8f9175cb092d2751171d1c6"
+      "sha256": "40d78f59bec5f0881822858dc58dc0f298c513c6ac901466043e406592e19679"
+    },
+    {
+      "file": "docs/IPAD-PERFORMANCE.md",
+      "sha256": "fd9932a97d50ed6cb37b0016052e9e1de336df8b301a8672954c265a1743343a"
     },
     {
       "file": "docs/KEYPAD-PENCIL.md",
@@ -68,7 +72,7 @@
     },
     {
       "file": "docs/TOUCH-SHELL.md",
-      "sha256": "e29fc9671196cd588769bf4303f1c342e23a44c65b04ab24cf0b9946deefc74f"
+      "sha256": "ff05a903444e2762487671a9ab71be93190f16dc49ec62b8b9f182c2a3714842"
     },
     {
       "file": "docs/screenshots/ap2-error.png",
@@ -85,6 +89,14 @@
     {
       "file": "docs/screenshots/ap7-touch.png",
       "sha256": "58cf3debfecd35746633e6d38f28108d0f303b0d652fa349f2078723294a5c41"
+    },
+    {
+      "file": "docs/screenshots/ipad-performance-spline.png",
+      "sha256": "3a5c08e0a141960e6f4bbb790dbd312b6d2fdf687553a001359f13b0e32bc8d0"
+    },
+    {
+      "file": "docs/screenshots/pr8-pr9-integrated.png",
+      "sha256": "ea90f90862f6a226657dca0eac9dbbead3e87aacbd7ca43fbe3c272158758d8e"
     },
     {
       "file": "fonts/BIZUDPGothic-Regular.ttf",
@@ -156,11 +168,11 @@
     },
     {
       "file": "pencil-gestures.js",
-      "sha256": "41990a0d831525fc79fe917e05bc0d75e69c8f66019dea25836ada2bf4a00e5e"
+      "sha256": "49f2a62833faa7cb57f2d0c7387dd5d81b959cef31f0e62d31b7a60b1754a607"
     },
     {
       "file": "pencil-sketch.js",
-      "sha256": "ee5e383d7fd499b6058b4e7397de4dd2c7c1cd859a50a39a3867de641970274d"
+      "sha256": "9f8404e246b81ffa46fdf7bdbf60f6c9665d28ba8b5a3d46c6bddf79b4c0220e"
     },
     {
       "file": "project-version.js",
@@ -172,19 +184,23 @@
     },
     {
       "file": "scripts/release.py",
-      "sha256": "df1959a1b68d888cab38c58e1b185abc261d9f5bc10531abe6526800c65c3a38"
+      "sha256": "55e75eb7fb7e1e2aee4d17573f784f91bb2685ba24cf739ae5d679a6dec2165f"
     },
     {
       "file": "sketch-tools-view.js",
-      "sha256": "5df81d884fc1ac36c8baf48e07a7f43a52fd72b8da3c6747a4f95bd90592197d"
+      "sha256": "1b35e71e27166a097e843a3fa235dd1187521ef89c95a10a1d6308b0c62d7c6f"
     },
     {
       "file": "sketch-tools.js",
-      "sha256": "634e0637be028aedb88ca888758899484d82c18354ecde04358d3c5aa0370383"
+      "sha256": "cdc40fd4361c03aedb71cace6ac522c254c6eb7af5ec6e8c992e172d73f9a8dc"
     },
     {
       "file": "solidcraft-web-4b1d77a936edaef2.js",
       "sha256": "a1766999f27bac22c11e93e18da9bdba4f4a3e01a412803fe179c9559bee858d"
+    },
+    {
+      "file": "tests/canvas-shift.test.cjs",
+      "sha256": "febe2aedbed2570ea575cc246ca9530aaa59d204598a258a50a2d491d6ddaf85"
     },
     {
       "file": "tests/keypad-tools.test.cjs",
@@ -195,20 +211,36 @@
       "sha256": "b0f6169b9eba2a44f839617b18f31c4c428f7108eb0cac1fc50b69defeefbe86"
     },
     {
+      "file": "tests/pencil-ink.test.cjs",
+      "sha256": "2b435810bbc84bd5573bebc0147b87bc368e28bef478a79169ddc521ada01966"
+    },
+    {
       "file": "tests/pencil-integration.test.cjs",
       "sha256": "3df7ed355e1bc1b91511ecaebb04698deeada2790d2e450ad114665637ce3e4f"
     },
     {
       "file": "tests/sketch-browser.html",
-      "sha256": "bbb675dac9879d31d5cd99f5e3fa52ff9b8cd885675e31d8c37c1437ff0de7c9"
+      "sha256": "6cee6380498d1dcfafb0bf4112fb7898d0a08c429cf627c9e9c0aa2900ea45ce"
+    },
+    {
+      "file": "tests/sketch-refresh.test.cjs",
+      "sha256": "43bdcf74d426ada935808d6709fd2a31ad324fc652121589136d451347a5aa6d"
     },
     {
       "file": "tests/sketch-tools.test.cjs",
       "sha256": "0645027b065224734736543320e80637c8acec88a3d01ab42dbb1b14da6ecec2"
     },
     {
+      "file": "tests/sketch-view.test.cjs",
+      "sha256": "b44d442feb3ea0673cbc42c9a716decede3c2bdb3a563c1e1ffed2c444be6669"
+    },
+    {
       "file": "tests/test_release.py",
       "sha256": "12e5779ada482a3f28be5fa29e36d90b227574547bba148c222d4039e9fa1ad5"
+    },
+    {
+      "file": "tests/touch-refresh.test.cjs",
+      "sha256": "483ac8236b1a685226b7b6183f65e6673246e63825e78b82bfb496dc77bfa858"
     },
     {
       "file": "tests/touch-shell.test.cjs",
@@ -216,7 +248,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "89a9f45014ca658c1985138a8f3438df91c16f7b7c888655697f20039991efb5"
+      "sha256": "56fdc313d89b716e8ae3b047a4dcd09a95741cd5fb3c9acc4965ec26c5eec21e"
     },
     {
       "file": "touch-shell.js",

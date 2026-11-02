@@ -24,6 +24,17 @@ Rückmeldung aus dem Gerätetest von 0.5.0 („die Schaltfläche ist immer noch 
 - Ziffernfeld kleiner und rechts über der Bedingungen-Leiste statt mitten über der Zeichnung.
 - Die halb verdeckte Zustandszeile („… degrees of freedom“) wird in der iPad-Ansicht ausgeblendet.
 
+- Gemeinsame, überlappungsfreie Aktualisierung für Werkzeugstatus, Auswahl, Leisten und Zeichenfelder; Hintergrundabfragen während Finger-/Pencil-Gesten und in ausgeblendeten Tabs pausieren.
+- Pencil-Tinte höchstens einmal pro Bildschirmbild aktualisieren, vorhandene Koordinatentexte wiederverwenden und den letzten Punkt beim Abheben sofort darstellen.
+- Maßetiketten gesammelt einfügen/vermessen/platzieren; Projektion gemeinsam mit Pencil-Treffflächen in begrenzten Paketen abfragen.
+- Veraltete Pencil-Treffflächen nach Kamera-/Dokumentwechsel verwerfen; Scrollen in der Bedingungen-Leiste löst keine Aktion aus.
+- Gleichzeitige Skizzenabfragen warten auf aktuelle Auswahl; geänderte Dokumenteinheiten werden auch in einer geöffneten Skizze berücksichtigt.
+- Messverfahren und Geräteprüfliste: `docs/IPAD-PERFORMANCE.md`.
+
+
+- Zusammenführung mit den Performance-Verbesserungen aus PR #9; Koordinaten-Tests für Pixelverhältnis 1/2/3, Erweitert, Opt-out und Größenwechsel ergänzt.
+- Vollflächenversatz nach Größenwechsel neu messen und Treffzonen nach dem Canvas-Umbau aktualisieren.
+
 ## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
 
 Rückmeldung aus dem ersten Gerätetest auf dem iPad:

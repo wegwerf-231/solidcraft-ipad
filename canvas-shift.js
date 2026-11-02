@@ -119,25 +119,35 @@ body.sc-shift #sc-ipad-ui .ts-menu:not(.flyout){top:48px!important}`;
     } catch (_) {}
   }
 
-  let busy = false;
+  let busy = false, needsMeasure = false;
+  addEventListener("resize", () => { needsMeasure = true; });
+  function changed() {
+    // Let the canvas resize before consumers rebuild viewport hit zones.
+    requestAnimationFrame(() => requestAnimationFrame(() => dispatchEvent(new CustomEvent("solidcraft-canvas-shift"))));
+  }
   async function tick() {
-    if (DISABLED || busy || !raw) return;
+    if (DISABLED || busy || !raw || document.hidden) return;
     const host = document.getElementById("sc-ipad-ui");
     const want = !!host && host.dataset.shellMode === "touch";
-    if (want === !!shift) return;
+    if (want === !!shift && (!want || !needsMeasure)) return;
     busy = true;
     try {
       if (want) {
         const s = await measure();
+        if (document.getElementById("sc-ipad-ui")?.dataset.shellMode !== "touch") return;
+        needsMeasure = false;
+        const previous = shift;
         shift = s;
         document.body.style.setProperty("--sc-shift", s + "px");
         document.body.classList.add("sc-shift");
-        await summary(true);
+        if (!previous) await summary(true);
+        if (previous !== shift) changed();
       } else {
         shift = 0;
         document.body.classList.remove("sc-shift");
         document.body.style.removeProperty("--sc-shift");
         await summary(false);
+        changed();
       }
     } finally {
       busy = false;

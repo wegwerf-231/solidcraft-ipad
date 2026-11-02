@@ -31,6 +31,7 @@ Zahleneingabe. Funktionen und Grenzen: [IPAD-ANPASSUNG.md](IPAD-ANPASSUNG.md).
 AP 3 und AP 4: [Bedienung und Abnahme](docs/SKETCH-IPAD.md).
 AP 7: [iPad-Ansicht, Varianten und Erweitert-Modus](docs/TOUCH-SHELL.md).
 AP 2/6: [Zeichenwerte, Variablen und Pencil-Gesten](docs/KEYPAD-PENCIL.md).
+Optimierungen und Messverfahren: [iPad-Performance](docs/IPAD-PERFORMANCE.md).
 Vor wichtigen Arbeiten auf dem eigenen Gerät testen und Designs regelmäßig exportieren.
 
 ## Entwickeln und prüfen
