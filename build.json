@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0+203ba1271d047a22",
+  "version": "0.5.0+494ae050279f304e",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "89100af9ff5e80b7e38e0899bed8cd95c1b6b70843fe6e28d1941f40b7d82805"
+      "sha256": "656f74bf89f4882044cc798ec0f4f990beaa21dc60a95a530473b13c8c0cfcbf"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "7c9578f9e009e67ec252f5373d8ce546a9276e889c7accbeae031dfab7c87d23"
+      "sha256": "d944b117c1fe76e00f36d25a2f6fc709276c0479d4b6768ad8daf0c81189e80d"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "a2414aee9a1a5526dfbdc3d1a9a8137fb9db8a2374deb55505100feca0da8bf5"
+      "sha256": "743db792bd38f8bdd156fb1a61b7e7234eed7c6c4dbf0353ec141ad0562d4efb"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -45,6 +45,10 @@
     {
       "file": "about.html",
       "sha256": "bfa9a37f0f98aca6665b47bcdc90faf36a37c5165318c6ce0949d9ac2c2ba331"
+    },
+    {
+      "file": "docs/IPAD-PERFORMANCE.md",
+      "sha256": "baeb2fd1ccd805ed3255df0bf95e70d7918b3e75d735232b0432efc365b16342"
     },
     {
       "file": "docs/KEYPAD-PENCIL.md",
@@ -81,6 +85,10 @@
     {
       "file": "docs/screenshots/ap7-touch.png",
       "sha256": "58cf3debfecd35746633e6d38f28108d0f303b0d652fa349f2078723294a5c41"
+    },
+    {
+      "file": "docs/screenshots/ipad-performance-spline.png",
+      "sha256": "3a5c08e0a141960e6f4bbb790dbd312b6d2fdf687553a001359f13b0e32bc8d0"
     },
     {
       "file": "fonts/BIZUDPGothic-Regular.ttf",

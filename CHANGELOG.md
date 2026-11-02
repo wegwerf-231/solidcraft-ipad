@@ -4,6 +4,13 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+- Gemeinsame, überlappungsfreie Aktualisierung für Werkzeugstatus, Auswahl, Leisten und Zeichenfelder; Hintergrundabfragen während Finger-/Pencil-Gesten und in ausgeblendeten Tabs pausieren.
+- Pencil-Tinte höchstens einmal pro Bildschirmbild aktualisieren, vorhandene Koordinatentexte wiederverwenden und den letzten Punkt beim Abheben sofort darstellen.
+- Maßetiketten gesammelt einfügen/vermessen/platzieren; Projektion gemeinsam mit Pencil-Treffflächen in begrenzten Paketen abfragen.
+- Veraltete Pencil-Treffflächen nach Kamera-/Dokumentwechsel verwerfen; Scrollen in der Bedingungen-Leiste löst keine Aktion aus.
+- Gleichzeitige Skizzenabfragen warten auf aktuelle Auswahl; geänderte Dokumenteinheiten werden auch in einer geöffneten Skizze berücksichtigt.
+- Messverfahren und Geräteprüfliste: `docs/IPAD-PERFORMANCE.md`.
+
 ## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
 
 Rückmeldung aus dem ersten Gerätetest auf dem iPad:
