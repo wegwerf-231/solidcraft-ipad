@@ -25,7 +25,7 @@ function fixture() {
   vm.createContext(context);
   const source = fs.readFileSync(require.resolve('../touch-nav.js'), 'utf8');
   vm.runInContext(source.replace(/\}\)\(\);\s*$/, `
-    globalThis.hooks = { refreshUI, fieldCheck, appState, numericIntent, move, releaseAfterMoves, displayInfo, onPointer,
+    globalThis.hooks = { refreshUI, fieldCheck, appState, numericIntent, move, releaseAfterMoves, displayInfo, onPointer, nativeTextMode,
       gesture(value) { state = value; }, pen(value) { stylusStart = value; },
       setup(sketch, shell, render, el, keypad) {
         sketchTools = sketch; touchShell = shell;
@@ -42,7 +42,7 @@ function fixture() {
   const sketch = { refresh: async (i, s) => render('sketch', i, s) };
   const shell = { refresh: async (i, s) => render('shell', i, s) };
   context.hooks.setup(sketch, shell, render);
-  return { calls, rendered, events, document, info, selection, canvas, mouseEvents, microtasks, frames, flushMicrotasks(){while(microtasks.length)microtasks.shift()();}, flushFrame(){const pending=frames.splice(0);for(const fn of pending)if(fn)fn();}, hooks: context.hooks,
+  return { navigator:context.navigator, calls, rendered, events, document, info, selection, canvas, mouseEvents, microtasks, frames, flushMicrotasks(){while(microtasks.length)microtasks.shift()();}, flushFrame(){const pending=frames.splice(0);for(const fn of pending)if(fn)fn();}, hooks: context.hooks,
     hold(promise) { hold = promise; }, fail(value) { fail = value; },
     focused(dialog = null) {
       const el = { setAttribute() {} }; document.activeElement = el;
@@ -125,4 +125,13 @@ test('display diagnostics distinguish Retina resolution from a stretched lower-r
  const f=fixture();assert.equal(f.hooks.displayInfo().nativeResolution,true);
  f.canvas.width=1024;f.canvas.height=768;assert.equal(f.hooks.displayInfo().nativeResolution,false);
  assert.equal(f.hooks.displayInfo().dpr,2);
+});
+
+
+test('iPad native text agent remains read-only until keyboard input is explicitly requested',()=>{
+ const f=fixture(),attrs={},el={setAttribute:(k,v)=>attrs[k]=v};
+ f.navigator.userAgent='Mozilla/5.0 (Macintosh; Intel Mac OS X)';f.navigator.maxTouchPoints=5;
+ f.hooks.nativeTextMode(el,false);assert.equal(el.readOnly,true);assert.equal(attrs.inputmode,'none');
+ f.hooks.nativeTextMode(el,true);assert.equal(el.readOnly,false);assert.equal(attrs.inputmode,'text');
+ f.navigator.maxTouchPoints=0;f.hooks.nativeTextMode(el,false);assert.equal(el.readOnly,false);
 });

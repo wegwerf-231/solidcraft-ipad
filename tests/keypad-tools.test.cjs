@@ -55,3 +55,26 @@ test('confirm on the first rectangle field moves to the height field instead of 
 test('field names follow the drawing tool',()=>{
  assert.deepEqual(K.FIELDS('sketch.rectangle.center'),['Breite','Höhe']);assert.deepEqual(K.FIELDS('sketch.circle.center'),['Durchmesser']);assert.deepEqual(K.FIELDS('sketch.spline.fit_point'),[]);
 });
+
+test('concurrent keypad openings share one read and create only one editor',async()=>{
+ const {s,bridge}=fixture();let release,reads=0,changes=0;
+ bridge.execute=()=>{reads++;return new Promise(resolve=>{release=resolve;});};
+ const draft=new K.NativeDraft(bridge,()=>changes++),first=draft.begin(s.info,'tool',{});
+ await Promise.resolve();const second=draft.begin(s.info,'tool',{});assert.equal(first,second);assert.equal(reads,1);
+ release({...s.context});await first;assert.equal(changes,1);assert.ok(draft.editor);assert.equal(draft.opening,null);
+});
+
+test('a stalled opening times out, releases its lock and ignores a late reply',async()=>{
+ const {s,bridge}=fixture();bridge.readTimeoutMs=10;let release;
+ bridge.execute=()=>new Promise(resolve=>{release=resolve;});const draft=new K.NativeDraft(bridge);
+ await assert.rejects(draft.begin(s.info,'tool',{}),/CAD antwortet/);assert.equal(draft.opening,null);assert.equal(draft.editor,null);
+ release({...s.context});await Promise.resolve();assert.equal(draft.editor,null);
+ bridge.execute=async()=>({...s.context});await draft.begin(s.info,'tool',{},true);assert.ok(draft.editor);
+});
+
+test('cancelling an in-flight open resolves it without resurrecting an editor',async()=>{
+ const {s,bridge}=fixture();bridge.readTimeoutMs=10;let release;
+ bridge.execute=()=>new Promise(resolve=>{release=resolve;});const draft=new K.NativeDraft(bridge);
+ const pending=draft.begin(s.info,'tool',{});await Promise.resolve();draft.cancel();await pending;
+ release({...s.context});await Promise.resolve();assert.equal(draft.editor,null);assert.equal(draft.opening,null);assert.deepEqual(s.calls,[]);
+});

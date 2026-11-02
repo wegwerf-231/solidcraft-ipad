@@ -13,6 +13,12 @@
     const r=await bridge.execute('expr.evaluate',{expression:text,...(kind?{kind}:{})});
     if(!r.ok)throw Error(r.error||'Ungültiger Ausdruck.');return r;
   }
+  function readWithTimeout(promise,ms=2000){
+    return new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>reject(Error('CAD antwortet beim Öffnen des Zahlenfelds nicht. Bitte erneut antippen.')),ms);
+      Promise.resolve(promise).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
+    });
+  }
   // Native dialogs focus their first number automatically; only a short tap on
   // a numeric control may open the overlay. Consumed intent cannot reopen it.
   class FieldIntent {
@@ -46,7 +52,7 @@
     let drag=null,position=null;
     const viewport=()=>{const v=window.visualViewport;return {left:v?.offsetLeft||0,top:v?.offsetTop||0,width:v?.width||innerWidth,height:v?.height||innerHeight};};
     const size=()=>{const r=pad.getBoundingClientRect();return {width:r.width,height:r.height};};
-    function put(p){position=clampPosition(p,size(),viewport());pad.style.left=position.x+'px';pad.style.top=position.y+'px';pad.style.bottom='auto';}
+    function put(p){position=clampPosition(p,size(),viewport());for(const [key,value] of Object.entries({left:position.x+'px',top:position.y+'px',bottom:'auto'}))if(pad.style[key]!==value)pad.style[key]=value;}
     const block=e=>{e.preventDefault();e.stopImmediatePropagation();};
     grip.addEventListener('pointerdown',e=>{if(drag||e.button>0)return;block(e);const r=pad.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,start:{x:r.left,y:r.top},saved:position};try{grip.setPointerCapture(e.pointerId);}catch(_){};});
     grip.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;block(e);put({x:drag.start.x+e.clientX-drag.x,y:drag.start.y+e.clientY-drag.y});});
@@ -55,9 +61,17 @@
     grip.addEventListener('lostpointercapture',e=>{if(drag&&drag.id===e.pointerId){const old=drag;drag=null;put(old.start);position=old.saved;}});
     grip.addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d)return;block(e);const r=pad.getBoundingClientRect(),step=e.shiftKey?50:10;put({x:r.left+d[0]*step,y:r.top+d[1]*step});});
     for(const event of ['touchstart','touchmove','touchend','click'])grip.addEventListener(event,block,{passive:false});
-    function fit(){if(pad.classList.contains('on')){pad.style.maxHeight=Math.max(44,viewport().height-16)+'px';const saved=position,r=pad.getBoundingClientRect();put(position||{x:r.left,y:r.top});if(!saved)position=null;}}
-    addEventListener('resize',fit);window.visualViewport?.addEventListener('resize',fit);window.visualViewport?.addEventListener('scroll',fit);
-    return {grip,viewport,restore(){fit();if(!position)return false;put(position);return true;}};
+    let fittedViewport='';
+    function fit(force=false){
+      if(!pad.classList.contains('on'))return;
+      const v=viewport(),key=JSON.stringify(v);if(!force&&key===fittedViewport)return;fittedViewport=key;
+      const height=Math.max(44,v.height-16)+'px';if(pad.style.maxHeight!==height)pad.style.maxHeight=height;
+      const saved=position,r=pad.getBoundingClientRect();put(position||{x:r.left,y:r.top});if(!saved)position=null;
+    }
+    // iOS focus can emit repeated viewport events. Never write layout on scroll
+    // or refit an unchanged viewport; this avoids a focus/scroll/layout feedback loop.
+    const resized=()=>fit(false);addEventListener('resize',resized);window.visualViewport?.addEventListener('resize',resized);
+    return {grip,viewport,restore(){fit(true);if(!position)return false;put(position);return true;}};
   }
   // Wertfelder der Zeichenwerkzeuge in der Reihenfolge, in der SolidCraft sie mit Tab durchläuft.
   function FIELDS(tool){
@@ -71,14 +85,24 @@
     return [];
   }
   class NativeDraft {
-    constructor(bridge,changed=()=>{}){this.bridge=bridge;this.changed=changed;this.editor=null;this.busy=false;this.suppressUntil=0;}
-    async begin(info,key,anchor,manual=false){
-      if(this.editor||this.busy||(!manual&&Date.now()<this.suppressUntil))return;
-      const context=await this.bridge.execute('document.revision');
-      this.editor={context,tool:info.tool,field:key,kind:/^sketch\.(rectangle\.|circle\.|ellipse$)/.test(info.tool||'')?'length':undefined,anchor,value:'',first:true,error:'',keyboard:false};this.changed();
+    constructor(bridge,changed=()=>{}){this.bridge=bridge;this.changed=changed;this.editor=null;this.busy=false;this.suppressUntil=0;this.opening=null;}
+    begin(info,key,anchor,manual=false){
+      if(this.editor||this.busy||(!manual&&Date.now()<this.suppressUntil))return Promise.resolve();
+      if(this.opening)return this.opening.promise;
+      const aborted=Symbol('cancelled');let cancel;
+      const cancelled=new Promise(resolve=>{cancel=()=>resolve(aborted);});
+      const operation={cancel,promise:null};this.opening=operation;
+      operation.promise=Promise.resolve().then(async()=>{
+        if(this.opening!==operation)return;
+        const context=await Promise.race([readWithTimeout(this.bridge.execute('document.revision'),this.bridge.readTimeoutMs||2000),cancelled]);
+        if(context===aborted||this.opening!==operation)return;
+        this.editor={context,tool:info.tool,field:key,kind:/^sketch\.(rectangle\.|circle\.|ellipse$)/.test(info.tool||'')?'length':undefined,anchor,value:'',first:true,error:'',keyboard:false};this.changed();
+      }).finally(()=>{if(this.opening===operation)this.opening=null;});
+      return operation.promise;
     }
+    abortOpen(){if(this.opening){const operation=this.opening;this.opening=null;operation.cancel();}}
     async guard(e){
-      const [context,info]=await Promise.all([this.bridge.execute('document.revision'),this.bridge.request('ui.inspect')]);
+      const [context,info]=await readWithTimeout(Promise.all([this.bridge.execute('document.revision'),this.bridge.request('ui.inspect')]),this.bridge.readTimeoutMs||2000);
       if(!same(context,e.context)||info.tool!==e.tool||info.home)throw Error('Das Zeichenfeld wurde geändert. Bitte erneut antippen.');
       return info;
     }
@@ -86,7 +110,7 @@
       if(!this.editor||this.busy||this.observing)return;this.observing=true;const e=this.editor;
       try{await this.guard(e);}catch(_){if(this.editor===e)this.cancel();}finally{this.observing=false;}
     }
-    cancel(){this.editor=null;this.suppressUntil=Date.now()+450;this.changed();}
+    cancel(){this.abortOpen();this.editor=null;this.suppressUntil=Date.now()+450;this.changed();}
     key(k){const e=this.editor;if(!e||this.busy)return;if(k==='esc')return this.cancel();if(k==='ok'||k==='tab')return this.commit(k==='tab');if(k==='abc'){e.keyboard=!e.keyboard;this.changed();return;}typeKey(e,k);this.changed();}
     async commit(next=false){
       const e=this.editor;if(!e||this.busy)return;
@@ -180,5 +204,5 @@
     for(const type of ['touchstart','touchmove','touchend'])vars.addEventListener(type,e=>e.stopPropagation(),{passive:true});
     return {native,variables,get active(){return !!native.editor;},get editing(){return !!native.editor;},render,cancel:()=>{vars.hidden=true;native.cancel();}};
   }
-  return {FieldIntent,clampPosition,placePad,draggable,NativeDraft,FIELDS,typeKey,validate,definition,mount,same};
+  return {readWithTimeout,FieldIntent,clampPosition,placePad,draggable,NativeDraft,FIELDS,typeKey,validate,definition,mount,same};
 });

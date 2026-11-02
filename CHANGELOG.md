@@ -4,6 +4,12 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+- Numpad auf iPadOS: versteckten nativen Texteingang bis zur ausdrücklich angeforderten Systemtastatur schreibgeschützt halten.
+- Viewport-Anpassung ohne Scroll-Abonnement, wiederholte Layout-Schreibzugriffe oder erneutes Vermessen unveränderter Größen.
+- Zahlenfeld-Tipps bevorzugen vorhandene Trefferpositionen; weitere Abfragen erfolgen außerhalb des Touch-Ereignisses.
+- Numpad-Öffnung gegen parallele Aufrufe, ausbleibende Leseantworten und verspätete Antworten nach Abbruch absichern; Zeitüberschreitung sichtbar melden.
+- Isolierter Finger-/Pencil-Test und vereinfachter Geräteprüfstand ergänzt. Der gemeldete iPad-Freeze ist im Desktop nicht reproduziert; Gerätebestätigung steht aus.
+
 ## [0.6.1] - 2026-11-02
 
 - Extrudieren: Ziffernfeld erst nach einem bewussten Tipp auf das native Zahlenfeld öffnen; Autofokus und Ziehen des Extrusionsgriffs öffnen es nicht mehr.

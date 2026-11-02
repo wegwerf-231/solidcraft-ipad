@@ -25,7 +25,7 @@ test('initial placement avoids the extrusion dialog and clamping keeps the grip 
   assert.deepEqual(clampPosition({x:-100,y:-100},size,{left:20,top:100,width:300,height:200}),{x:28,y:108});
 });
 
-function dom(t){
+function dom(t,visualViewport){
   const old={};for(const k of ['document','window','innerWidth','innerHeight','addEventListener'])old[k]=global[k];
   t.after(()=>{for(const k in old)if(old[k]===undefined)delete global[k];else global[k]=old[k];});
   const events=new Map();
@@ -37,7 +37,7 @@ function dom(t){
     getBoundingClientRect(){return {left:parseFloat(this.style.left)||100,top:parseFloat(this.style.top)||100,width:300,height:400};}
     fire(n,extra={}){const e={button:0,pointerId:7,clientX:120,clientY:120,preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;},...extra};for(const fn of this.listeners[n]||[])fn(e);return e;}
   }
-  global.document={head:{append(){}},createElement:()=>new El()};global.window={};global.innerWidth=1000;global.innerHeight=800;
+  global.document={head:{append(){}},createElement:()=>new El()};global.window={visualViewport};global.innerWidth=1000;global.innerHeight=800;
   global.addEventListener=(n,fn)=>events.set(n,fn);
   const pad=new El(),drag=draggable(pad);return {pad,drag,grip:pad.grip,events};
 }
@@ -57,4 +57,17 @@ test('resize and keyboard movement keep a manually placed keypad on screen',t=>{
   const {pad,grip,events}=dom(t);grip.fire('pointerdown');grip.fire('pointermove',{clientX:900,clientY:700});grip.fire('pointerup');
   global.innerWidth=512;global.innerHeight=600;events.get('resize')();assert.equal(pad.style.left,'204px');assert.equal(pad.style.top,'192px');
   const key=grip.fire('keydown',{key:'ArrowLeft',shiftKey:true});assert.equal(key.stopped,true);assert.equal(pad.style.left,'154px');
+});
+
+
+test('repeated iOS viewport events do not refit unchanged layout or subscribe to focus scrolling',t=>{
+ const listeners=new Map(),v={width:1000,height:800,offsetLeft:0,offsetTop:0,addEventListener:(n,fn)=>listeners.set(n,fn)};
+ const {pad,drag}=dom(t,v);let reads=0,writes=0;
+ const rect=pad.getBoundingClientRect.bind(pad);pad.getBoundingClientRect=()=>{reads++;return rect();};
+ pad.style=new Proxy(pad.style,{set:(o,k,value)=>{writes++;o[k]=value;return true;}});
+ drag.restore();const oldReads=reads,oldWrites=writes;
+ for(let i=0;i<100;i++)listeners.get('resize')();
+ assert.equal(reads,oldReads);assert.equal(writes,oldWrites);assert.equal(listeners.has('scroll'),false);
+ v.height=600;listeners.get('resize')();const resizedReads=reads,resizedWrites=writes;
+ for(let i=0;i<100;i++)listeners.get('resize')();assert.equal(reads,resizedReads);assert.equal(writes,resizedWrites);
 });
