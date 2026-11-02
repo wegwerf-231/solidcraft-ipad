@@ -1,5 +1,5 @@
 {
-  "version": "0.6.2+395c2dd5ad03b6e7",
+  "version": "0.7.0+c7221d6358315d1c",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "a867f750730b50132b65ce0729de5215498e7cb9bc8690811129e6ad48694987"
+      "sha256": "2f8d6e80eb1ab355d522f51a47148cc2a6106d310760b0d845abc0f8b5b0f5ed"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,11 +16,11 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "d581813f9cb25eb75121a0d8ef22699ca0d77cf739f51a635220c6fbbdbba42e"
+      "sha256": "7b0cee734c919503d49187023b8bb7d609f1e7f5532df8811d55c595c613ddab"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
-      "sha256": "ff61b1270e2a0871f54a2dbe74ffbaf7d32d2164af3d4e822b70f3c582e0bb4f"
+      "sha256": "89552beddf3dc3854df46a5c158674c9a0ffb8e39e97bb4ee3acd433a79c8cfd"
     },
     {
       "file": "LICENSE-APACHE",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "bb80cd78e319ef4b2fb9d7d7b1b2336e29d08527fcfa5257df7402b0bc9a29aa"
+      "sha256": "ad5142b00d6a40b41694341d3649ab4c736e7480e5499deb44140dd13993dde9"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -60,11 +60,11 @@
     },
     {
       "file": "docs/LEGAL.md",
-      "sha256": "83e99560669e752953f145eb8239289803fe1ba4eda51f8ded9d2972fb5819d3"
+      "sha256": "d8308d57d11ee1953c8b93603832b6d964d51a7f51e999ed551347377c8bede0"
     },
     {
       "file": "docs/NUMPAD-DISPLAY.md",
-      "sha256": "c4d9d94160c9fbf4e2753b1225856b2c2682a2d3267cf01d928c925df73e4f36"
+      "sha256": "aee2fcde072317f2d8a083940884ed9f8ef2c25f7db4dd34b12dab72aae2ed0e"
     },
     {
       "file": "docs/RELEASING.md",
@@ -76,7 +76,7 @@
     },
     {
       "file": "docs/TOUCH-SHELL.md",
-      "sha256": "bd26615227be52340178927676f64555d7cf0b508a4d19ecf1e1788da749f5e9"
+      "sha256": "a3fae242649cef4589c003079e03b69487cb3129f5521f4d622e656e41de3e93"
     },
     {
       "file": "docs/screenshots/ap2-error.png",
@@ -148,19 +148,19 @@
     },
     {
       "file": "index.html",
-      "sha256": "c3c77954dfb9a585f372d340120c00d31cbc889c8d1af4927dd824e87d6a6f57"
+      "sha256": "5f0552d6928fd0269e1927558a157358f1f029f8b7de15b269c5a76166cdfb76"
     },
     {
       "file": "keypad-tools.js",
-      "sha256": "77134fe798d2cea57ecf958f7e724eb28615d07e7e1fccc850847e92621312ec"
+      "sha256": "5dbb26436651d3ebe8defa6bb4b3e1a33b9eb9adfabb4aeffef09098d9eaf947"
     },
     {
       "file": "legal/upstream-files.json",
-      "sha256": "d26bf1c27484d6770049901260e51b4ec6bc21d74ad6fc38657d8223c4ff9de9"
+      "sha256": "a0301ab47d82e57972ca2c4f813a68eb82bbcbe00736748f626b66824ae53cc6"
     },
     {
       "file": "legal/upstream/ATTRIBUTION.md",
-      "sha256": "889cc4fa02053b7c58ed6cf3f3c14363f98b329469b011c85e30d2a8d5d61e2c"
+      "sha256": "1925b70a67c3f89444a53659854de6601e0066195f8ce9f2b535e32bfd86f0c6"
     },
     {
       "file": "legal/upstream/DISCLAIMER.md",
@@ -180,19 +180,19 @@
     },
     {
       "file": "pencil-gestures.js",
-      "sha256": "49f2a62833faa7cb57f2d0c7387dd5d81b959cef31f0e62d31b7a60b1754a607"
+      "sha256": "9c50ffb2c7ac521cc4ba616668fdbda6b300521d4da22dc6731e4b819e24992f"
     },
     {
       "file": "pencil-sketch.js",
-      "sha256": "9f8404e246b81ffa46fdf7bdbf60f6c9665d28ba8b5a3d46c6bddf79b4c0220e"
+      "sha256": "7ec6e9990168cd524c6050cad3221779c2ed5aea228c4a3bc73b4fdc33fcfd0f"
     },
     {
       "file": "project-version.js",
-      "sha256": "88c2d54275a7ee0cfa2a6d2dd0038a632b4e7d06c80d185225717508425f19a5"
+      "sha256": "c6628a3ee4ba9b79cfc98e3c6042c6d580353490054e70c9b719a152eaea116f"
     },
     {
       "file": "project.json",
-      "sha256": "1ffa9b03c3923d3dc5af86f9c5081cb7c02b1d25796be2d87b1d3d7909d47da4"
+      "sha256": "21a603ac726232c49ae1720dd3f733d687887d28047ed0ae04005542ad6755fe"
     },
     {
       "file": "scripts/release.py",
@@ -207,8 +207,8 @@
       "sha256": "cdc40fd4361c03aedb71cace6ac522c254c6eb7af5ec6e8c992e172d73f9a8dc"
     },
     {
-      "file": "solidcraft-web-4b1d77a936edaef2.js",
-      "sha256": "a1766999f27bac22c11e93e18da9bdba4f4a3e01a412803fe179c9559bee858d"
+      "file": "solidcraft-web-eddd050bdb20187.js",
+      "sha256": "412b87234c34dd39db55683d6de2b3ef26905fd9132073396c462edb9071045c"
     },
     {
       "file": "tests/canvas-shift.test.cjs",
@@ -216,7 +216,7 @@
     },
     {
       "file": "tests/keypad-interaction.test.cjs",
-      "sha256": "09f7ff8ea9b71ad5e57c489d572387146e5ef8fe2bff37f4e33ebce808e7a77a"
+      "sha256": "ed9d3dd332fb649dfca9f64653eb54a91e24e26bb63786351ed3eba62955c900"
     },
     {
       "file": "tests/keypad-tools.test.cjs",
@@ -224,7 +224,7 @@
     },
     {
       "file": "tests/pencil-gestures.test.cjs",
-      "sha256": "b0f6169b9eba2a44f839617b18f31c4c428f7108eb0cac1fc50b69defeefbe86"
+      "sha256": "097172121d17b3662724b3cb0031c0008ba9c2898d74a7a1d1418a5d3670b995"
     },
     {
       "file": "tests/pencil-ink.test.cjs",
@@ -264,31 +264,31 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "4919b18fed1af44010e31d890fa4a2db4ed237554002e72a7a4ef4a606c8096f"
+      "sha256": "bfbacdb7c9708f6ec6d30e29e317fa00abcc35ef4a4ee5941a008de1376fbf9c"
     },
     {
       "file": "touch-shell.js",
       "sha256": "4e456ea22252960defc9d7e11e7b6bb271bf954d6c520d9e2f07a02df41664c5"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",
-      "sha256": "ebd3a83cc7182aafe28971c06589f7f120192ac9eacdeb26f07a08f1b4f95600"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part0.bin",
+      "sha256": "8bc57b622af1dc3b8b73583c3b3083348d79f6f3adeb0683d01d07a31e40cb27"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part1.bin",
-      "sha256": "857ef5da9bc25f12c8c46458fc50d628fe6ccb857887a59355b0c2bda676492e"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part1.bin",
+      "sha256": "e48d57fbc20dfe23d265e0d4bf4cbd7b4a777018e74a7ddd7d9ad1afb447b583"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part2.bin",
-      "sha256": "1c81ff57298c2c6c9bf03f92b405e81c655b3c740a14bca39e59dced14b30fc9"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part2.bin",
+      "sha256": "02d96ea250ca510be181a85baf6e54f28a94c7654bbd0051eb269d2eea5bb6d7"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part3.bin",
-      "sha256": "85bf84429d9635208eab5f7f6086515a5b404b764f6ff675f6399207621c4141"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part3.bin",
+      "sha256": "fce23c8ca850534f9a80384d9306f28d1e434d671cd16115259bb54801a8a5c5"
     },
     {
-      "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part4.bin",
-      "sha256": "6260c9bfde1eb7ee0d286d9bf956eab0d2112dff6b0c8ed7d2847de491cd07cc"
+      "file": "wasm/solidcraft-web-eddd050bdb20187_bg.part4.bin",
+      "sha256": "72b986b77820ac031f22c5e08bff609615da6e47450e4fc9134f2afebbda2782"
     }
   ]
 }

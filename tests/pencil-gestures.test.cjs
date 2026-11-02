@@ -26,6 +26,13 @@ test('native hover parsing requires a complete curve record and preserves quoted
  assert.deepEqual(G.hoverCurve('SketchCurve { sketch: 7, id: "s1", straight: false, point: Vec3 }'),{sketch:7,id:'s1'});
  assert.equal(G.hoverCurve('SketchPoint { sketch: 7, id: "p1" }'),null);
 });
+test('SolidCraft 0.30 hover objects resolve curves only',()=>{
+ assert.deepEqual(G.hoverCurve({type:'sketch_curve',sketch:1,id:'l1',straight:true,point:[30,0,0]}),{sketch:1,id:'l1'});
+ assert.equal(G.hoverCurve({type:'sketch_midpoint',sketch:1,id:'l1',at:[20,0]}),null);
+ assert.equal(G.hoverCurve({type:'face',body:'Body1',index:0,point:[0,0,0]}),null);
+ assert.equal(G.hoverCurve({type:'sketch_curve',sketch:'1',id:'l1'}),null);
+ assert.equal(G.hoverCurve(null),null);
+});
 test('wiggling after an already curved stroke switches back to a line',()=>{
  const s=new G.Stroke({x:0,y:0},0);for(const [i,p]of [[10,-20],[20,-25],[30,-20],[40,0]].entries())s.move({x:p[0],y:p[1]},i*100);
  let result;for(let i=0;i<12;i++)result=s.move({x:40+(i%2?8:-8),y:0},1200+i*70)||result;assert.equal(result,'line');

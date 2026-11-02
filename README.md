@@ -10,7 +10,9 @@ Eine eigenständige Touch-/Pencil-Erweiterung der Web-Ausgabe von
 
 ## Versionen
 
-Die **iPad-Ausgabe 0.6.2** basiert auf **SolidCraft 0.29.0**.
+Die **iPad-Ausgabe 0.7.0** basiert auf **SolidCraft 0.30.0**.
+Entwürfe, die mit 0.7.0 gespeichert werden, nutzen das Dateiformat 47 von SolidCraft 0.30.0
+und lassen sich mit 0.6.x und älteren Ausgaben nicht mehr öffnen.
 Die verbindlichen Angaben stehen in [project.json](project.json).
 Die Versionsnummer im eingebetteten CAD-Programm bezeichnet weiterhin das Original;
 die iPad-Version steht im Seitentitel, auf der Infoseite und in den Release-Metadaten.
