@@ -44,6 +44,7 @@
   }
   // ---------- Tinte: der Strich wird sofort sichtbar, bis er in Geometrie umgewandelt ist ----------
   let inkSvg = null;
+  const inkStates = new WeakMap();
   function inkLayer() {
     if (inkSvg && inkSvg.isConnected) return inkSvg;
     inkSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -60,13 +61,41 @@
     path.setAttribute("stroke-linecap", "round");
     path.setAttribute("stroke-linejoin", "round");
     inkLayer().appendChild(path);
+    inkStates.set(path, { pts: null, source: null, count: 0, text: "", frame: null });
     return path;
   }
-  function inkDraw(path, pts) {
-    path.setAttribute("points", pts.map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" "));
+  function inkPaint(path, state) {
+    const pts = state.pts;
+    // A wiggle replaces the fitting path. Ordinary movement only appends samples,
+    // so format each sample once instead of formatting the whole stroke per event.
+    if (state.source !== pts || state.count > pts.length) {
+      state.source = pts; state.count = 0; state.text = "";
+    }
+    if (state.count === pts.length) return;
+    const suffix = pts.slice(state.count).map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+    state.text += (state.text ? " " : "") + suffix;
+    state.count = pts.length;
+    path.setAttribute("points", state.text);
+  }
+  function inkDraw(path, pts, immediate = false) {
+    const state = inkStates.get(path);
+    if (!state) return;
+    state.pts = pts;
+    if (immediate) {
+      if (state.frame !== null) cancelAnimationFrame(state.frame);
+      state.frame = null; inkPaint(path, state);
+    } else if (state.frame === null) {
+      state.frame = requestAnimationFrame(() => {
+        state.frame = null;
+        if (inkStates.get(path) === state) inkPaint(path, state);
+      });
+    }
   }
   function inkFade(path) {
     if (!path) return;
+    const state = inkStates.get(path);
+    if (state && state.frame !== null) cancelAnimationFrame(state.frame);
+    inkStates.delete(path);
     path.style.transition = "opacity .25s";
     path.style.opacity = "0";
     setTimeout(() => path.remove(), 300);
@@ -256,23 +285,25 @@
       s.lastSample=t;
       const p = { x: t.clientX, y: t.clientY };
       if (s.mode === "drag") { nav.move(p.x, p.y); return; }
-      if (s.failed) return;
+      if (s.failed || (s.mode !== "pending" && s.mode !== "draw")) return;
+      let changed = false;
       try {
         if(s.gesture){
           const count=s.gesture.controls.length;
           const forced=s.gesture.move({...p,pressure:Number.isFinite(t.force)?t.force:t.pressure},performance.now());
           if(s.spline&&s.gesture.controls.length>count)hint("Spline: "+s.gesture.controls.length+" Punkte");
-          if(forced&&!s.spline){s.pts=s.gesture.points.map(q=>({x:q.x,y:q.y}));hint(forced==='arc'?'Bogen aktiviert':'Linie aktiviert');}
+          if(forced&&!s.spline){s.pts=s.gesture.points.map(q=>({x:q.x,y:q.y}));changed=true;hint(forced==='arc'?'Bogen aktiviert':'Linie aktiviert');}
         }
       } catch(e){s.failed=true;hint(e.message,true);inkFade(s.ink);return;}
       const last = s.pts[s.pts.length - 1];
-      if (dist(last, p) >= 1.5) s.pts.push(p);
-      if (s.ink) inkDraw(s.ink, s.pts);
+      if (dist(last, p) >= 1.5) { s.pts.push(p); changed = true; }
+      if (changed && s.ink) inkDraw(s.ink, s.pts);
     },
     end(s, at, cancelled) {
       clearInterval(s.pressTimer);
       if (s.mode === "drag") { nav.releaseAfterMoves(at.x, at.y); return; }
       if (cancelled || s.failed) { s.mode = "off"; inkFade(s.ink); return; }
+      if (s.mode !== "pending" && s.mode !== "draw") return;
       if (dist(s.pts[s.pts.length - 1], at) >= 1) s.pts.push(at);
       s.endAt = at;
       if (s.mode === "draw") ext.finish(s);
@@ -282,6 +313,9 @@
       const pts = s.pts;
       if (pts.length < 2 || (s.spline ? pts.reduce((n,p,i)=>n+(i?dist(pts[i-1],p):0),0) : dist(pts[0], pts[pts.length - 1])) < MIN_LEN_PX) { inkFade(s.ink); return; }
       if (committing) { inkFade(s.ink); return; }
+      // Lifting may precede the scheduled frame. Show the exact endpoint while
+      // the CAD command is pending, without dropping any fitting samples.
+      if (s.ink) inkDraw(s.ink, pts, true);
       committing = true;
       try {
         const info = await s.info;

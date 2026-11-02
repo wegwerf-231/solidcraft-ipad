@@ -43,7 +43,7 @@
     const hint = document.createElement("p"); hint.textContent = "✓ bindet das Maß. Außerhalb tippen oder Esc verwirft die Eingabe.";
     direct.append(heading, input, binding, error, hint); pad.prepend(direct); host.append(labels, panel);
     let open = innerWidth >= 900, panelKey = "", labelKey = "", directShown = false, keyboard = false, projected = [];
-    let projectionBusy = false;
+    let projectionBusy = false, projectionContext = "";
     try { const saved = localStorage.getItem("solidcraft-ipad.constraints-open-v1"); if (saved !== null) open = saved === "1"; } catch (_) {}
     const buttons = new Map();
     const glyphNames = { parallel: ["∥", "Parallel"], perpendicular: ["⊥", "Senkrecht"], horizontal: ["H", "Horizontal"], vertical: ["V", "Vertikal"], tangent: ["T", "Tangential"], coincident: ["●", "Zusammenfallend"], midpoint: ["M", "Mittelpunkt"], equal: ["=", "Gleich"], concentric: ["◎", "Konzentrisch"], fix: ["F", "Gesperrt"], collinear: ["K", "Kollinear"], symmetric: ["S", "Symmetrisch"] };
@@ -56,29 +56,38 @@
       await control.refresh();
       options.changed();
     }
-    function positionedButton(record, position, occupied, maxX) {
-      if (!M.point(position) || position[0] < 0 || position[1] < 150 || position[0] > innerWidth || position[1] > innerHeight - 50) return;
+    function contextKey(s) {
+      return s ? JSON.stringify([s.context.document_id, s.context.revision, s.sketch.id]) : "";
+    }
+    function labelButton(record, position) {
+      if (!M.point(position) || position[0] < 0 || position[1] < 150 || position[0] > innerWidth || position[1] > innerHeight - 50) return null;
       const b = button(record.text, record.action); b.dataset.scene = "1";
       if (record.kind === "glyph") b.className = "sk-glyph";
-      if (record.kind === "pair") { b.className = "sk-pair"; delete b.dataset.scene; } // ein Bedienknopf, auch per Finger
+      if (record.kind === "pair") { b.className = "sk-pair"; delete b.dataset.scene; } // Bedienknopf, auch per Finger
       b.title = record.title; b.setAttribute("aria-label", record.title); b.setAttribute("aria-pressed", String(!!record.selected));
       b.dataset.record = String(buttons.size); buttons.set(b.dataset.record, record);
-      labels.appendChild(b);
-      const width = Math.max(record.kind === "glyph" ? 22 : 24, b.offsetWidth || 80), height = record.kind === "glyph" ? 22 : 24;
+      return { b, position, height: record.kind === "glyph" ? 22 : 24 };
+    }
+    function placement(item, occupied, maxX) {
+      const { position, width, height } = item;
       let x = Math.max(6, Math.min(maxX - width, position[0] - width / 2));
       let y = Math.max(160, Math.min(innerHeight - 105, position[1] - height / 2));
       for (let tries = 0; tries < 8 && occupied.some((r) => x < r.x + r.w + 3 && x + width + 3 > r.x && y < r.y + r.h + 3 && y + height + 3 > r.y); tries++) y -= height + 4;
-      if (y < 155 || options.isUI(x + width / 2, y + height / 2)) { b.remove(); return; }
-      b.style.left = x + "px"; b.style.top = y + "px";
+      if (y < 155 || options.isUI(x + width / 2, y + height / 2)) return null;
       occupied.push({ x, y, w: width, h: height });
+      return { x, y };
     }
     function render() {
       const s = control.snapshot;
       renderEditor();
+      if (projectionContext !== contextKey(s)) {
+        projected = []; projectionContext = "";
+        if (labelKey) { labels.replaceChildren(); buttons.clear(); labelKey = ""; }
+      }
       panel.hidden = !s || !!s.info.home || host.dataset.shellMode === "advanced";
       labels.hidden = !s || !!s.info.dialog || !!control.editor;
       if (!s) {
-        labels.replaceChildren(); labelKey = "";
+        labels.replaceChildren(); buttons.clear(); labelKey = "";
         if (control.model && M.point(control.model.screen)) {
           labels.hidden = false;
           const out = document.createElement("output");
@@ -115,33 +124,32 @@
       project(s);
     }
 
-    async function project(s) {
-      if (projectionBusy || labels.hidden) return;
-      projectionBusy = true;
-      try {
-        const records = [];
-        const chosen = s.selection.selection || [];
-        for (const c of s.sketch.constraints.slice(0, 200)) {
-          if (M.isDimension(c)) {
-            if (!s.options.show_dimensions && !M.related(s.sketch, c, chosen)) continue;
-            const a = M.anchors(s.sketch, c); if (!a.length) continue;
-            const native = (s.selection.dimensions || []).find((d) => d.id === c.id || d.id === c.param);
-            const value = M.ANGLES.has(c.type) ? c.value * 180 / Math.PI : c.value;
-            records.push({ kind: "dimension", action: "edit", id: c.id, at: a[0], screen: native && [native.x, native.y], text: `${c.param ? "🔒 " : ""}${c.type === "radius" ? "R " : c.type === "diameter" ? "Ø " : ""}${M.formatted(value, M.ANGLES.has(c.type), control.units)} · ${c.param ? "fest" : "Referenz"}`, title: c.param ? "Festes Maß ändern" : "Referenzmaß: durch andere Bedingungen bestimmt" });
-          } else if (glyphNames[c.type] && (s.options.show_constraints || M.related(s.sketch, c, chosen))) {
-            const a = M.anchors(s.sketch, c); if (!a.length) continue;
-            records.push({ kind: "glyph", action: "select-constraint", id: c.id, at: a[0], text: glyphNames[c.type][0], title: glyphNames[c.type][1] + " auswählen", selected: chosen.some((x) => x.type === "sketch_constraint" && x.id === c.id) });
-          }
+    function recordsFor(s) {
+      const records = [];
+      const chosen = s.selection.selection || [];
+      for (const c of s.sketch.constraints.slice(0, 200)) {
+        if (M.isDimension(c)) {
+          if (!s.options.show_dimensions && !M.related(s.sketch, c, chosen)) continue;
+          const a = M.anchors(s.sketch, c); if (!a.length) continue;
+          const native = (s.selection.dimensions || []).find((d) => d.id === c.id || d.id === c.param);
+          const value = M.ANGLES.has(c.type) ? c.value * 180 / Math.PI : c.value;
+          records.push({ kind: "dimension", action: "edit", id: c.id, at: a[0], screen: native && [native.x, native.y], text: `${c.param ? "🔒 " : ""}${c.type === "radius" ? "R " : c.type === "diameter" ? "Ø " : ""}${M.formatted(value, M.ANGLES.has(c.type), control.units)} · ${c.param ? "fest" : "Referenz"}`, title: c.param ? "Festes Maß ändern" : "Referenzmaß: durch andere Bedingungen bestimmt" });
+        } else if (glyphNames[c.type] && (s.options.show_constraints || M.related(s.sketch, c, chosen))) {
+          const a = M.anchors(s.sketch, c); if (!a.length) continue;
+          records.push({ kind: "glyph", action: "select-constraint", id: c.id, at: a[0], text: glyphNames[c.type][0], title: glyphNames[c.type][1] + " auswählen", selected: chosen.some((x) => x.type === "sketch_constraint" && x.id === c.id) });
         }
-        const selectedIds = chosen.filter((x) => x.type === "sketch_curve").map((x) => x.id);
-        for (const c of s.sketch.curves.filter((x) => s.options.show_dimensions || selectedIds.includes(x.id) || control.lastAdded.includes(x.id)).slice(0, 200)) {
-          const idx = s.sketch.curves.indexOf(c);
-          if (s.sketch.constraints.some((k) => M.isDimension(k) && ["length", "radius", "diameter", "arc_length"].includes(k.type) && M.constraintCurveIndices(k).includes(idx))) continue;
-          const choices = M.dimensionChoices(s.sketch, [{ type: "sketch_curve", id: c.id, sketch: s.sketch.id }]);
-          const d = choices[0], at = M.curvePoint(c); if (!d || !at) continue;
-          const determined = !!c.fully_constrained || !!c.fixed;
-          records.push({ kind: "free", action: "free", choice: d, at, ends: c.type === "line" ? [M.point(c.start_at), M.point(c.end_at)] : c.center_at ? [[M.point(c.center_at)[0]-c.radius,M.point(c.center_at)[1]], [M.point(c.center_at)[0]+c.radius,M.point(c.center_at)[1]]] : null, text: `${d.key === "diameter" ? "Ø " : "↔ "}${M.formatted(M.measureChoice(s.sketch, d), false, control.units)} · ${determined ? "bestimmt" : "frei"}`, title: determined ? "Bereits bestimmte Geometrie" : d.label + " festlegen", determined });
-        }
+      }
+      const selectedIds = new Set(chosen.filter((x) => x.type === "sketch_curve").map((x) => x.id));
+      const dimensioned = new Set(s.sketch.constraints.filter((k) => M.isDimension(k) && ["length", "radius", "diameter", "arc_length"].includes(k.type)).flatMap(M.constraintCurveIndices));
+      for (const c of s.sketch.curves.filter((x) => s.options.show_dimensions || selectedIds.has(x.id) || control.lastAdded.includes(x.id)).slice(0, 200)) {
+        const idx = s.sketch.curves.indexOf(c);
+        if (dimensioned.has(idx)) continue;
+        const choices = M.dimensionChoices(s.sketch, [{ type: "sketch_curve", id: c.id, sketch: s.sketch.id }]);
+        const d = choices[0], at = M.curvePoint(c); if (!d || !at) continue;
+        const determined = !!c.fully_constrained || !!c.fixed;
+        records.push({ kind: "free", action: "free", choice: d, at, ends: c.type === "line" ? [M.point(c.start_at), M.point(c.end_at)] : c.center_at ? [[M.point(c.center_at)[0]-c.radius,M.point(c.center_at)[1]], [M.point(c.center_at)[0]+c.radius,M.point(c.center_at)[1]]] : null, text: `${d.key === "diameter" ? "Ø " : "↔ "}${M.formatted(M.measureChoice(s.sketch, d), false, control.units)} · ${determined ? "bestimmt" : "frei"}`, title: determined ? "Bereits bestimmte Geometrie" : d.label + " festlegen", determined });
+      }
+
         // Zwei Linien gewählt: Winkel- bzw. Abstandsmaß direkt an der Geometrie anbieten (wie in Shapr3D).
         const pairChoices = M.dimensionChoices(s.sketch, chosen).filter((d) => d.entities.length === 2 && d.enabled);
         for (const d of pairChoices) {
@@ -162,14 +170,33 @@
           const value = M.measureChoice(s.sketch, d);
           records.unshift({ kind: "pair", action: "dimension:" + d.key, at, text: (d.key === "angle" ? "∠ " : "↔ ") + M.formatted(value, d.key === "angle", control.units) + " festlegen", title: d.label + " zwischen den zwei Linien festlegen" });
         }
+      return records;
+    }
+
+    async function project(s) {
+      if (projectionBusy || labels.hidden) return;
+      projectionBusy = true;
+      try {
+        const records = recordsFor(s);
         const inputs = records.map((r) => r.at);
         for (const r of records) if (r.ends) { r.endIndex = inputs.length; inputs.push(...r.ends); }
-        const points = await options.request("ui.sketchToScreen", { points: inputs });
-        if (control.snapshot !== s || control.editor) return;
-        const sig = JSON.stringify([records, points, innerWidth, innerHeight, open]);
+        // Share projection batches between visible labels and Pencil hit tests.
+        // Hit geometry refreshes even when labels are absent or unchanged.
+        const lines = s.sketch.curves.filter((c) => c.type === "line").slice(0, 256);
+        const lineStart = inputs.length;
+        inputs.push(...lines.flatMap((c) => [M.point(c.start_at), M.point(c.end_at)]));
+        // The pinned native API silently truncates each request after 1000 points.
+        const batches = [];
+        for (let i = 0; i < inputs.length; i += 1000) batches.push(options.request("ui.sketchToScreen", { points: inputs.slice(i, i + 1000) }));
+        const points = (await Promise.all(batches)).flat();
+        if (control.snapshot !== s || control.editor || labels.hidden) return;
+        projected = lines.map((c, i) => ({ a: points[lineStart + i * 2], b: points[lineStart + i * 2 + 1] }));
+        projectionContext = contextKey(s);
+        const maxX = open && !panel.hidden ? Math.min(innerWidth - 6, panel.getBoundingClientRect().left - 6) : innerWidth - 6;
+        const sig = JSON.stringify([projectionContext, records, points.slice(0, lineStart), innerWidth, innerHeight, maxX]);
         if (sig === labelKey) return;
-        labelKey = sig; labels.replaceChildren(); buttons.clear(); projected = [];
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); labels.appendChild(svg);
+        labelKey = sig; buttons.clear();
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         const line = (a,b) => {
           const node = document.createElementNS(svg.namespaceURI, "line");
           for(const [key,value] of Object.entries({x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:"#abc7e8","stroke-width":1.4})) node.setAttribute(key,value);
@@ -184,20 +211,31 @@
           for(const [tip,s] of [[p,1],[q,-1]])for(const side of [-1,1])line(tip,[tip[0]+u[0]*s*7+v[0]*side*3,tip[1]+u[1]*s*7+v[1]*side*3]);
           return [(p[0]+q[0])/2,(p[1]+q[1])/2];
         };
-        const occupied = [], maxX = open && !panel.hidden ? Math.min(innerWidth - 6, panel.getBoundingClientRect().left - 6) : innerWidth - 6;
+        const candidates = [];
         records.forEach((record, i) => {
           const pos = record.screen || points[i];
           if (!M.point(pos)) return;
           const dim = record.ends && dimensionLine(points[record.endIndex], points[record.endIndex+1]);
           const shifted = dim || (record.screen ? pos : [pos[0], pos[1] - (record.kind === "glyph" ? 14 : 22)]);
-          positionedButton(record, shifted, occupied, maxX);
+          const item = labelButton(record, shifted); if (item) candidates.push(item);
         });
-        // Hit-tested centreline projections are used only for additive Pencil selection.
-        const lines = s.sketch.curves.filter((c) => c.type === "line").slice(0, 256);
-        const ends = await options.request("ui.sketchToScreen", { points: lines.flatMap((c) => [M.point(c.start_at), M.point(c.end_at)]) });
-        if (control.snapshot === s) projected = lines.map((c, i) => ({ c, a: ends[i * 2], b: ends[i * 2 + 1] }));
-      } catch (_) { /* A view or document switched while projecting: next refresh recovers. */ }
-      finally { projectionBusy = false; }
+        // Insert together, measure together, then place together. Interleaving an
+        // append/style write and offsetWidth for each label forced repeated layout.
+        labels.replaceChildren(svg, ...candidates.map(({ b }) => b));
+        for (const item of candidates) item.width = Math.max(item.height, item.b.offsetWidth || 80);
+        const occupied = [];
+        const placements = candidates.map((item) => placement(item, occupied, maxX));
+        candidates.forEach(({ b }, i) => {
+          const at = placements[i];
+          if (!at) { buttons.delete(b.dataset.record); b.remove(); return; }
+          b.style.left = at.x + "px"; b.style.top = at.y + "px";
+        });
+      } catch (_) { projected = []; projectionContext = ""; /* Next refresh recovers. */ }
+      finally {
+        projectionBusy = false;
+        // A newer snapshot may have arrived during the asynchronous projection.
+        if (control.snapshot && control.snapshot !== s && !labels.hidden) project(control.snapshot);
+      }
     }
 
     function renderEditor() {
@@ -243,10 +281,15 @@
       else if (action === "unlock") await run(() => control.unlock());
       else {
         const record = buttons.get(b.dataset.record); if (!record) return;
+        const expected = projectionContext;
+        const prepare = async () => {
+          await stopTool();
+          if (!expected || contextKey(control.snapshot) !== expected) throw new Error("Die Skizze wurde geändert. Maß oder Symbol bitte erneut auswählen.");
+        };
         const r=b.getBoundingClientRect();if(options.anchor)options.anchor({x:r.left+r.width/2,y:r.top+r.height/2});
-        if (action === "select-constraint") await run(async () => { await stopTool(); await control.write("select.set", { items: [{ type: "sketch_constraint", id: record.id }] }); });
-        else if (action === "free") await run(async () => { await stopTool(); control.begin(record.choice); });
-        else if (action === "edit") await run(async () => { await stopTool(); control.edit(record.id); });
+        if (action === "select-constraint") await run(async () => { await prepare(); await control.write("select.set", { items: [{ type: "sketch_constraint", id: record.id }] }); });
+        else if (action === "free") await run(async () => { await prepare(); control.begin(record.choice); });
+        else if (action === "edit") await run(async () => { await prepare(); control.edit(record.id); });
       }
     }
     function interaction(event) {
@@ -256,8 +299,21 @@
       act(b).catch((e) => { control.error = String(e.message || e); render(); });
     }
     for (const node of [panel, labels, direct]) {
-      node.addEventListener("pointerdown", (e) => { if (node === panel && e.pointerType === "touch") e.stopPropagation(); else if (e.target !== input) e.preventDefault(); });
-      node.addEventListener("pointerup", interaction);
+      let press = null;
+      node.addEventListener("pointerdown", (e) => {
+        if (node === panel && e.pointerType === "touch") e.stopPropagation(); else if (e.target !== input) e.preventDefault();
+        press = { id: e.pointerId, x: e.clientX, y: e.clientY, button: e.target.closest("button[data-sketch-action]"), moved: false };
+      });
+      node.addEventListener("pointermove", (e) => {
+        if (press && e.pointerId === press.id && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 8) press.moved = true;
+      });
+      node.addEventListener("scroll", () => { if (press) press.moved = true; }, { passive: true });
+      node.addEventListener("pointercancel", () => { press = null; });
+      node.addEventListener("pointerup", (e) => {
+        const start = press; press = null;
+        if (!start || start.id !== e.pointerId || start.moved || start.button !== e.target.closest("button[data-sketch-action]") || Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) return;
+        interaction(e);
+      });
       node.addEventListener("click", (e) => { if (e.detail === 0) interaction(e); });
     }
     // Let native finger scrolling reach the right rail; the outer keypad host normally cancels touch defaults.
@@ -275,7 +331,7 @@
       if (existing) control.edit(existing.id); else control.begin(c);
     }
     function additiveAt(x, y) {
-      const s = control.snapshot; if (!s || s.info.tool || s.info.dialog || control.editor || options.isUI(x, y)) return false;
+      const s = control.snapshot; if (!s || projectionContext !== contextKey(s) || s.info.tool || s.info.dialog || control.editor || options.isUI(x, y)) return false;
       return projected.some(({ a, b }) => {
         if (!M.point(a) || !M.point(b)) return false;
         const vx = b[0] - a[0], vy = b[1] - a[1], n = vx * vx + vy * vy;

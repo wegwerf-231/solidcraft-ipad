@@ -180,9 +180,9 @@
     return rects;
   }
 
-  function refreshZones() {
+  function refreshZones(info) {
     if (!api() || zoneRequest) return zoneRequest;
-    zoneRequest = Promise.all([req("ui.handles"), req("ui.inspect")])
+    zoneRequest = Promise.all([req("ui.handles"), info || req("ui.inspect")])
       .then(([handles, info]) => {
         const list = Array.isArray(handles) ? handles : (handles && handles.handles) || [];
         zones.viewport = info.viewport || null;
@@ -656,16 +656,18 @@
     stateBusy = true;
     try {
       const info = await req("ui.inspect");
-      appState.tool = info.tool || null;
-      appState.dialog = info.dialog != null;
-      appState.home = !!info.home;
-      appState.tab = (info.ui && info.ui.tab) || "";
+      updateAppState(info);
     } catch (_) {
     } finally {
       stateBusy = false;
     }
   }
-  setInterval(pollState, 400);
+  function updateAppState(info) {
+    appState.tool = info.tool || null;
+    appState.dialog = info.dialog != null;
+    appState.home = !!info.home;
+    appState.tab = (info.ui && info.ui.tab) || "";
+  }
 
   // Zeichenwerkzeuge, bei denen ein Pencil-Zug wie in Shapr3D gezeichnet wird: Aufsetzen setzt den
   // ersten Punkt, Abheben den zweiten. SolidCraft erwartet dafür zwei Klicks; der Zug wird übersetzt.
@@ -735,9 +737,10 @@
   let checking = false;
   let padTab = false;
   let blurredCount = 0;
-  async function fieldCheck() {
+  async function fieldCheck(info, sel) {
+    if (document.hidden) return;
     if (sketchTools && sketchTools.editing) return;
-    if(keypadTools&&keypadTools.active){keypadTools.native.observe();return;}
+    if(keypadTools&&keypadTools.active){await keypadTools.native.observe();return;}
     if(stylusStart)return;
     const el = agent;
     if (!el || checking || !api()) return;
@@ -754,8 +757,8 @@
     if (textMode) return;
     checking = true;
     try {
-      const [sel, info] = await Promise.all([req("ui.selection"), req("ui.inspect")]);
-      if (document.activeElement !== el || textMode) return;
+      if (!info || !sel) [sel, info] = await Promise.all([req("ui.selection"), req("ui.inspect")]);
+      if (document.activeElement !== el || textMode || document.hidden) return;
       const dlg = typeof info.dialog === "string" ? info.dialog : "";
       const vf = /value_focus: Some\(([^)]*)\)/.exec(dlg);
       // Wertfelder beim Zeichnen (Länge, Winkel, Breite …) gehören zum aktiven Skizzenwerkzeug.
@@ -779,7 +782,6 @@
   }
   function onAgentFocus() { setTimeout(fieldCheck, 40); }
   function onAgentBlur() { setTimeout(fieldCheck, 80); }
-  setInterval(fieldCheck, 300);
 
   const isMac = /Mac|iPad|iPhone/.test(navigator.userAgent);
   function key(k, mods = {}) {
@@ -971,42 +973,62 @@
     return [];
   }
 
-  async function checkSelection() {
-    if (!api() || (pad && pad.classList.contains("on"))) return;
-    try {
-      const [sel, info] = await Promise.all([req("ui.selection"), req("ui.inspect")]);
-      if (sketchTools) await sketchTools.refresh(info, sel);
-      let acts = actionsFor(sel, info);
-      if (sketchTools && sketchTools.active && window.SolidCraftSketch.linePair(sketchTools.controller.snapshot.sketch, sel.selection)) {
-        acts = window.SolidCraftSketch.dimensionChoices(sketchTools.controller.snapshot.sketch, sel.selection).filter((c) => c.enabled).map((c) => [c.label, "dimension:" + c.key]);
-      }
-      buildUI();
-      if (info.home || menuMaybeOpen || !acts.length || (touchShell && touchShell.active)) { hideBar(); return; }
-      note("auswahl " + (sel.selection || []).map((i) => i.type).join(","));
-      const k = JSON.stringify([acts, sel.selection]);
-      if (k === barKey && bar.classList.contains("on")) return;
-      barKey = k;
-      bar.innerHTML = "";
-      for (const [label, action] of acts) {
-        const b = document.createElement("button");
-        b.textContent = label;
-        b.dataset.action = action;
-        bar.appendChild(b);
-      }
-      bar.classList.add("on");
-      // neben die letzte Berührung, innerhalb des Fensters
-      const p = lastTap || { x: innerWidth / 2, y: innerHeight / 2 };
-      const w = bar.offsetWidth, h = bar.offsetHeight;
-      let x = p.x - w / 2, y = p.y - h - 40;
-      if (y < 60) y = p.y + 40;
-      x = Math.max(12, Math.min(innerWidth - w - 12, x));
-      y = Math.max(12, Math.min(innerHeight - h - 12, y));
-      bar.style.left = x + "px"; bar.style.top = y + "px";
-    } catch (_) {}
+  function renderSelection(info, sel) {
+    if (pad && pad.classList.contains("on")) return;
+    let acts = actionsFor(sel, info);
+    if (sketchTools && sketchTools.active && window.SolidCraftSketch.linePair(sketchTools.controller.snapshot.sketch, sel.selection)) {
+      acts = window.SolidCraftSketch.dimensionChoices(sketchTools.controller.snapshot.sketch, sel.selection).filter((c) => c.enabled).map((c) => [c.label, "dimension:" + c.key]);
+    }
+    buildUI();
+    if (info.home || menuMaybeOpen || !acts.length || (touchShell && touchShell.active)) { hideBar(); return; }
+    const k = JSON.stringify([acts, sel.selection]);
+    if (k === barKey && bar.classList.contains("on")) return;
+    note("auswahl " + (sel.selection || []).map((i) => i.type).join(","));
+    barKey = k;
+    bar.innerHTML = "";
+    for (const [label, action] of acts) {
+      const b = document.createElement("button");
+      b.textContent = label;
+      b.dataset.action = action;
+      bar.appendChild(b);
+    }
+    bar.classList.add("on");
+    // neben die letzte Berührung, innerhalb des Fensters
+    const p = lastTap || { x: innerWidth / 2, y: innerHeight / 2 };
+    const w = bar.offsetWidth, h = bar.offsetHeight;
+    let x = p.x - w / 2, y = p.y - h - 40;
+    if (y < 60) y = p.y + 40;
+    x = Math.max(12, Math.min(innerWidth - w - 12, x));
+    y = Math.max(12, Math.min(innerHeight - h - 12, y));
+    bar.style.left = x + "px"; bar.style.top = y + "px";
   }
-  setInterval(() => {
-    if (!document.hidden && api() && state === "idle" && !stylusStart) { checkSelection(); refreshRail(); }
-  }, 900);
+
+  // Share one UI snapshot across the shell, selection, fields and sketch controls.
+  // Slow frames never queue another polling pass; gestures keep the CAD thread free.
+  let uiRefresh = null;
+  function canRefreshUI() { return api() && !document.hidden && state === "idle" && !stylusStart; }
+  function refreshUI(forceZones = false) {
+    if (!canRefreshUI()) return Promise.resolve();
+    if (uiRefresh) return uiRefresh;
+    uiRefresh = (async () => {
+      const [info, sel] = await Promise.all([req("ui.inspect"), req("ui.selection")]);
+      if (!canRefreshUI()) return;
+      updateAppState(info);
+      if (forceZones || !zones.at || performance.now() - zones.at >= 900) await refreshZones(info);
+      if (!canRefreshUI()) return;
+      if (touchShell) await touchShell.refresh(info, sel);
+      if (!canRefreshUI()) return;
+      if (sketchTools) await sketchTools.refresh(info, sel);
+      if (!canRefreshUI()) return;
+      renderSelection(info, sel);
+      renderRail(info, sel);
+      await fieldCheck(info, sel);
+    })().catch(() => {}).finally(() => { uiRefresh = null; });
+    return uiRefresh;
+  }
+  function checkSelection() { return refreshUI(); }
+  setInterval(refreshUI, 350);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshUI(true); });
 
   async function waitDialog(tries = 30) {
     for (let i = 0; i < tries; i++) {
@@ -1226,15 +1248,7 @@
     rail.style.setProperty("--rb", size + "px");
   }
 
-  async function refreshRail() {
-    if (!api() || document.hidden) return;
-    try {
-      await refreshZones();
-      const [info, sel] = await Promise.all([req("ui.inspect"), req("ui.selection")]);
-      if (touchShell) await touchShell.refresh(info, sel);
-      renderRail(info, sel);
-    } catch (_) {}
-  }
+  function refreshRail() { return refreshUI(true); }
 
   async function railAction(act) {
     if (act === "collapse") {
@@ -1307,10 +1321,18 @@
       changed:()=>{if(touchShell)touchShell.refresh();scheduleSelectionCheck();},
     });
     root.addEventListener('pointerdown',e=>{if(keypadTools&&keypadTools.active&&!e.target.closest('.sc-pad')){keypadTools.cancel();e.preventDefault();e.stopImmediatePropagation();}},{capture:true});
+    let shellMode = "";
     if (window.SolidCraftTouchShell) touchShell = window.SolidCraftTouchShell.mount({
       host: root, request: req, execute: exec, icon, handles: () => zones.handles || [],
       editing: () => !!(sketchTools && sketchTools.editing) || !!(keypadTools && keypadTools.active),
-      changed: () => { if (touchShell && touchShell.active) hideBar(); if (sketchTools) sketchTools.refresh(); },
+      changed: () => {
+        if (touchShell && touchShell.active) hideBar();
+        // Rendering the same shell must not start another full sketch inspection.
+        if (root.dataset.shellMode !== shellMode) {
+          shellMode = root.dataset.shellMode;
+          scheduleSelectionCheck();
+        }
+      },
     });
     try {
       // Version 3.0 bis 3.5 hatte den Browser ausgeblendet; einmalig wieder einblenden.
@@ -1335,9 +1357,6 @@
   }, 300);
   setTimeout(() => clearInterval(boot), 180000);
 
-  setInterval(() => {
-    if (sketchTools && sketchTools.active && !document.hidden && state === "idle" && !stylusStart) sketchTools.refresh();
-  }, 350);
   addEventListener("pointerdown", (e) => {
     if (((sketchTools && sketchTools.editing) || (keypadTools && keypadTools.active)) && !synthetic && e.pointerType === "mouse" && !e.target.closest(".sc-pad")) {
       if(keypadTools&&keypadTools.active)keypadTools.cancel();else sketchTools.cancel(); e.preventDefault(); e.stopImmediatePropagation();
