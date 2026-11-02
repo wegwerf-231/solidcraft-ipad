@@ -15,6 +15,8 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
 - `touch-nav.js`: eigenständige Touch-/Pencil-Bedienung, Auswahl, Kontextwerkzeuge,
   Ziffernfeld, Layout und Diagnosefunktionen; Projektversion vereinheitlicht;
   Versand von Diagnosen nur mit ausdrücklichem `?senddiagnostics=1` auf lokalen Hosts.
+- `touch-shell.js`: eigene gruppierte Skizzenwerkzeuge, Variantenwahl und umschaltbare
+  Bedienebene vor dem unveränderten Canvas; keine Grafik-/Quellübernahme aus Shapr3D.
 - `sketch-tools.js`, `sketch-tools-view.js`: eigene Maßetiketten, Eingabeentwürfe,
   Bedingungen-Leiste und vergrößerte Symbole über die öffentliche CAD-API.
   Keine übernommenen Shapr3D-Quelltexte, Grafiken oder Produkt-Screenshots.
