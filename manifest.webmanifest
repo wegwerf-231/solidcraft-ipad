@@ -5,8 +5,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#e8ebf0",
-  "theme_color": "#343840",
+  "background_color": "#1f242d",
+  "theme_color": "#1f242d",
   "categories": [
     "productivity",
     "utilities"
@@ -28,5 +28,5 @@
       "type": "image/png"
     }
   ],
-  "x-solidcraft-ipad-modified": "Name and description adapted; see FORK-NOTICE.md"
+  "x-solidcraft-ipad-modified": "Name, description and dark launch/theme colours adapted; see FORK-NOTICE.md"
 }

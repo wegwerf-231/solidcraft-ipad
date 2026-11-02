@@ -4,6 +4,9 @@ Diese Änderung ergänzt die noch offenen Punkte aus der Anforderungsliste vom
 2. November 2026. Sie baut auf AP 7 in PR #5 auf und wird separat geprüft.
 Der CAD-Kern und seine Lizenz-/Herkunftsnachweise bleiben unverändert.
 
+Aktuelle Korrektur für Extrusionen, bewegbares Ziffernfeld und Darstellung:
+[Bedienung und Prüfstand](NUMPAD-DISPLAY.md).
+
 ## Zeichenwerte und Variablen (AP 2)
 
 Ein Zahlenfeld beim Zeichnen antippen. Das Ziffernfeld zeigt einen lokalen
