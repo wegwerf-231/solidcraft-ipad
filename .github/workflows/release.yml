@@ -24,6 +24,7 @@ jobs:
       - name: Validate scripts and packaging
         run: |
           node --check touch-nav.js
+          node --check canvas-shift.js
           node --check touch-shell.js
           node --check pencil-sketch.js
           node --check pencil-gestures.js

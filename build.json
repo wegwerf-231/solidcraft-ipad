@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0+83d1831cccc34a70",
+  "version": "0.6.0+d73f72f24f82cd44",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "89100af9ff5e80b7e38e0899bed8cd95c1b6b70843fe6e28d1941f40b7d82805"
+      "sha256": "65811ff2003d85091cc79f25546c4fc5f6f58fa187afabf3af4378198bef75da"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "7c9578f9e009e67ec252f5373d8ce546a9276e889c7accbeae031dfab7c87d23"
+      "sha256": "c6aa7e899f23a4fcf96d25b44cdc51e5940f2befb620ef38847890c594357217"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "a2414aee9a1a5526dfbdc3d1a9a8137fb9db8a2374deb55505100feca0da8bf5"
+      "sha256": "0b57bc2f596e5d96f05d31211a0284f9dd7c861ce449469d40b3c883290922bd"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -45,6 +45,10 @@
     {
       "file": "about.html",
       "sha256": "bfa9a37f0f98aca6665b47bcdc90faf36a37c5165318c6ce0949d9ac2c2ba331"
+    },
+    {
+      "file": "canvas-shift.js",
+      "sha256": "a972917d58453b13e4d06ef711f3ce91a7769e3fadb68b8106950aa980eb4470"
     },
     {
       "file": "docs/KEYPAD-PENCIL.md",
@@ -64,7 +68,7 @@
     },
     {
       "file": "docs/TOUCH-SHELL.md",
-      "sha256": "4325d15d0ca7fafb5bf95fcff2030697cd9d5d6d5f66c54e2537bc3f1aa14190"
+      "sha256": "e29fc9671196cd588769bf4303f1c342e23a44c65b04ab24cf0b9946deefc74f"
     },
     {
       "file": "docs/screenshots/ap2-error.png",
@@ -120,7 +124,7 @@
     },
     {
       "file": "index.html",
-      "sha256": "284580e6efdcc3aed6056e6635cac06fdf3b88b12b81a3c692981872e6981b53"
+      "sha256": "f4404bd42190c898fe11ae50abed05fa798c72993eca8871c949b6cd5d5d863a"
     },
     {
       "file": "keypad-tools.js",
@@ -160,11 +164,11 @@
     },
     {
       "file": "project-version.js",
-      "sha256": "9808b851534ad95d09508296d43932ff1a18baefb61d183aec1310bf6b7c9aea"
+      "sha256": "b55e6ceaa56843085b5341d29bdfebb0a8893a00bfcb2d2bea2b796c247b03a1"
     },
     {
       "file": "project.json",
-      "sha256": "296bd3d934cac6fa13a160c8ba66bfcb7efdce8eb2c592329a7e17ab5bd42264"
+      "sha256": "8f88f20527b99aed8421471c97de7df3f11a1e45a83e44ae4698e3c75d57af68"
     },
     {
       "file": "scripts/release.py",
@@ -172,7 +176,7 @@
     },
     {
       "file": "sketch-tools-view.js",
-      "sha256": "2af4447f668005b77a638d194baf7b59ded99ec13178407833d711a0701c1255"
+      "sha256": "e88a46ac8098c14b9dc9e39d54a470b5cc899f085ce6aa80f4e1815ae4196af5"
     },
     {
       "file": "sketch-tools.js",
@@ -216,7 +220,7 @@
     },
     {
       "file": "touch-shell.js",
-      "sha256": "2a95035b0e1761a409351b8bf748e487d5c191ddc53d86d8e6052f57ba110057"
+      "sha256": "f5185bfd7646cd38c66c4dc3e0a48bdfc666aec42031b1fe07603a62c01cdf2f"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",

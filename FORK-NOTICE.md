@@ -20,6 +20,9 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
 - `pencil-gestures.js`: eigene begrenzte Wackel-, Druck- und Verweil-Erkennung.
 - `touch-shell.js`: eigene gruppierte Skizzenwerkzeuge, Variantenwahl und umschaltbare
   Bedienebene vor dem unveränderten Canvas; keine Grafik-/Quellübernahme aus Shapr3D.
+- `canvas-shift.js`: verschiebt das unveränderte Canvas in der iPad-Skizzenansicht nach oben,
+  damit Kopfzeile und Befehlsleiste außerhalb des Bildschirms liegen, und rechnet die
+  Bildschirmkoordinaten der Browser-Schnittstelle entsprechend um.
 - `sketch-tools.js`, `sketch-tools-view.js`: eigene Maßetiketten, Eingabeentwürfe,
   Bedingungen-Leiste und vergrößerte Symbole über die öffentliche CAD-API.
   Keine übernommenen Shapr3D-Quelltexte, Grafiken oder Produkt-Screenshots.

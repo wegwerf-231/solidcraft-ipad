@@ -1,6 +1,6 @@
 # AP 7 – iPad-Skizzenansicht
 
-Vorbereitet für 0.4.0. Der unveränderte SolidCraft-Kern bleibt Version 0.29.0.
+Vorbereitet für 0.4.0, Zeichenfläche ohne Kopfband seit 0.6.0. Der unveränderte SolidCraft-Kern bleibt Version 0.29.0.
 Diese Änderung behandelt AP 7 aus der bereitgestellten Anforderungsliste vom
 2. November 2026. Restpunkte aus AP 2/6 und der eigene Rust-Build (AP 8) sind getrennt.
 
@@ -40,16 +40,20 @@ Gerätetest zu viel Platz belegte. Die Listen scrollen weiterhin, statt Knöpfe 
 Split View erscheinen die linken Werkzeuge als Symbole mit zugänglichen Namen.
 Maß-/Bedingungssymbole vermeiden die eigenen Leisten. Die Maße-/Bedingungen-Aktionen
 werden nicht zusätzlich in der linken Leiste oder einer Kontextleiste angeboten.
-Rückgängig/Wiederholen bleiben in der ursprünglichen Anwendungsleiste und per Geste.
+Rückgängig/Wiederholen stehen seit 0.6.0 als kleine Knöpfe neben der Werkzeug-Pille und bleiben per Geste verfügbar.
 
 Der übernommene CAD-Kern zeichnet Befehlsleiste und Skizzenpalette in ein einziges
 Canvas. Er bietet keine öffentliche API zum echten Ein-/Ausklappen dieser Bereiche.
-Deshalb überdeckt eine undurchsichtige, bedienbare Ebene im iPad-Modus die Original-
-Befehlsleiste und -Palette. Die native Anwendung und die Zeichenkoordinaten werden
-nicht verschoben oder skaliert. **Der reservierte Platz dieser Bereiche wird damit
-nicht als zusätzliche Zeichenfläche zurückgewonnen.** Das echte Entfernen dieser
-Canvas-Flächen und die Größe aller ursprünglichen Dialog-/Menüknöpfe benötigen AP 8.
-Die Datei-/Entwurfsleiste oberhalb der Skizzenwerkzeuge bleibt original.
+Seit 0.6.0 verschiebt `canvas-shift.js` das Canvas im iPad-Modus um die gemessene Unterkante
+der Befehlsleiste (rund 160 Pixel) nach oben und vergrößert es um denselben Betrag. Kopfzeile
+und Befehlsleiste liegen damit außerhalb des Bildschirms; der Platz steht dem Modell zur
+Verfügung. SolidCraft rechnet Berührungen über die Lage des Canvas selbst um. Die Datei hüllt
+zusätzlich `window.solidcraft` ein und rechnet Bildschirmkoordinaten in Antworten (`ui.handles`,
+`ui.inspect`, `ui.sketchToScreen`, `ui.worldToScreen`, `ui.at`, `ui.selection`) und Anfragen
+(`ui.pick`, `view.pick`, `ui.click`, `ui.move`, `ui.drag`, `ui.scroll`, `ui.menu`) um.
+Die übrigen Skripte arbeiten daher unverändert mit Bildschirmkoordinaten. Im erweiterten Modus,
+außerhalb von Skizzen und mit `?fullsketch=off` bleibt das Canvas unverändert.
+Die Größe der ursprünglichen Dialog- und Menüknöpfe benötigt weiterhin AP 8.
 
 ## Prüfung
 

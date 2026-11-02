@@ -4,6 +4,19 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.6.0] - vorbereitet, Geräteabnahme ausstehend
+
+Rückmeldung aus dem Gerätetest von 0.5.0 („die Schaltfläche ist immer noch riesig“):
+
+- Das dunkle Kopfband entfällt. In der iPad-Skizzenansicht wird die Zeichenfläche um die Höhe
+  von Kopfzeile und Original-Befehlsleiste nach oben verschoben (neue Datei `canvas-shift.js`);
+  diese Bereiche liegen außerhalb des Bildschirms, das Modell nutzt die ganze Höhe.
+- Oben bleiben nur kleine Knöpfe: Rückgängig, Werkzeug-Pille, Wiederholen und „Erweitert“.
+  Rückgängig und Wiederholen sind nötig, weil die Original-Kopfzeile verdeckt ist.
+- Alle Bildschirmkoordinaten der Browser-Schnittstelle werden umgerechnet, sodass Pencil,
+  Ziffernfeld, Maßetiketten und Auswahl unverändert treffen.
+- „Erweitert“, Verlassen der Skizze und `?fullsketch=off` zeigen die unveränderte Oberfläche.
+
 ## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
 
 Rückmeldung aus dem ersten Gerätetest auf dem iPad:

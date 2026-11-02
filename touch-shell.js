@@ -159,7 +159,9 @@
           const title=document.createElement('span');title.className='ts-title';title.textContent='Skizze · iPad';
           const pill=button(active?active.label+(active.variants.length>1?' · '+activeVariant.label:'')+' ▾':control.info.tool?'Werkzeug aktiv ▾':'Automatisch · Pencil ▾','variants',active?active.label+' · '+activeVariant.label+' · Varianten wählen':'Werkzeug wählen');pill.className='ts-pill';pill.setAttribute('aria-expanded',String(menuOpen));pill.disabled=locked;
           const toggle=button('Erweitert','toggle','Erweiterte Befehlsleiste anzeigen');toggle.className='ts-toggle';toggle.disabled=locked;
-          row.append(title,pill,toggle);
+          const undo=button('↶','undo','Rückgängig');undo.className='ts-toggle';undo.disabled=locked;
+          const redo=button('↷','redo','Wiederholen');redo.className='ts-toggle';redo.disabled=locked;
+          row.append(title,undo,pill,redo,toggle);
           const hint=document.createElement('p');hint.className='ts-hint';hint.textContent=control.info.tool?'Mit Pencil zeichnen · Esc beendet das Werkzeug':'Mit Pencil zeichnen oder ein Werkzeug wählen · Finger bewegen die Ansicht';
           deck.append(row,hint);
           if(control.error){const err=document.createElement('p');err.className='ts-error';err.setAttribute('role','alert');err.textContent=control.error;deck.append(err);}

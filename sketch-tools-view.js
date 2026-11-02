@@ -56,8 +56,10 @@
       await control.refresh();
       options.changed();
     }
+    // Oberkante für Etiketten: bei verschobener Zeichenfläche (canvas-shift.js) gehört der obere Rand dem Modell.
+    const topLimit = () => document.body.classList.contains("sc-shift") ? 8 : 150;
     function positionedButton(record, position, occupied, maxX) {
-      if (!M.point(position) || position[0] < 0 || position[1] < 150 || position[0] > innerWidth || position[1] > innerHeight - 50) return;
+      if (!M.point(position) || position[0] < 0 || position[1] < topLimit() || position[0] > innerWidth || position[1] > innerHeight - 50) return;
       const b = button(record.text, record.action); b.dataset.scene = "1";
       if (record.kind === "glyph") b.className = "sk-glyph";
       if (record.kind === "pair") { b.className = "sk-pair"; delete b.dataset.scene; } // ein Bedienknopf, auch per Finger
@@ -66,9 +68,9 @@
       labels.appendChild(b);
       const width = Math.max(record.kind === "glyph" ? 22 : 24, b.offsetWidth || 80), height = record.kind === "glyph" ? 22 : 24;
       let x = Math.max(6, Math.min(maxX - width, position[0] - width / 2));
-      let y = Math.max(160, Math.min(innerHeight - 105, position[1] - height / 2));
+      let y = Math.max(topLimit() + 10, Math.min(innerHeight - 105, position[1] - height / 2));
       for (let tries = 0; tries < 8 && occupied.some((r) => x < r.x + r.w + 3 && x + width + 3 > r.x && y < r.y + r.h + 3 && y + height + 3 > r.y); tries++) y -= height + 4;
-      if (y < 155 || options.isUI(x + width / 2, y + height / 2)) { b.remove(); return; }
+      if (y < topLimit() + 5 || options.isUI(x + width / 2, y + height / 2)) { b.remove(); return; }
       b.style.left = x + "px"; b.style.top = y + "px";
       occupied.push({ x, y, w: width, h: height });
     }
@@ -84,7 +86,7 @@
           const out = document.createElement("output");
           out.textContent = M.formatted(control.model.value, false, control.units) + " · gemessen";
           out.setAttribute("aria-label", "Gemessene Kantenlänge, nicht gebunden");
-          out.style.cssText = `position:absolute;left:${Math.max(8,Math.min(innerWidth-180,control.model.screen[0]))}px;top:${Math.max(160,control.model.screen[1]-50)}px;background:#242830;color:#e8ebf0;padding:10px;border:1px solid #8094af;border-radius:8px;font:15px system-ui`;
+          out.style.cssText = `position:absolute;left:${Math.max(8,Math.min(innerWidth-180,control.model.screen[0]))}px;top:${Math.max(topLimit()+10,control.model.screen[1]-50)}px;background:#242830;color:#e8ebf0;padding:10px;border:1px solid #8094af;border-radius:8px;font:15px system-ui`;
           labels.appendChild(out);
         }
         return;

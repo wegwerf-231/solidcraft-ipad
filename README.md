@@ -10,7 +10,7 @@ Eine eigenständige Touch-/Pencil-Erweiterung der Web-Ausgabe von
 
 ## Versionen
 
-Die **iPad-Ausgabe 0.5.0** basiert auf **SolidCraft 0.29.0**.
+Die **iPad-Ausgabe 0.6.0** basiert auf **SolidCraft 0.29.0**.
 Die verbindlichen Angaben stehen in [project.json](project.json).
 Die Versionsnummer im eingebetteten CAD-Programm bezeichnet weiterhin das Original;
 die iPad-Version steht im Seitentitel, auf der Infoseite und in den Release-Metadaten.
@@ -42,6 +42,7 @@ python3 scripts/release.py prepare
 python3 scripts/release.py check
 python3 -m unittest discover -s tests -v
 node --check touch-nav.js
+node --check canvas-shift.js
 node --check pencil-sketch.js
 node --check project-version.js
 node --check touch-shell.js
