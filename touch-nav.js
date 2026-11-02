@@ -52,6 +52,7 @@
 
   let sketchTools = null;
   let touchShell = null;
+  let keypadTools = null;
   let synthetic = false;
   let lastFingerTime = 0;
   let stylusDown = 0;
@@ -336,7 +337,7 @@
     logTouch(e);
     if (inOverlay(e)) return;
     const changed = [...e.changedTouches];
-    if (sketchTools && sketchTools.editing && changed.length) { sketchTools.cancel(); block(e); return; }
+    if (((sketchTools && sketchTools.editing) || (keypadTools && keypadTools.active)) && changed.length) { if (keypadTools && keypadTools.active) keypadTools.cancel(); else sketchTools.cancel(); block(e); return; }
     lastFingerTime = performance.now();
     block(e);
     if (changed.some(isStylus)) { stylusDown += changed.filter(isStylus).length; onStylusStart(changed.find(isStylus)); return; }
@@ -549,7 +550,7 @@
   let stylusStart = null;
   function onStylusStart(t) {
     if (!t) return;
-    const s = { x: t.clientX, y: t.clientY, moved: false, pressed: false, menu: false };
+    const s = { x: t.clientX, y: t.clientY, moved: false, pressed: false, menu: false, pressure: t.force };
     fieldPos = { x: s.x, y: s.y };
     stylusStart = s;
     lastTap = { x: t.clientX, y: t.clientY };
@@ -608,10 +609,10 @@
     const at = t ? { x: t.clientX, y: t.clientY } : s;
     if (s.ext) { s.ext.end(s, at, cancelled); setTimeout(scheduleSelectionCheck, 120); return; }
     if (s.held && !s.moved && !cancelled) {
-      clickAt(s.x, s.y, 2);
-      menuMaybeOpen = true;
-      hideBar();
-      note("pencil kontextmenü");
+      const openMenu = () => { clickAt(s.x,s.y,2);menuMaybeOpen=true;hideBar();note("pencil kontextmenü"); };
+      const extension=window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+      if(extension && extension.hold)Promise.resolve(extension.hold(s)).then(handled=>{if(!handled)openMenu();scheduleSelectionCheck();}).catch(()=>openMenu());
+      else openMenu();
       return;
     }
     if (s.draw) {
@@ -736,6 +737,8 @@
   let blurredCount = 0;
   async function fieldCheck() {
     if (sketchTools && sketchTools.editing) return;
+    if(keypadTools&&keypadTools.active){keypadTools.native.observe();return;}
+    if(stylusStart)return;
     const el = agent;
     if (!el || checking || !api()) return;
     debug.fc = (debug.fc || 0) + 1;
@@ -763,7 +766,10 @@
       if (k !== fieldKey) { fieldKey = k; firstKey = true; }
       debug.lastField = numeric ? "number" : "text";
       debug.fcBranch = numeric ? "pad" : "pill";
-      if (numeric) { showKeyboardPill(false); showPad(true); }
+      if (numeric) {
+        showKeyboardPill(false);
+        if (keypadTools) await keypadTools.native.begin(info,k,fieldPos); else showPad(true);
+      }
       else { showPad(false); showKeyboardPill(true); }
     } catch (err) {
       debug.fcBranch = "error " + err;
@@ -799,7 +805,9 @@
     el.dispatchEvent(new InputEvent("input", { inputType: "insertText", data: s, bubbles: true }));
   }
   function padKey(k) {
+    if (k === "vars" && keypadTools) { keypadTools.variables().catch(e=>note("Variable: "+e.message)); return; }
     if (sketchTools && sketchTools.editing) { sketchTools.key(k); return; }
+    if (keypadTools && keypadTools.active) { keypadTools.native.key(k); return; }
     if (k === "ok") { key("Enter"); confirmDialog(); return; }
     if (k === "esc") { key("Escape"); return; }
     if (k === "back") { key("Backspace"); firstKey = false; return; }
@@ -872,7 +880,7 @@
       ["4"], ["5"], ["6"], ["×", "*", "op"], ["✓", "ok", "ok tall"],
       ["1"], ["2"], ["3"], ["−", "-", "op"],
       ["±", "neg", "op"], ["0"], [".", "."], ["+", "+", "op"],
-      ["⌨︎", "abc", "op"], ["Esc", "esc", "esc"], ["⇥", "tab", "op tabkey"], ["deg", " deg", "op"],
+      ["⌨︎", "abc", "op"], ["Esc", "esc", "esc"], ["⇥", "tab", "op tabkey"], ["deg", " deg", "op"], ["x+", "vars", "op"],
     ];
     for (const [label, val, cls] of keys) {
       const b = document.createElement("button");
@@ -919,7 +927,7 @@
     hideBar();
     // neben das Feld, aber nicht darüber (wie in Shapr3D)
     let p = fieldPos || lastTap || { x: innerWidth / 2, y: innerHeight / 2 };
-    if (agent) {
+    if (agent && !(sketchTools && sketchTools.editing)) {
       const r = agent.getBoundingClientRect();
       if (r.left > 2 || r.top > 2) p = { x: r.left, y: r.top };
     }
@@ -1284,11 +1292,24 @@
     buildUI();
     if (window.SolidCraftSketchView) sketchTools = window.SolidCraftSketchView.mount({
       host: root, pad, request: req, execute: exec, isUI, handles: () => zones.handles || [],
-      showPad, changed: scheduleSelectionCheck,
+      showPad, anchor: p => { fieldPos=p; }, changed: scheduleSelectionCheck,
     });
+    if (window.SolidCraftKeypad) keypadTools = window.SolidCraftKeypad.mount({
+      host:root,pad,request:req,execute:exec,showPad,
+      focus:async()=>{const el=textAgent();if(el)el.focus({preventScroll:true});},
+      settle:async()=>{await frame();await frame();},confirm:confirmDialog,
+      anchor:()=>{const r=agent&&agent.getBoundingClientRect();return r?{x:r.left,y:r.top}:fieldPos;},
+      direct:()=>{
+        const c=sketchTools&&sketchTools.controller,e=c&&c.editor;if(!e)return null;
+        const constraint=e.constraint&&c.snapshot&&c.snapshot.sketch.constraints.find(v=>v.id===e.constraint);
+        return {ref:e,parameter:e.param,context:e.context,kind:e.choice&&e.choice.key==='angle'||constraint&&window.SolidCraftSketch.ANGLES.has(constraint.type)?'angle':'length',get value(){return e.value;},get first(){return e.first;},set(value){if(c.editor!==e)return;e.value=value.slice(0,256);e.first=false;e.error='';c.changed();}};
+      },
+      changed:()=>{if(touchShell)touchShell.refresh();scheduleSelectionCheck();},
+    });
+    root.addEventListener('pointerdown',e=>{if(keypadTools&&keypadTools.active&&!e.target.closest('.sc-pad')){keypadTools.cancel();e.preventDefault();e.stopImmediatePropagation();}},{capture:true});
     if (window.SolidCraftTouchShell) touchShell = window.SolidCraftTouchShell.mount({
       host: root, request: req, execute: exec, icon, handles: () => zones.handles || [],
-      editing: () => !!(sketchTools && sketchTools.editing),
+      editing: () => !!(sketchTools && sketchTools.editing) || !!(keypadTools && keypadTools.active),
       changed: () => { if (touchShell && touchShell.active) hideBar(); if (sketchTools) sketchTools.refresh(); },
     });
     try {
@@ -1318,8 +1339,8 @@
     if (sketchTools && sketchTools.active && !document.hidden && state === "idle" && !stylusStart) sketchTools.refresh();
   }, 350);
   addEventListener("pointerdown", (e) => {
-    if (sketchTools && sketchTools.editing && !synthetic && e.pointerType === "mouse" && !e.target.closest(".sc-pad")) {
-      sketchTools.cancel(); e.preventDefault(); e.stopImmediatePropagation();
+    if (((sketchTools && sketchTools.editing) || (keypadTools && keypadTools.active)) && !synthetic && e.pointerType === "mouse" && !e.target.closest(".sc-pad")) {
+      if(keypadTools&&keypadTools.active)keypadTools.cancel();else sketchTools.cancel(); e.preventDefault(); e.stopImmediatePropagation();
     }
   }, { capture: true });
 
@@ -1391,6 +1412,7 @@
     extension: null, zones, refreshZones, zoneAt, fieldCheck,
     get sketch() { return sketchTools; },
     get shell() { return touchShell; },
+    get keypad() { return keypadTools; },
     get padOn() { return !!(pad && pad.classList.contains("on")); },
     get state() { return state; },
   };

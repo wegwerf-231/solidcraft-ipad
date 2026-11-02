@@ -2,7 +2,7 @@
 <html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>iPad-Integration · isolierter Browsertest</title>
 <style>body{margin:0;background:#20252b;color:white;font:14px system-ui}header{max-height:70px;overflow:auto;padding:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}button{padding:8px;font:inherit}iframe{border:0;width:100%;height:calc(100vh - 100px);display:block}#report{white-space:pre-wrap;margin:0;padding:4px 8px;background:#15191f;max-height:80px;overflow:auto}</style>
-<header><strong>Nur Testdaten im eingebetteten Entwurf</strong><button id="lines">Zwei Linien</button><button id="angle">Winkel</button><button id="single">Einzelne Linie</button><button id="pencil">Pencil-Auswahl simulieren</button><button id="report-button">Status prüfen</button><button id="tools">Werkzeuge prüfen</button><button id="auto-line">Automatische Linie</button><button id="auto-arc">Automatischer Bogen</button><button id="finger">Finger-Auswahl testen</button><button id="empty">Testentwurf leeren</button></header>
+<header><strong>Nur Testdaten im eingebetteten Entwurf</strong><button id="lines">Zwei Linien</button><button id="angle">Winkel</button><button id="single">Einzelne Linie</button><button id="pencil">Pencil-Auswahl simulieren</button><button id="report-button">Status prüfen</button><button id="rectangle-values">Rechteck-Zeichenwerte</button><button id="pressure">Druck-Spline</button><button id="wiggle">Wackel-Bogen</button><button id="insert">Spline-Punkt halten</button><button id="tools">Werkzeuge prüfen</button><button id="auto-line">Automatische Linie</button><button id="auto-arc">Automatischer Bogen</button><button id="finger">Finger-Auswahl testen</button><button id="empty">Testentwurf leeren</button></header>
 <pre id="report" role="status">Web-App lädt …</pre>
 <iframe id="app" title="CAD-Testinstanz" src="../index.html"></iframe>
 <script>
@@ -10,7 +10,7 @@ const frame = document.getElementById('app'), report = document.getElementById('
 const pause = ms => new Promise(r=>setTimeout(r,ms));
 let api, activeKind;
 const wait = setInterval(()=>{const w=frame.contentWindow;if(w.solidcraft && w.solidcraftTouchNav && w.solidcraftTouchNav.sketch){api=w.solidcraft;clearInterval(wait);report.textContent='Bereit. Testknopf erzeugt ausschließlich einen neuen Testentwurf in dieser Instanz.';}},200);
-async function state(){const sk=await api.execute('sketch.inspect');const info=await api.request('ui.inspect');const sel=await api.request('ui.selection');report.textContent=JSON.stringify({Werkzeug:info.tool,Modus:frame.contentWindow.solidcraftTouchNav.shell?.controller.state.mode,Auswahl:sel.selection,Kurven:sk.curves.map(c=>({id:c.id,type:c.type})),Bedingungen:sk.constraints.map(c=>({id:c.id,type:c.type,value:c.value,param:c.param})),Fehler:frame.contentWindow.solidcraftTouchNav.debug.errors,Editor:!!frame.contentWindow.solidcraftTouchNav.sketch.editing});}
+async function state(){const sk=await api.execute('sketch.inspect');const info=await api.request('ui.inspect');const sel=await api.request('ui.selection');report.textContent=JSON.stringify({Werkzeug:info.tool,Modus:frame.contentWindow.solidcraftTouchNav.shell?.controller.state.mode,Auswahl:sel.selection,Kurven:sk.curves.map(c=>({id:c.id,type:c.type,points:c.points})),Bedingungen:sk.constraints.map(c=>({id:c.id,type:c.type,value:c.value,param:c.param})),Fehler:frame.contentWindow.solidcraftTouchNav.debug.errors,Editor:!!frame.contentWindow.solidcraftTouchNav.sketch.editing});}
 async function fixture(kind){
  if(!api)return;report.textContent='Testentwurf wird vorbereitet …';
  for(let i=0;i<3;i++){const inf=await api.request('ui.inspect');if(!inf.tool)break;await api.request('ui.key',{key:'Escape'});}
@@ -57,6 +57,23 @@ for(const kind of ['lines','angle','single'])document.getElementById(kind).oncli
 document.getElementById('finger').onclick=()=>pencil(true).catch(e=>report.textContent=e.stack);
 document.getElementById('pencil').onclick=()=>pencil().catch(e=>report.textContent=e.stack);
 document.getElementById('empty').onclick=async()=>{await api.execute('file.new');report.textContent='Testentwurf geleert.';};
+
+async function emptySketch(){frame.contentWindow.solidcraftTouchNav.keypad?.cancel();for(let i=0;i<3;i++){const inf=await api.request('ui.inspect');if(!inf.tool)break;await api.request('ui.key',{key:'Escape'});}await api.execute('file.new');await api.request('ui.home',{open:false});await api.execute('sketch.create',{plane:'XY'});await api.request('ui.set',{showBrowser:false,showTimeline:false});await api.request('ui.view',{view:'top'});}
+async function stroke(samples,hold=false){
+ const w=frame.contentWindow,canvas=w.document.getElementById('solidcraft_canvas');
+ let last;
+ for(let i=0;i<samples.length;i++){
+  const [x,y,force=.2]=samples[i];last=new w.Touch({identifier:77,target:canvas,clientX:x,clientY:y,pageX:x,pageY:y,force});Object.defineProperty(last,'touchType',{value:'stylus'});
+  canvas.dispatchEvent(new w.TouchEvent(i?'touchmove':'touchstart',{bubbles:true,cancelable:true,touches:[last],targetTouches:[last],changedTouches:[last]}));await pause(70);
+ }
+ if(hold)await pause(600);
+ canvas.dispatchEvent(new w.TouchEvent('touchend',{bubbles:true,cancelable:true,touches:[],targetTouches:[],changedTouches:[last]}));await pause(700);await state();
+}
+document.getElementById('rectangle-values').onclick=async()=>{await emptySketch();await api.request('ui.start',{command:'sketch.rectangle.two_point'});await api.request('ui.move',{x:400,y:350});await pause(100);await api.request('ui.click',{x:400,y:350});await api.request('ui.move',{x:560,y:450});await pause(450);await state();};
+document.getElementById('pressure').onclick=async()=>{await emptySketch();await api.request('ui.start',{command:'sketch.spline.fit_point'});await pause(450);await stroke([[400,350,.2],[420,330,.2],[440,300,.8],[460,320,.2],[480,350,.8],[500,360,.2],[520,370,.2]]);};
+document.getElementById('wiggle').onclick=async()=>{await emptySketch();await pause(450);await stroke([[400,350],[420,350],[440,350],...Array.from({length:10},(_,i)=>[440+(i%2?8:-8),350]),[460,335],[480,325],[500,330],[520,350]]);};
+document.getElementById('insert').onclick=async()=>{await emptySketch();await api.execute('sketch.spline.fit_point',{points:[[0,0],[40,0]]});await api.request('ui.view',{view:'fit'});await pause(350);const [p]=await api.request('ui.sketchToScreen',{points:[[20,0]]});await stroke([p],true);};
+
 document.getElementById('tools').onclick=async()=>{const cmds=await api.execute('engine.commands');const wanted=frame.contentWindow.SolidCraftTouchShell.TOOLS.flatMap(g=>g.variants.map(v=>v.command));report.textContent=JSON.stringify({Werkzeuge:wanted.length,Fehlend:wanted.filter(id=>!cmds.some(c=>c.id===id))});};
 document.getElementById('report-button').onclick=()=>state().catch(e=>report.textContent=e.stack);
 </script></html>

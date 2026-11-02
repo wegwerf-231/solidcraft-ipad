@@ -19,6 +19,8 @@
   "use strict";
   if (new URLSearchParams(location.search).get("pencilsketch") === "off") return;
 
+  const gestures = window.SolidCraftPencilGestures;
+
   // ---------- Einstellungen ----------
   const SNAP_PX = 16; // Endpunkt rastet an Punkten in diesem Abstand ein
   const STRAIGHT = 0.07; // Ausbiegung / Sehnenlänge, bis zu der ein Strich als gerade gilt
@@ -35,6 +37,11 @@
   const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
   const note = (s) => nav && nav.note && nav.note("skizze: " + s);
 
+  let feedback=null,feedbackTimer=0;
+  function hint(text,error=false){
+    if(!feedback){feedback=document.createElement("div");feedback.setAttribute("role","status");feedback.style.cssText="position:fixed;left:50%;bottom:80px;transform:translateX(-50%);max-width:80vw;padding:12px 18px;border-radius:12px;z-index:2147483002;background:#202833;color:white;font:16px system-ui;pointer-events:none";document.body.append(feedback);}
+    feedback.textContent=String(text||"");feedback.style.color=error?"#ffb7aa":"#e8ebf0";feedback.hidden=false;clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>{feedback.hidden=true;},error?6000:2000);
+  }
   // ---------- Tinte: der Strich wird sofort sichtbar, bis er in Geometrie umgewandelt ist ----------
   let inkSvg = null;
   function inkLayer() {
@@ -135,7 +142,7 @@
     return best;
   }
 
-  async function commit(pts, expected) {
+  async function commit(pts, expected, intent = {}) {
     const before = await exec("document.revision");
     if (!expected || before.document_id !== expected.document_id || before.revision !== expected.revision) throw new Error("Entwurf wurde während des Strichs geändert");
     if (chainDocument !== before.document_id) { chain = null; chainDocument = before.document_id; }
@@ -153,9 +160,14 @@
     let A = refA ? (pointsScreen.find((q) => q.id === refA) || { at: a }).at : a;
     let B = refB ? (pointsScreen.find((q) => q.id === refB) || { at: b }).at : b;
     const { d, at, L } = deviation(pts);
-    const straight = d < Math.max(STRAIGHT_PX, STRAIGHT * L);
+    const straight = intent.forced ? intent.forced === "line" : d < Math.max(STRAIGHT_PX, STRAIGHT * L);
     const sA = map.toSketch(A), sB0 = map.toSketch(B);
 
+    if (intent.spline) {
+      const controls=intent.controls.map(map.toSketch);controls[0]=refA||controls[0];controls[controls.length-1]=refB||controls.at(-1);
+      await exec(intent.spline, {points: controls});
+      chain = null; return;
+    }
     if (straight) {
       let sB = sB0;
       // fast waagrecht/senkrecht: ausrichten, die Bedingung setzt infer
@@ -170,7 +182,12 @@
       chain = id ? { ref: id + ".end", at: map.toScreen(sB), curve: id, dir: [sB[0] - sA[0], sB[1] - sA[1]], t: performance.now() } : null;
       note("linie " + (refA ? "an " + refA : "") + (refB ? " bis " + refB : ""));
     } else {
-      const sM = map.toSketch(at);
+      let sM = map.toSketch(at);
+      if (gestures && fresh && refA === fresh.ref && fresh.dir) {
+        const initial=pts[Math.min(3,pts.length-1)], tangent=map.toSketch(initial);
+        const v=[tangent[0]-sA[0],tangent[1]-sA[1]],dot=(v[0]*fresh.dir[0]+v[1]*fresh.dir[1])/(Math.hypot(...v)*Math.hypot(...fresh.dir)||1);
+        if(dot>Math.cos(TANGENT_DEG*Math.PI/180)) sM=gestures.tangentThrough(sA,sB0,fresh.dir,sM)||sM;
+      }
       const r = await exec("sketch.arc.three_point", { start: refA || sA, end: refB || sB0, through: sM });
       const id = r.curves && r.curves[0];
       // Tangential an eine vorangehende Linie anschließen, wenn die Richtung passt
@@ -202,7 +219,10 @@
     claim(s) {
       if (!nav || !api() || committing) return false;
       const st = nav.appState;
-      if (st.tool || st.dialog || st.home || s.held) return false;
+      const spline = /^sketch\.spline\.(fit_point|control_point|control_point_5)$/.test(st.tool || "") ? st.tool : null;
+      if (st.tool && !spline || st.dialog || st.home || s.held) return false;
+      s.spline = spline;
+      if (gestures) s.gesture=new gestures.Stroke({x:s.x,y:s.y,pressure:s.pressure},performance.now());
       if (nav.zoneAt(s.x, s.y) !== null) return false; // auf Bedienelementen nie
       s.pts = [{ x: s.x, y: s.y }];
       s.ink = inkStart();
@@ -211,7 +231,9 @@
         if (s.mode !== "pending") return;
         if (!info) { s.mode = "off"; inkFade(s.ink); return; }
         if (chainDocument !== info.context.document_id) chain = null;
-        const onSketchGeometry = info && info.tab === "SKETCH" && info.hover && /^Sketch/.test(String(info.hover));
+        s.spline=/^sketch\.spline\.(fit_point|control_point|control_point_5)$/.test(info.tool||'')?info.tool:null;
+        if(info.tool&&!s.spline){s.mode='off';inkFade(s.ink);return;}
+        const onSketchGeometry = !s.spline && info && info.tab === "SKETCH" && info.hover && /^Sketch/.test(String(info.hover));
         const onChainEnd = chain && performance.now() - chain.t < CHAIN_MS && dist(chain.at, s) < SNAP_PX * 1.4;
         if (onSketchGeometry && !onChainEnd) {
           // vorhandene Skizzengeometrie ziehen wie bisher
@@ -224,21 +246,33 @@
           note("ziehen");
         } else {
           s.mode = "draw";
+          if(s.spline&&!s.endAt){hint("Spline: stärker drücken setzt einen Punkt; Verweilen geht ebenfalls.");s.pressTimer=setInterval(()=>{if(s.mode==='draw'&&s.lastSample)ext.move(s,s.lastSample);},100);}
           if (s.endAt) ext.finish(s);
         }
       });
       return true;
     },
     move(s, t) {
+      s.lastSample=t;
       const p = { x: t.clientX, y: t.clientY };
       if (s.mode === "drag") { nav.move(p.x, p.y); return; }
+      if (s.failed) return;
+      try {
+        if(s.gesture){
+          const count=s.gesture.controls.length;
+          const forced=s.gesture.move({...p,pressure:Number.isFinite(t.force)?t.force:t.pressure},performance.now());
+          if(s.spline&&s.gesture.controls.length>count)hint("Spline: "+s.gesture.controls.length+" Punkte");
+          if(forced&&!s.spline){s.pts=s.gesture.points.map(q=>({x:q.x,y:q.y}));hint(forced==='arc'?'Bogen aktiviert':'Linie aktiviert');}
+        }
+      } catch(e){s.failed=true;hint(e.message,true);inkFade(s.ink);return;}
       const last = s.pts[s.pts.length - 1];
       if (dist(last, p) >= 1.5) s.pts.push(p);
       if (s.ink) inkDraw(s.ink, s.pts);
     },
     end(s, at, cancelled) {
+      clearInterval(s.pressTimer);
       if (s.mode === "drag") { nav.releaseAfterMoves(at.x, at.y); return; }
-      if (cancelled) { s.mode = "off"; inkFade(s.ink); return; }
+      if (cancelled || s.failed) { s.mode = "off"; inkFade(s.ink); return; }
       if (dist(s.pts[s.pts.length - 1], at) >= 1) s.pts.push(at);
       s.endAt = at;
       if (s.mode === "draw") ext.finish(s);
@@ -246,18 +280,39 @@
     async finish(s) {
       s.mode = "done";
       const pts = s.pts;
-      if (pts.length < 2 || dist(pts[0], pts[pts.length - 1]) < MIN_LEN_PX) { inkFade(s.ink); return; }
+      if (pts.length < 2 || (s.spline ? pts.reduce((n,p,i)=>n+(i?dist(pts[i-1],p):0),0) : dist(pts[0], pts[pts.length - 1])) < MIN_LEN_PX) { inkFade(s.ink); return; }
       if (committing) { inkFade(s.ink); return; }
       committing = true;
       try {
         const info = await s.info;
-        await commit(pts, info && info.context);
+        if(s.spline){
+          const current=await exec("document.revision");
+          if(!info || current.document_id!==info.context.document_id || current.revision!==info.context.revision)throw Error("Entwurf wurde während des Strichs geändert");
+          for(let i=0;i<3;i++){const ui=await req("ui.inspect");if(!ui.tool)break;await req("ui.key",{key:"Escape"});await frame();await frame();}
+        }
+        await commit(pts, info && info.context, {forced:s.gesture && s.gesture.forced,spline:s.spline,controls:s.gesture?s.gesture.finish(s.endAt):pts});
       } catch (e) {
+        hint(e && e.message, true);
         note("fehler " + (e && e.message));
         console.warn("pencil-sketch:", e);
       } finally { committing = false; }
       inkFade(s.ink);
       nav.pollState();
+    },
+    async hold(s) {
+      const info=await s.info, pick=info && gestures && gestures.hoverCurve(info.hover);
+      if(!pick || info.tool || info.dialog)return false;
+      const current=await exec("document.revision");
+      if(current.document_id!==info.context.document_id || current.revision!==info.context.revision)return true;
+      const sketch=await exec("sketch.inspect"),curve=sketch.curves.find(c=>c.id===pick.id);
+      if(sketch.id!==pick.sketch || !curve || curve.type!=="spline")return false;
+      if(curve.control){hint("Punkte einfügen: einen Spline durch Punkte wählen.",true);return true;}
+      try {
+        const map=await sketchMap(),after=await exec("document.revision");
+        if(after.document_id!==current.document_id||after.revision!==current.revision)return true;
+        await exec("sketch.spline.insert_point",{curve:curve.id,at:map.toSketch(s)});hint("Spline-Punkt eingefügt");
+      } catch(e){hint(e.message,true);}
+      return true;
     },
     // Pencil-Tipp ohne Bewegung: im Skizzenmodus ins Leere bei leerer Auswahl beendet die Skizze.
     async tap(s) {

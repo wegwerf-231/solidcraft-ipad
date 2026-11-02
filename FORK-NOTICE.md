@@ -15,6 +15,9 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
 - `touch-nav.js`: eigenständige Touch-/Pencil-Bedienung, Auswahl, Kontextwerkzeuge,
   Ziffernfeld, Layout und Diagnosefunktionen; Projektversion vereinheitlicht;
   Versand von Diagnosen nur mit ausdrücklichem `?senddiagnostics=1` auf lokalen Hosts.
+- `keypad-tools.js`: eigene Eingabeentwürfe, Fehleranzeige und Parameter-Auswahl über
+  den unveränderten Ausdrucksauswerter.
+- `pencil-gestures.js`: eigene begrenzte Wackel-, Druck- und Verweil-Erkennung.
 - `touch-shell.js`: eigene gruppierte Skizzenwerkzeuge, Variantenwahl und umschaltbare
   Bedienebene vor dem unveränderten Canvas; keine Grafik-/Quellübernahme aus Shapr3D.
 - `sketch-tools.js`, `sketch-tools-view.js`: eigene Maßetiketten, Eingabeentwürfe,
@@ -22,7 +25,8 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
   Keine übernommenen Shapr3D-Quelltexte, Grafiken oder Produkt-Screenshots.
 - `pencil-sketch.js`: Skizzieren mit dem Pencil ohne Werkzeugwahl (Skizze automatisch
   starten und beenden, Strich als Linie oder Bogen); hängt sich an `touch-nav.js` an;
-  bei der Integration für 0.3.0 um Dokument-/Revisionsprüfungen und Commit-Sperre ergänzt.
+  bei der Integration für 0.3.0 um Dokument-/Revisionsprüfungen und Commit-Sperre ergänzt;
+  für AP 6 um Wackeln, Druck-Splines und Punkt-Einfügen erweitert.
 - `index.html`: Touch-Adapter und Projektmetadaten eingebunden; WASM-Teile zusammengefügt;
   Metadaten und sichtbare Projekt-/Lizenzinformation unterscheiden diese Ausgabe vom Original.
 - `manifest.webmanifest`: Name und Beschreibung der inoffiziellen iPad-Ausgabe.
