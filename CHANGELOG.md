@@ -4,6 +4,8 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-02
+
 - Extrudieren: Ziffernfeld erst nach einem bewussten Tipp auf das native Zahlenfeld öffnen; Autofokus und Ziehen des Extrusionsgriffs öffnen es nicht mehr.
 - Gemeinsames Ziffernfeld am oberen Griff mit Finger, Pencil oder Maus verschieben; Position während der Sitzung behalten und nach Größenwechsel im sichtbaren Bereich halten.
 - Anfangsposition des Ziffernfelds neben dem Extrusionsdialog suchen, statt ihn zu verdecken.

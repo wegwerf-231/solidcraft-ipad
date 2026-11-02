@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0+b7a6093313a468c2",
+  "version": "0.6.1+34ad8d4dc0a8032b",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "5d2dcff2d40cfe58862e52e00c6fa4a0a1c8fe6137e81b04ca19898771b83b75"
+      "sha256": "eb079bf6639d484a8b57f43a54179d75f10b8489e560ab62822d88aee60f4f4a"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "8f88ca0212e7b834d29809a4328b6371ea5928f0e8b4e2204558fe421c122a5c"
+      "sha256": "37135df40ea2ac2073896af5444c1e7d550c5a41cfac45dc08b2f4725a67ba40"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -188,11 +188,11 @@
     },
     {
       "file": "project-version.js",
-      "sha256": "b55e6ceaa56843085b5341d29bdfebb0a8893a00bfcb2d2bea2b796c247b03a1"
+      "sha256": "730b698e52439a72bc91241080b12cf87fcd43e99d814732627cf6643ce10ef7"
     },
     {
       "file": "project.json",
-      "sha256": "8f88f20527b99aed8421471c97de7df3f11a1e45a83e44ae4698e3c75d57af68"
+      "sha256": "d17a74dedb5bfef4167f7751fba6f1c62ff0e628639cc17188b6a749885ce94b"
     },
     {
       "file": "scripts/release.py",
