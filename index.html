@@ -5,11 +5,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>SolidCraft iPad — inoffiziell</title>
+  <meta name="color-scheme" content="dark">
   <meta name="description" content="Inoffizielle iPad-/Pencil-Anpassung auf Basis von SolidCraft. Eigenständiges Projekt, nicht von Tangency Labs oder Apple unterstützt.">
   <script src="project-version.js"></script>
   <script>document.title = `SolidCraft iPad ${window.SOLIDCRAFT_IPAD_RELEASE.version} — inoffiziell`;</script>
   <!-- iPad: Touch- und Pencil-Steuerung (touch-nav.js) -->
-  <style>html,body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}#solidcraft_canvas{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}</style>
+  <style>html:root,html:root body{background:#1f242d;color-scheme:dark}html:root #solidcraft_loading{background:#1f242d;color:#d9e7fa}html,body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}#solidcraft_canvas{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}</style>
   <script src="sketch-tools.js"></script>
   <script src="sketch-tools-view.js"></script>
   <script src="keypad-tools.js"></script>
@@ -46,10 +47,10 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
   <link rel="stylesheet" href="./loading-fa23566dd89fa92b.css" integrity="sha384-euwKh4irKhe2/jloPXvLM24Jyb1hGwXpW8te2IFuClbPEShB7WM0y+ZiFiHMDnKJ"/>
   
   <!-- Installable as an app (manifest.webmanifest); the icons are the Linux exports of the app mark. -->
-  <meta name="theme-color" content="#343840">
+  <meta name="theme-color" content="#1f242d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="SolidCraft iPad (inoffiziell)">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/32x32/io.tangencylabs.solidcraft.png">

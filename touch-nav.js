@@ -52,7 +52,14 @@
 
   let sketchTools = null;
   let touchShell = null;
-  let keypadTools = null;
+  let keypadTools = null, padDrag = null;
+  const numericIntent = window.SolidCraftKeypad ? new window.SolidCraftKeypad.FieldIntent() : null;
+  let numericTapGeneration = 0;
+  function clearNumericTap(){numericTapGeneration++;numericIntent?.clear();}
+  async function armNumericTap(x,y){
+    const generation=++numericTapGeneration;
+    try{const result=await req("ui.handles");if(generation===numericTapGeneration)numericIntent?.tap(x,y,Array.isArray(result)?result:result.handles);}catch(_){}
+  }
   let synthetic = false;
   let lastFingerTime = 0;
   let stylusDown = 0;
@@ -104,17 +111,26 @@
     if (double) clickAt(x, y);
   }
 
-  // Bewegungen höchstens einmal pro Frame; Loslassen nie im selben Frame wie die letzte Bewegung.
-  let queuedMove = null, moveFrame = 0;
+  // Skizzenbewegungen pro Frame bündeln; Dialogzüge vor dem nächsten nativen Frame zustellen.
+  // Loslassen folgt erst nach der letzten verarbeiteten Bewegung.
+  let queuedMove = null, moveFrame = 0, moveMicrotask = false, moveGeneration = 0, directMove = false;
   function move(x, y) {
     queuedMove = { x, y };
-    if (!moveFrame) moveFrame = requestAnimationFrame(flushMove);
+    // Dialog/gizmo moves must reach the native input queue before its next
+    // animation frame; another RAF here adds a full frame of Pencil latency.
+    if (appState.dialog && stylusStart && stylusStart.pressed && typeof queueMicrotask === "function") {
+      if (moveFrame) { cancelAnimationFrame(moveFrame); moveFrame = 0; }
+      directMove = true;
+      if (!moveMicrotask) { moveMicrotask = true; const generation=moveGeneration; queueMicrotask(() => { if(generation!==moveGeneration)return;moveMicrotask = false; flushMove(); }); }
+    } else if (!moveFrame) moveFrame = requestAnimationFrame(flushMove);
   }
   function flushMove() {
     moveFrame = 0;
     if (queuedMove) { fire("mousemove", queuedMove.x, queuedMove.y, 0, true); queuedMove = null; }
   }
   function releaseAfterMoves(x, y) {
+    moveGeneration++; moveMicrotask=false;
+    if(directMove){queuedMove={x,y};directMove=false;}
     if (moveFrame) { cancelAnimationFrame(moveFrame); moveFrame = 0; }
     if (queuedMove) {
       fire("mousemove", queuedMove.x, queuedMove.y, 0, true);
@@ -338,6 +354,7 @@
     if (inOverlay(e)) return;
     const changed = [...e.changedTouches];
     if (((sketchTools && sketchTools.editing) || (keypadTools && keypadTools.active)) && changed.length) { if (keypadTools && keypadTools.active) keypadTools.cancel(); else sketchTools.cancel(); block(e); return; }
+    clearNumericTap();
     lastFingerTime = performance.now();
     block(e);
     if (changed.some(isStylus)) { stylusDown += changed.filter(isStylus).length; onStylusStart(changed.find(isStylus)); return; }
@@ -464,6 +481,7 @@
 
   // Fingertipp: nur auf Bedienelementen (oder in ein offenes Menü) wird geklickt.
   function fingerTap(x, y) {
+    armNumericTap(x,y);
     const zone = zoneAt(x, y);
     // Ohne Kenntnis der Bedienelemente (noch nicht geladen oder Fehler) lieber klicken als nichts tun.
     const unknown = !zones.count;
@@ -514,9 +532,17 @@
   }
 
   // Zeigerereignisse von Fingern verwerfen (die App bekommt die nachgebildeten Mausereignisse).
+  let numericMouse = null, nativeDragActive = false;
   function onPointer(e) {
+    if (!synthetic && e.pointerType === "mouse" && (e.type === "pointerup" || e.type === "pointercancel")) nativeDragActive = false;
     if (!synthetic && (e.type === "pointerdown" || e.type === "pointerup")) note(e.type + " " + e.pointerType + (inOverlay(e) ? " overlay" : "") + " " + Math.round(e.clientX) + "," + Math.round(e.clientY));
     if (synthetic || inOverlay(e)) return;
+    if(e.pointerType === "mouse"){
+      if(e.type === "pointerdown"){clearNumericTap();nativeDragActive=true;numericMouse={x:e.clientX,y:e.clientY,moved:false};}
+      else if(e.type === "pointermove"&&numericMouse&&Math.hypot(e.clientX-numericMouse.x,e.clientY-numericMouse.y)>MOVE_SLOP)numericMouse.moved=true;
+      else if(e.type === "pointerup"){const p=numericMouse;numericMouse=null;if(p&&!p.moved&&Math.hypot(e.clientX-p.x,e.clientY-p.y)<=MOVE_SLOP)armNumericTap(p.x,p.y);}
+      else if(e.type === "pointercancel")numericMouse=null;
+    }
     // Pencil schwebt über dem Display (iPad mit Hover-Unterstützung): als Zeigerbewegung weitergeben,
     // damit Fangpunkte, Vorschau und Hervorhebung schon vor dem Aufsetzen erscheinen.
     if (e.pointerType === "pen" && e.type === "pointermove" && e.buttons === 0 && !stylusStart) {
@@ -558,7 +584,7 @@
     hideBar();
     hover(s.x, s.y);
     const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
-    if (extension && extension.prefetch) extension.prefetch(s);
+    if (extension && extension.prefetch && !appState.dialog && !isUI(s.x,s.y) && (!appState.tool || /^sketch\./.test(appState.tool))) extension.prefetch(s);
     // Gedrückt halten (wie in Shapr3D): danach ziehen = Bereichsauswahl, ohne Ziehen abheben = Kontextmenü.
     s.timer = setTimeout(() => {
       if (stylusStart !== s || s.moved || s.pressed) return;
@@ -626,6 +652,7 @@
     }
     if (s.pressed) releaseAfterMoves(at.x, at.y);
     else if (!cancelled) {
+      armNumericTap(s.x,s.y);
       const additive = !!(sketchTools && sketchTools.additiveAt(s.x, s.y));
       requestAnimationFrame(() => requestAnimationFrame(() => clickAt(s.x, s.y, 0, additive)));
       const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
@@ -738,7 +765,7 @@
   let padTab = false;
   let blurredCount = 0;
   async function fieldCheck(info, sel) {
-    if (document.hidden) return;
+    if (document.hidden || nativeDragActive) return;
     if (sketchTools && sketchTools.editing) return;
     if(keypadTools&&keypadTools.active){await keypadTools.native.observe();return;}
     if(stylusStart)return;
@@ -771,7 +798,10 @@
       debug.fcBranch = numeric ? "pad" : "pill";
       if (numeric) {
         showKeyboardPill(false);
-        if (keypadTools) await keypadTools.native.begin(info,k,fieldPos); else showPad(true);
+        // Opening a command or dragging a handle must never open the keypad.
+        const manualDialog = !!vf && /\bExtrude\s*\{/.test(dlg);
+        if (manualDialog && (!numericIntent || !numericIntent.consume())) { fieldKey=""; showPad(false); return; }
+        if (keypadTools) await keypadTools.native.begin(info,k,fieldPos,manualDialog); else showPad(true);
       }
       else { showPad(false); showKeyboardPill(true); }
     } catch (err) {
@@ -927,6 +957,7 @@
     pad.classList.toggle("on", on);
     if (!on || was) return;
     hideBar();
+    if (padDrag && padDrag.restore()) return;
     // neben das Feld, aber nicht darüber (wie in Shapr3D)
     let p = fieldPos || lastTap || { x: innerWidth / 2, y: innerHeight / 2 };
     if (agent && !(sketchTools && sketchTools.editing)) {
@@ -945,6 +976,10 @@
     if (x + w > innerWidth - 12) x = p.x - w - 130;
     x = Math.max(railWidth() + 12, Math.min(innerWidth - w - 12, x));
     y = Math.max(60, Math.min(innerHeight - h - 12, y));
+    if (window.SolidCraftKeypad) {
+      const placed=window.SolidCraftKeypad.placePad({x,y},{width:w,height:h},padDrag?padDrag.viewport():{width:innerWidth,height:innerHeight},zones.rects.filter(r=>r.g==="dialog"));
+      x=placed.x;y=placed.y;
+    }
     pad.style.left = x + "px"; pad.style.top = y + "px"; pad.style.bottom = "auto";
   }
   function showKeyboardPill(on) { buildUI(); pill.classList.toggle("on", on); }
@@ -1013,7 +1048,7 @@
   // Share one UI snapshot across the shell, selection, fields and sketch controls.
   // Slow frames never queue another polling pass; gestures keep the CAD thread free.
   let uiRefresh = null;
-  function canRefreshUI() { return api() && !document.hidden && state === "idle" && !stylusStart; }
+  function canRefreshUI() { return api() && !document.hidden && state === "idle" && !stylusStart && !nativeDragActive; }
   function refreshUI(forceZones = false) {
     if (!canRefreshUI()) return Promise.resolve();
     if (uiRefresh) return uiRefresh;
@@ -1292,6 +1327,7 @@
   // =====================================================================================
   // Ereignisse anmelden
   // =====================================================================================
+  addEventListener("blur", () => { nativeDragActive = false; numericMouse = null; clearNumericTap(); });
   addEventListener("resize", () => { refreshZones(); setTimeout(refreshRail, 300); });
   addEventListener("solidcraft-canvas-shift", () => { refreshZones(); refreshRail(); });
   const opts = { capture: true, passive: false };
@@ -1328,6 +1364,7 @@
       },
       changed:()=>{if(touchShell)touchShell.refresh();scheduleSelectionCheck();},
     });
+    if (window.SolidCraftKeypad) padDrag = window.SolidCraftKeypad.draggable(pad);
     root.addEventListener('pointerdown',e=>{if(keypadTools&&keypadTools.active&&!e.target.closest('.sc-pad')){keypadTools.cancel();e.preventDefault();e.stopImmediatePropagation();}},{capture:true});
     let shellMode = "";
     if (window.SolidCraftTouchShell) touchShell = window.SolidCraftTouchShell.mount({
@@ -1371,6 +1408,15 @@
     }
   }, { capture: true });
 
+  function displayInfo() {
+    const c=canvas();if(!c)return null;
+    const r=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+    if(!r.width||!r.height)return null;
+    return {css:[r.width,r.height],pixels:[c.width,c.height],dpr,expected:[Math.round(r.width*dpr),Math.round(r.height*dpr)],
+      nativeResolution:Math.abs(c.width-r.width*dpr)<=2&&Math.abs(c.height-r.height*dpr)<=2,
+      pageScale:window.visualViewport?.scale||1};
+  }
+
   // ---------- Diagnose-Anzeige: ?touchdebug=1 oder 4 Finger kurz auflegen ----------
   let hud = null;
   function toggleHud(on) {
@@ -1382,10 +1428,12 @@
       const tick = () => {
         if (!hud) return;
         const vp = zones.viewport ? zones.viewport.map(Math.round).join(",") : "-";
+        const display=displayInfo();
         hud.textContent = [
           "touch-nav " + VERSION + "  api " + (api() ? "ok" : "FEHLT") + "  textfeld " + (agent ? "ok" : "-"),
           "zonen " + (zones.count || 0) + " / rects " + zones.rects.length + "  viewport " + vp + (zones.error ? "  FEHLER " + zones.error : ""),
           "zustand " + state + "  stift " + stylusDown + "  finger " + fingers.size + "  dpr " + devicePixelRatio + "  " + innerWidth + "x" + innerHeight,
+          display ? "Canvas " + display.pixels.join("x") + " px / CSS " + display.css.map(Math.round).join("x") + " / DPR " + display.dpr + (display.nativeResolution ? " passend" : " AUFLÖSUNG ABWEICHEND") + " / Seitenzoom " + display.pageScale : "Canvas noch nicht vermessen",
           "feld " + (debug.lastField || "-") + "  fokus " + (document.activeElement ? document.activeElement.tagName : "-"),
           "fehler: " + (debug.errors.slice(-3).join(" | ") || "keine"),
           "",
@@ -1433,7 +1481,7 @@
   }
 
   window.solidcraftTouchNav = {
-    version: VERSION, debug, toggleHud,
+    version: VERSION, debug, toggleHud, displayInfo,
     // Schnittstelle für Erweiterungen (pencil-sketch.js)
     internal: { hover, press, move, releaseAfterMoves, clickAt, note, pickAt, zoneAt, appState, pollState },
     extension: null, zones, refreshZones, zoneAt, fieldCheck,

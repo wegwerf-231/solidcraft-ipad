@@ -13,6 +13,52 @@
     const r=await bridge.execute('expr.evaluate',{expression:text,...(kind?{kind}:{})});
     if(!r.ok)throw Error(r.error||'Ungültiger Ausdruck.');return r;
   }
+  // Native dialogs focus their first number automatically; only a short tap on
+  // a numeric control may open the overlay. Consumed intent cannot reopen it.
+  class FieldIntent {
+    constructor(){this.pending=null;}
+    clear(){this.pending=null;}
+    tap(x,y,handles,now=Date.now()){
+      this.clear();
+      const numeric=/^dialog:(?:length:|angle:|scalar:|vector:|(?:control:)?(?:Distance(?: [12XY])?|Length|Width|Height|Depth|Diameter|Radius|Angle|Draft Angle|Offset|Thickness|Scale|Count|Abstand|Länge|Breite|Höhe|Radius|Winkel)$)/i;
+      const hits=(handles||[]).filter(h=>numeric.test(h.name)&&Number.isFinite(h.x)&&Number.isFinite(h.y));
+      if(hits.some(h=>Math.abs(x-h.x)<=80&&Math.abs(y-h.y)<=18))this.pending={at:now};
+    }
+    consume(now=Date.now()){
+      const p=this.pending;this.clear();return !!p&&now-p.at>=0&&now-p.at<1200;
+    }
+  }
+  function clampPosition(p,size,v){
+    const left=v.left||0,top=v.top||0;
+    return {x:Math.max(left+8,Math.min(left+v.width-size.width-8,p.x)),y:Math.max(top+8,Math.min(top+v.height-size.height-8,p.y))};
+  }
+  function placePad(preferred,size,v,obstacles=[]){
+    const candidates=[preferred];
+    for(const r of obstacles)candidates.push({x:r.x0-size.width-12,y:preferred.y},{x:r.x1+12,y:preferred.y},{x:preferred.x,y:r.y0-size.height-12},{x:preferred.x,y:r.y1+12});
+    const overlap=p=>obstacles.reduce((n,r)=>n+Math.max(0,Math.min(p.x+size.width,r.x1)-Math.max(p.x,r.x0))*Math.max(0,Math.min(p.y+size.height,r.y1)-Math.max(p.y,r.y0)),0);
+    return candidates.map(p=>clampPosition(p,size,v)).sort((a,b)=>overlap(a)-overlap(b)||Math.hypot(a.x-preferred.x,a.y-preferred.y)-Math.hypot(b.x-preferred.x,b.y-preferred.y))[0];
+  }
+  function draggable(pad){
+    const grip=document.createElement('div');grip.className='sc-pad-grip';grip.textContent='⠿  Ziffernfeld verschieben';grip.tabIndex=0;
+    grip.setAttribute('role','button');grip.setAttribute('aria-label','Ziffernfeld verschieben');
+    const style=document.createElement('style');style.textContent='#sc-ipad-ui .sc-pad-grip{grid-column:1/-1;position:sticky;top:-1px;z-index:2;min-height:44px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:#303b4b;color:#d9e7fa;border:1px solid #71839c;border-radius:9px;font:500 14px system-ui;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}#sc-ipad-ui .sc-pad-grip:active{cursor:grabbing}';
+    document.head.append(style);pad.prepend(grip);
+    let drag=null,position=null;
+    const viewport=()=>{const v=window.visualViewport;return {left:v?.offsetLeft||0,top:v?.offsetTop||0,width:v?.width||innerWidth,height:v?.height||innerHeight};};
+    const size=()=>{const r=pad.getBoundingClientRect();return {width:r.width,height:r.height};};
+    function put(p){position=clampPosition(p,size(),viewport());pad.style.left=position.x+'px';pad.style.top=position.y+'px';pad.style.bottom='auto';}
+    const block=e=>{e.preventDefault();e.stopImmediatePropagation();};
+    grip.addEventListener('pointerdown',e=>{if(drag||e.button>0)return;block(e);const r=pad.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,start:{x:r.left,y:r.top},saved:position};try{grip.setPointerCapture(e.pointerId);}catch(_){};});
+    grip.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;block(e);put({x:drag.start.x+e.clientX-drag.x,y:drag.start.y+e.clientY-drag.y});});
+    function finish(e,cancel=false){if(!drag||drag.id!==e.pointerId)return;block(e);const old=drag;drag=null;if(cancel){put(old.start);position=old.saved;}try{grip.releasePointerCapture(e.pointerId);}catch(_){};}
+    grip.addEventListener('pointerup',e=>finish(e));grip.addEventListener('pointercancel',e=>finish(e,true));
+    grip.addEventListener('lostpointercapture',e=>{if(drag&&drag.id===e.pointerId){const old=drag;drag=null;put(old.start);position=old.saved;}});
+    grip.addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d)return;block(e);const r=pad.getBoundingClientRect(),step=e.shiftKey?50:10;put({x:r.left+d[0]*step,y:r.top+d[1]*step});});
+    for(const event of ['touchstart','touchmove','touchend','click'])grip.addEventListener(event,block,{passive:false});
+    function fit(){if(pad.classList.contains('on')){pad.style.maxHeight=Math.max(44,viewport().height-16)+'px';const saved=position,r=pad.getBoundingClientRect();put(position||{x:r.left,y:r.top});if(!saved)position=null;}}
+    addEventListener('resize',fit);window.visualViewport?.addEventListener('resize',fit);window.visualViewport?.addEventListener('scroll',fit);
+    return {grip,viewport,restore(){fit();if(!position)return false;put(position);return true;}};
+  }
   // Wertfelder der Zeichenwerkzeuge in der Reihenfolge, in der SolidCraft sie mit Tab durchläuft.
   function FIELDS(tool){
     tool=tool||'';
@@ -26,8 +72,8 @@
   }
   class NativeDraft {
     constructor(bridge,changed=()=>{}){this.bridge=bridge;this.changed=changed;this.editor=null;this.busy=false;this.suppressUntil=0;}
-    async begin(info,key,anchor){
-      if(this.editor||this.busy||Date.now()<this.suppressUntil)return;
+    async begin(info,key,anchor,manual=false){
+      if(this.editor||this.busy||(!manual&&Date.now()<this.suppressUntil))return;
       const context=await this.bridge.execute('document.revision');
       this.editor={context,tool:info.tool,field:key,kind:/^sketch\.(rectangle\.|circle\.|ellipse$)/.test(info.tool||'')?'length':undefined,anchor,value:'',first:true,error:'',keyboard:false};this.changed();
     }
@@ -134,5 +180,5 @@
     for(const type of ['touchstart','touchmove','touchend'])vars.addEventListener(type,e=>e.stopPropagation(),{passive:true});
     return {native,variables,get active(){return !!native.editor;},get editing(){return !!native.editor;},render,cancel:()=>{vars.hidden=true;native.cancel();}};
   }
-  return {NativeDraft,FIELDS,typeKey,validate,definition,mount,same};
+  return {FieldIntent,clampPosition,placePad,draggable,NativeDraft,FIELDS,typeKey,validate,definition,mount,same};
 });

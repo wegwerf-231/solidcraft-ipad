@@ -14,10 +14,11 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
 
 - `touch-nav.js`: eigenständige Touch-/Pencil-Bedienung, Auswahl, Kontextwerkzeuge,
   Ziffernfeld, Layout und Diagnosefunktionen; Projektversion vereinheitlicht;
-  gemeinsame Zustandsaktualisierung ohne parallele Polling-Schleifen;
+  gemeinsame Zustandsaktualisierung ohne parallele Polling-Schleifen; bewusste Zahlenfeld-Tipps,
+  verzögerungsärmere Dialogzüge und lokale Auflösungsdiagnose;
   Versand von Diagnosen nur mit ausdrücklichem `?senddiagnostics=1` auf lokalen Hosts.
 - `keypad-tools.js`: eigene Eingabeentwürfe, Fehleranzeige und Parameter-Auswahl über
-  den unveränderten Ausdrucksauswerter.
+  den unveränderten Ausdrucksauswerter; verschiebbarer Griff, Positionierung und Eingabeabsicht.
 - `pencil-gestures.js`: eigene begrenzte Wackel-, Druck- und Verweil-Erkennung.
 - `touch-shell.js`: eigene gruppierte Skizzenwerkzeuge, Variantenwahl und umschaltbare
   Bedienebene vor dem unveränderten Canvas; keine Grafik-/Quellübernahme aus Shapr3D.
@@ -36,7 +37,7 @@ SolidCraft, iPad und Apple Pencil werden zur Beschreibung von Herkunft und Kompa
   Tintenvorschau pro Animationsframe gebündelt und Koordinatentexte wiederverwendet.
 - `index.html`: Touch-Adapter und Projektmetadaten eingebunden; WASM-Teile zusammengefügt;
   Metadaten und sichtbare Projekt-/Lizenzinformation unterscheiden diese Ausgabe vom Original.
-- `manifest.webmanifest`: Name und Beschreibung der inoffiziellen iPad-Ausgabe.
+- `manifest.webmanifest`: Name, Beschreibung sowie dunkle Start-/Themenfarben der inoffiziellen iPad-Ausgabe.
 - `sw.js`: Änderungshinweis ergänzt; Versionskennung und Offline-Dateiliste durch
   `scripts/release.py` neu erzeugt. Die ursprüngliche Cache-Logik bleibt bestehen.
 - `build.json`: aus eigener Version und ausgelieferten Dateien neu erzeugte Prüfsummen.

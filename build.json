@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0+161d7ac97afd3040",
+  "version": "0.6.0+b7a6093313a468c2",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "3531d24c0c36ad31ace8ed72ed7c5d4cc7cf08784c0031a380918a6f713070e5"
+      "sha256": "5d2dcff2d40cfe58862e52e00c6fa4a0a1c8fe6137e81b04ca19898771b83b75"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "91819f5c9f1096cc1b247154e6beb05e92976ce273f72d85d629eeef661638d0"
+      "sha256": "6c584660eddd4970cf6f77c369f5d770290dd9b60a10d28c62b52cac5a11a562"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -56,11 +56,15 @@
     },
     {
       "file": "docs/KEYPAD-PENCIL.md",
-      "sha256": "b7d853fe13763cf738eecf34bd27f087e0c9a2ee29ab48706b9b108a6d73e2c6"
+      "sha256": "a41509b4afd4747493a279e4d56aabfc534f6ce0e1ea277e32431a47bf5d2d2d"
     },
     {
       "file": "docs/LEGAL.md",
       "sha256": "83e99560669e752953f145eb8239289803fe1ba4eda51f8ded9d2972fb5819d3"
+    },
+    {
+      "file": "docs/NUMPAD-DISPLAY.md",
+      "sha256": "9ecc417e62f96db7338bf581a28b9614fd73b09f7a8f92d1fb05b10627197bc4"
     },
     {
       "file": "docs/RELEASING.md",
@@ -91,8 +95,16 @@
       "sha256": "58cf3debfecd35746633e6d38f28108d0f303b0d652fa349f2078723294a5c41"
     },
     {
+      "file": "docs/screenshots/extrude-drag-no-keypad.png",
+      "sha256": "124abf2cebb45a46e0d845edd509f0e970c96108c319d11b431a87b944dc7ebe"
+    },
+    {
       "file": "docs/screenshots/ipad-performance-spline.png",
       "sha256": "3a5c08e0a141960e6f4bbb790dbd312b6d2fdf687553a001359f13b0e32bc8d0"
+    },
+    {
+      "file": "docs/screenshots/keypad-dragged.png",
+      "sha256": "ebfbc158d98b66a14e2aa52c9b6ac6111231b22c3dd7ffed713bb8205052ba09"
     },
     {
       "file": "docs/screenshots/pr8-pr9-integrated.png",
@@ -136,11 +148,11 @@
     },
     {
       "file": "index.html",
-      "sha256": "f4404bd42190c898fe11ae50abed05fa798c72993eca8871c949b6cd5d5d863a"
+      "sha256": "c3c77954dfb9a585f372d340120c00d31cbc889c8d1af4927dd824e87d6a6f57"
     },
     {
       "file": "keypad-tools.js",
-      "sha256": "6750c7b0f7e7f78a931f8d6e1388d536137277ece35da216d499e8eed1cf81db"
+      "sha256": "af43953ed8285b0a8f12be6c2274427fdbb1d6e482f9b37c9b3873adc1b23d3b"
     },
     {
       "file": "legal/upstream-files.json",
@@ -164,7 +176,7 @@
     },
     {
       "file": "manifest.webmanifest",
-      "sha256": "417c55cbb57b892163d93ca29dba599c47b4d610513cce825b39c7fb7fcac4ba"
+      "sha256": "ce7c33e4e7845bf86b6c76cb97bb31a9148068bbe929192cca4c9f2ad46053c3"
     },
     {
       "file": "pencil-gestures.js",
@@ -203,6 +215,10 @@
       "sha256": "57f341b5a407c848269b16fdf26c8776f1ad790b1ee1b9433faf677ebe8658df"
     },
     {
+      "file": "tests/keypad-interaction.test.cjs",
+      "sha256": "a8271444f5e3a6a01f4682ec763395576b445dd58fb6c5fdf9c0510f093b2616"
+    },
+    {
       "file": "tests/keypad-tools.test.cjs",
       "sha256": "d00011a86386647ffbd9ba554d69ea4e5b307721a8fe1165ea5a3a7c2ec65be7"
     },
@@ -220,7 +236,7 @@
     },
     {
       "file": "tests/sketch-browser.html",
-      "sha256": "6cee6380498d1dcfafb0bf4112fb7898d0a08c429cf627c9e9c0aa2900ea45ce"
+      "sha256": "b90a8c7a623ba538af5bed20bf8e8d43d0455ea0abccd63edf886960466974aa"
     },
     {
       "file": "tests/sketch-refresh.test.cjs",
@@ -240,7 +256,7 @@
     },
     {
       "file": "tests/touch-refresh.test.cjs",
-      "sha256": "483ac8236b1a685226b7b6183f65e6673246e63825e78b82bfb496dc77bfa858"
+      "sha256": "2d55ffb9150771bdc2ec40eb5ae3ac720578b28334dd1db8a4be3778604ad1e2"
     },
     {
       "file": "tests/touch-shell.test.cjs",
@@ -248,7 +264,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "56fdc313d89b716e8ae3b047a4dcd09a95741cd5fb3c9acc4965ec26c5eec21e"
+      "sha256": "70fe66991a7457186b32a9d63b307ff39564af985059324ae3696cf3a35f7dbe"
     },
     {
       "file": "touch-shell.js",

@@ -4,6 +4,14 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+- Extrudieren: Ziffernfeld erst nach einem bewussten Tipp auf das native Zahlenfeld öffnen; Autofokus und Ziehen des Extrusionsgriffs öffnen es nicht mehr.
+- Gemeinsames Ziffernfeld am oberen Griff mit Finger, Pencil oder Maus verschieben; Position während der Sitzung behalten und nach Größenwechsel im sichtbaren Bereich halten.
+- Anfangsposition des Ziffernfelds neben dem Extrusionsdialog suchen, statt ihn zu verdecken.
+- Extrusionszüge vor dem nächsten nativen Frame zustellen, statt einen zusätzlichen Animationsframe zu warten; letzten Punkt beim Loslassen erhalten.
+- Während nativer Mauszüge Hintergrundabfragen pausieren und bei Dialog-/Modellzügen keine Skizzeninformationen vorladen.
+- Dunkle Seiten-/Startfarben und deckende iPad-Statusleisten-Vorgabe; Anzeige von Canvas-Auflösung, Pixelverhältnis und Seitenzoom in der optionalen Diagnose.
+- Bekannte Grenze: dauerhafte Unschärfe am physischen iPad noch nicht reproduziert; Diagnose und Abnahme in `docs/NUMPAD-DISPLAY.md` dokumentiert.
+
 ## [0.6.0] - 2026-11-02
 
 Automatisierte Prüfungen und Desktop-Browserprüfung bestanden; Abnahme des vollständigen
