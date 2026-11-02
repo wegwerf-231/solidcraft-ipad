@@ -10,7 +10,10 @@
   <script>document.title = `SolidCraft iPad ${window.SOLIDCRAFT_IPAD_RELEASE.version} — inoffiziell`;</script>
   <!-- iPad: Touch- und Pencil-Steuerung (touch-nav.js) -->
   <style>html,body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}#solidcraft_canvas{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}</style>
+  <script src="sketch-tools.js"></script>
+  <script src="sketch-tools-view.js"></script>
   <script src="touch-nav.js"></script>
+  <script src="pencil-sketch.js"></script>
 <script type="module">
 import init, * as bindings from './solidcraft-web-4b1d77a936edaef2.js';
 const wasm = await init({ module_or_path: await (async () => {

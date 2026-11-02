@@ -4,6 +4,29 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.3.0] - vorbereitet, Geräteabnahme ausstehend
+
+- AP 3: direkte Maßetiketten mit frei/fest, Längen-/Durchmessermaß und Abstand-/Winkel-Auswahl für zwei Linien.
+- Werte bleiben bis zur Bestätigung ein Entwurf; Fehler bleiben sichtbar, außerhalb tippen verwirft ohne CAD-Änderung.
+- Bestehende Maßparameter bearbeiten und Maßbindung gezielt lösen; Sichtbarkeit aller Maße umschalten.
+- AP 4: rechte, einklappbare Bedingungen-Leiste mit deutschen Knöpfen, passender Auswahl und vergrößerten Symbolen.
+- Bedingungen auswählen/löschen, Zusammenfallend-Verbindung trennen, Elemente sperren/lösen und in Konstruktion umwandeln.
+- Additive Pencil-Linienauswahl; Finger bleiben von der Geometrieauswahl getrennt.
+- Node-Regressionstests, isolierte Browser-Testentwürfe und dokumentierte Geräteabnahme.
+- Gemeinsame Prüfung der Beiträge: Pencil-Zugvorschau korrigiert; automatische Striche und Skizzenende gegen Dokumentwechsel abgesichert; Linienketten bei Dokumentwechsel zurückgesetzt.
+
+- Skizze automatisch (AP 5): Ein Pencil-Strich ohne aktives Werkzeug startet eine Skizze auf der
+  berührten ebenen Fläche, sonst auf der Grundebene. Ein Pencil-Tipp ins Leere beendet die Skizze,
+  wenn nichts ausgewählt ist.
+- Linie/Bogen automatisch (AP 6): Ein gerader Strich wird zur Linie, ein gebogener zum Bogen durch
+  drei Punkte. Endpunkte rasten an vorhandenen Punkten ein; fast waagrechte oder senkrechte Linien
+  werden ausgerichtet und bedingt; ein Bogen, der eine Linie fortsetzt, schließt tangential an.
+  Der Strich ist als Tinte sichtbar, bis er umgewandelt ist.
+- Ein Strich, der auf vorhandener Skizzengeometrie beginnt, zieht diese wie bisher.
+- Pencil gedrückt halten: danach ziehen ergibt eine Bereichsauswahl, ohne Ziehen abheben öffnet
+  das Kontextmenü (wie in Shapr3D).
+- Neue Datei `pencil-sketch.js`; `touch-nav.js` bietet dafür eine kleine Erweiterungsschnittstelle.
+
 ## [0.2.0] - vorbereitet, noch nicht veröffentlicht
 
 - Zeichnen per Pencil-Zug wie in Shapr3D: Aufsetzen setzt den ersten Punkt, Abheben den zweiten

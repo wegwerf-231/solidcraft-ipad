@@ -15,7 +15,11 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check touch-nav.js
+          node --check pencil-sketch.js
           node --check project-version.js
           node --check sw.js
+          node --check sketch-tools.js
+          node --check sketch-tools-view.js
+          node --test tests/*.test.cjs
       - name: Verify offline inventory and release packaging regressions
         run: python3 -m unittest discover -s tests -v

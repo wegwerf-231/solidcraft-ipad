@@ -50,6 +50,7 @@
   addEventListener("error", (e) => { debug.errors.push(String(e.message || e.error).slice(0, 160)); });
   addEventListener("unhandledrejection", (e) => { debug.errors.push("promise: " + String(e.reason).slice(0, 160)); });
 
+  let sketchTools = null;
   let synthetic = false;
   let lastFingerTime = 0;
   let stylusDown = 0;
@@ -67,13 +68,14 @@
   // Nachgebildete Mausereignisse
   // =====================================================================================
   const BUTTONS = { 0: 1, 1: 4, 2: 2 };
-  function fire(type, x, y, button = 0, down = false) {
+  function fire(type, x, y, button = 0, down = false, additive = false) {
     const c = canvas();
     if (!c) return;
     const init = {
       bubbles: true, cancelable: true, composed: true, view: window,
       clientX: x, clientY: y, screenX: x, screenY: y,
       button, buttons: down ? BUTTONS[button] : 0,
+      shiftKey: additive,
       pointerId: 1, pointerType: "mouse", isPrimary: true,
     };
     synthetic = true;
@@ -85,18 +87,18 @@
     }
   }
   const hover = (x, y) => fire("mousemove", x, y, 0, false);
-  const press = (x, y, b = 0) => { hover(x, y); fire("pointerdown", x, y, b, true); note("press b" + b + " " + Math.round(x) + "," + Math.round(y)); };
-  const release = (x, y, b = 0) => { fire("pointerup", x, y, b, false); note("release b" + b); };
-  const clickAt = (x, y, b = 0) => { press(x, y, b); release(x, y, b); };
+  const press = (x, y, b = 0, additive = false) => { hover(x, y); fire("pointerdown", x, y, b, true, additive); note("press b" + b + " " + Math.round(x) + "," + Math.round(y)); };
+  const release = (x, y, b = 0, additive = false) => { fire("pointerup", x, y, b, false, additive); note("release b" + b); };
+  const clickAt = (x, y, b = 0, additive = false) => { press(x, y, b, additive); release(x, y, b, additive); };
 
   // Klick wie von einer Maus: erst hinbewegen, zwei Frames warten (die App ordnet den Druck dem
   // Element unter dem Zeiger des vorigen Frames zu), dann drücken.
-  async function clickUI(x, y, double = false) {
+  async function clickUI(x, y, double = false, additive = false) {
     fieldPos = { x, y };
     hover(x, y);
     await frame();
     await frame();
-    clickAt(x, y);
+    clickAt(x, y, 0, additive);
     if (double) clickAt(x, y);
   }
 
@@ -333,6 +335,7 @@
     logTouch(e);
     if (inOverlay(e)) return;
     const changed = [...e.changedTouches];
+    if (sketchTools && sketchTools.editing && changed.length) { sketchTools.cancel(); block(e); return; }
     lastFingerTime = performance.now();
     block(e);
     if (changed.some(isStylus)) { stylusDown += changed.filter(isStylus).length; onStylusStart(changed.find(isStylus)); return; }
@@ -524,7 +527,7 @@
     penHover = { x, y };
     if (!penHoverFrame) penHoverFrame = requestAnimationFrame(() => {
       penHoverFrame = 0;
-      if (penHover && !stylusStart) hover(penHover.x, penHover.y);
+      if (penHover && (!stylusStart || stylusStart.draw)) hover(penHover.x, penHover.y);
       penHover = null;
     });
   }
@@ -552,22 +555,35 @@
     menuMaybeOpen = false;
     hideBar();
     hover(s.x, s.y);
+    const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+    if (extension && extension.prefetch) extension.prefetch(s);
+    // Gedrückt halten (wie in Shapr3D): danach ziehen = Bereichsauswahl, ohne Ziehen abheben = Kontextmenü.
     s.timer = setTimeout(() => {
       if (stylusStart !== s || s.moved || s.pressed) return;
-      s.menu = true;
-      clickAt(s.x, s.y, 2);
-      menuMaybeOpen = true;
-      hideBar();
-      note("pencil kontextmenü");
+      s.held = true;
+      ripple(s.x, s.y);
+      note("pencil gehalten");
     }, LONG_PRESS_MS);
   }
   function onStylusMove(t) {
     const s = stylusStart;
     if (!t || !s || s.menu) return;
+    if (s.ext) { s.ext.move(s, t); return; }
     if (!s.moved && Math.hypot(t.clientX - s.x, t.clientY - s.y) > MOVE_SLOP / 2) {
       s.moved = true;
       clearTimeout(s.timer);
-      if (isDrawTool()) {
+      const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+      if (s.held) {
+        // Bereichsauswahl: Rahmen von der Startstelle aus aufziehen
+        hover(s.x, s.y);
+        press(s.x, s.y, 0);
+        s.pressed = true;
+        note("bereichsauswahl");
+      } else if (extension && extension.claim(s)) {
+        s.ext = extension;
+        s.ext.move(s, t);
+        return;
+      } else if (isDrawTool()) {
         // Zeichnen: erster Punkt als Klick, danach nur Zeigerbewegung (Vorschau), Klick beim Abheben.
         s.draw = true;
         const continues = chainEnd && /^sketch\.line/.test(appState.tool) && Math.hypot(s.x - chainEnd.x, s.y - chainEnd.y) < 14;
@@ -589,6 +605,14 @@
     clearTimeout(s.timer);
     if (s.menu) return;
     const at = t ? { x: t.clientX, y: t.clientY } : s;
+    if (s.ext) { s.ext.end(s, at, cancelled); setTimeout(scheduleSelectionCheck, 120); return; }
+    if (s.held && !s.moved && !cancelled) {
+      clickAt(s.x, s.y, 2);
+      menuMaybeOpen = true;
+      hideBar();
+      note("pencil kontextmenü");
+      return;
+    }
     if (s.draw) {
       if (!cancelled) {
         hover(at.x, at.y);
@@ -600,7 +624,10 @@
     }
     if (s.pressed) releaseAfterMoves(at.x, at.y);
     else if (!cancelled) {
-      requestAnimationFrame(() => requestAnimationFrame(() => clickAt(s.x, s.y, 0)));
+      const additive = !!(sketchTools && sketchTools.additiveAt(s.x, s.y));
+      requestAnimationFrame(() => requestAnimationFrame(() => clickAt(s.x, s.y, 0, additive)));
+      const extension = window.solidcraftTouchNav && window.solidcraftTouchNav.extension;
+      if (!additive && extension && extension.tap) setTimeout(() => extension.tap(s), 150);
       chainEnd = /^sketch\.line/.test(appState.tool || "") ? { x: s.x, y: s.y } : null;
     }
     setTimeout(pollState, 120);
@@ -707,6 +734,7 @@
   let padTab = false;
   let blurredCount = 0;
   async function fieldCheck() {
+    if (sketchTools && sketchTools.editing) return;
     const el = agent;
     if (!el || checking || !api()) return;
     debug.fc = (debug.fc || 0) + 1;
@@ -770,6 +798,7 @@
     el.dispatchEvent(new InputEvent("input", { inputType: "insertText", data: s, bubbles: true }));
   }
   function padKey(k) {
+    if (sketchTools && sketchTools.editing) { sketchTools.key(k); return; }
     if (k === "ok") { key("Enter"); confirmDialog(); return; }
     if (k === "esc") { key("Escape"); return; }
     if (k === "back") { key("Backspace"); firstKey = false; return; }
@@ -937,7 +966,11 @@
     if (!api() || (pad && pad.classList.contains("on"))) return;
     try {
       const [sel, info] = await Promise.all([req("ui.selection"), req("ui.inspect")]);
-      const acts = actionsFor(sel, info);
+      if (sketchTools) await sketchTools.refresh(info, sel);
+      let acts = actionsFor(sel, info);
+      if (sketchTools && sketchTools.active && window.SolidCraftSketch.linePair(sketchTools.controller.snapshot.sketch, sel.selection)) {
+        acts = window.SolidCraftSketch.dimensionChoices(sketchTools.controller.snapshot.sketch, sel.selection).filter((c) => c.enabled).map((c) => [c.label, "dimension:" + c.key]);
+      }
       buildUI();
       if (info.home || menuMaybeOpen || !acts.length) { hideBar(); return; }
       note("auswahl " + (sel.selection || []).map((i) => i.type).join(","));
@@ -1002,17 +1035,8 @@
       else if (action === "pushpull") await startWithValue("solid.press_pull", ["Distance"]);
       else if (action === "extrude") await startWithValue("solid.extrude", ["Distance"]);
       else if (action === "sketch") await req("ui.start", { command: "sketch.create" });
-      else if (action === "dimension") {
-        const sel = await req("ui.selection");
-        const ids = (sel.selection || []).filter((i) => i.type === "sketch_curve").map((i) => i.id);
-        const r = await exec("sketch.dimension", { entities: ids });
-        const id = r && r.created && r.created.dimensions && r.created.dimensions[0];
-        for (let i = 0; i < 20 && id; i++) {
-          await frame();
-          const s = await req("ui.selection");
-          const d = (s.dimensions || []).find((k) => k.id === id);
-          if (d) { await clickUI(d.x, d.y, true); break; }
-        }
+      else if (action === "dimension" || action.startsWith("dimension:")) {
+        if (sketchTools) await sketchTools.dimensionSelected(action.split(":")[1]);
       } else if (action === "editdim") {
         await editTappedDimension(null, null);
       }
@@ -1254,6 +1278,10 @@
     if (!agent) return;
     clearInterval(boot);
     buildUI();
+    if (window.SolidCraftSketchView) sketchTools = window.SolidCraftSketchView.mount({
+      host: root, pad, request: req, execute: exec, isUI, handles: () => zones.handles || [],
+      showPad, changed: scheduleSelectionCheck,
+    });
     try {
       // Version 3.0 bis 3.5 hatte den Browser ausgeblendet; einmalig wieder einblenden.
       if (localStorage.getItem("solidcraft-ipad.layout-v3") === "1" && localStorage.getItem("solidcraft-ipad.layout-v4") !== "1") {
@@ -1276,6 +1304,15 @@
     } catch (_) {}
   }, 300);
   setTimeout(() => clearInterval(boot), 180000);
+
+  setInterval(() => {
+    if (sketchTools && sketchTools.active && !document.hidden && state === "idle" && !stylusStart) sketchTools.refresh();
+  }, 350);
+  addEventListener("pointerdown", (e) => {
+    if (sketchTools && sketchTools.editing && !synthetic && e.pointerType === "mouse" && !e.target.closest(".sc-pad")) {
+      sketchTools.cancel(); e.preventDefault(); e.stopImmediatePropagation();
+    }
+  }, { capture: true });
 
   // ---------- Diagnose-Anzeige: ?touchdebug=1 oder 4 Finger kurz auflegen ----------
   let hud = null;
@@ -1339,7 +1376,11 @@
   }
 
   window.solidcraftTouchNav = {
-    version: VERSION, debug, toggleHud, zones, refreshZones, zoneAt, fieldCheck,
+    version: VERSION, debug, toggleHud,
+    // Schnittstelle für Erweiterungen (pencil-sketch.js)
+    internal: { hover, press, move, releaseAfterMoves, clickAt, note, pickAt, zoneAt, appState, pollState },
+    extension: null, zones, refreshZones, zoneAt, fieldCheck,
+    get sketch() { return sketchTools; },
     get padOn() { return !!(pad && pad.classList.contains("on")); },
     get state() { return state; },
   };
