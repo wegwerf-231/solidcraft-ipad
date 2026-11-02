@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0+392cf046073938e5",
+  "version": "0.5.0+83d1831cccc34a70",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "305b86130776166c5e438e4d7609979b35da4e132f0b10c9ac62399291c8f9e3"
+      "sha256": "89100af9ff5e80b7e38e0899bed8cd95c1b6b70843fe6e28d1941f40b7d82805"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "eccc970266353d2f0abd3a669b475ed3b0955318d7d4340d353aa75174b18e28"
+      "sha256": "a2414aee9a1a5526dfbdc3d1a9a8137fb9db8a2374deb55505100feca0da8bf5"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -64,7 +64,7 @@
     },
     {
       "file": "docs/TOUCH-SHELL.md",
-      "sha256": "aac1109d9139d89ece3f75763f7d932fb057e5a9e0e856ac4c1af01311136bdb"
+      "sha256": "4325d15d0ca7fafb5bf95fcff2030697cd9d5d6d5f66c54e2537bc3f1aa14190"
     },
     {
       "file": "docs/screenshots/ap2-error.png",
@@ -124,7 +124,7 @@
     },
     {
       "file": "keypad-tools.js",
-      "sha256": "798a2669cd279ea03da76cf1396dcb515c364467c7971c1b761531a60b4978db"
+      "sha256": "6750c7b0f7e7f78a931f8d6e1388d536137277ece35da216d499e8eed1cf81db"
     },
     {
       "file": "legal/upstream-files.json",
@@ -160,11 +160,11 @@
     },
     {
       "file": "project-version.js",
-      "sha256": "e84d54229c08bde673fba78b2f2731815b3e1115658deeaf036de3db05cf3972"
+      "sha256": "9808b851534ad95d09508296d43932ff1a18baefb61d183aec1310bf6b7c9aea"
     },
     {
       "file": "project.json",
-      "sha256": "5521e4c93a8930f2e55df1dd70fb4736691d7d982e924abdbf7e54933ade5c32"
+      "sha256": "296bd3d934cac6fa13a160c8ba66bfcb7efdce8eb2c592329a7e17ab5bd42264"
     },
     {
       "file": "scripts/release.py",
@@ -172,11 +172,11 @@
     },
     {
       "file": "sketch-tools-view.js",
-      "sha256": "3b476dbcb86d1fc82f02cc6d9836f2611c9af62513d71b1bb1bc3a15fbcc5508"
+      "sha256": "2af4447f668005b77a638d194baf7b59ded99ec13178407833d711a0701c1255"
     },
     {
       "file": "sketch-tools.js",
-      "sha256": "2b2dbb23a93dc574920b4fdbcb76b2e8d495117a74ea982db16133b1c24827d2"
+      "sha256": "634e0637be028aedb88ca888758899484d82c18354ecde04358d3c5aa0370383"
     },
     {
       "file": "solidcraft-web-4b1d77a936edaef2.js",
@@ -184,7 +184,7 @@
     },
     {
       "file": "tests/keypad-tools.test.cjs",
-      "sha256": "d6e0c46e06daf139ae42c1898d3e73b528d3abc4a6522d9731f46f1513ad8b9e"
+      "sha256": "d00011a86386647ffbd9ba554d69ea4e5b307721a8fe1165ea5a3a7c2ec65be7"
     },
     {
       "file": "tests/pencil-gestures.test.cjs",
@@ -200,7 +200,7 @@
     },
     {
       "file": "tests/sketch-tools.test.cjs",
-      "sha256": "32104aefe50404a2b494fadeab2215abdb7d122d00ef0479ed6d987fd00b3c71"
+      "sha256": "0645027b065224734736543320e80637c8acec88a3d01ab42dbb1b14da6ecec2"
     },
     {
       "file": "tests/test_release.py",
@@ -216,7 +216,7 @@
     },
     {
       "file": "touch-shell.js",
-      "sha256": "81885564c37972044c62d4080b46c53a693a4ae56968b81cae28512cf55f3ca3"
+      "sha256": "2a95035b0e1761a409351b8bf748e487d5c191ddc53d86d8e6052f57ba110057"
     },
     {
       "file": "wasm/solidcraft-web-4b1d77a936edaef2_bg.part0.bin",

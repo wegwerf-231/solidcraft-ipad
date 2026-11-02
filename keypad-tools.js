@@ -13,6 +13,17 @@
     const r=await bridge.execute('expr.evaluate',{expression:text,...(kind?{kind}:{})});
     if(!r.ok)throw Error(r.error||'Ungültiger Ausdruck.');return r;
   }
+  // Wertfelder der Zeichenwerkzeuge in der Reihenfolge, in der SolidCraft sie mit Tab durchläuft.
+  function FIELDS(tool){
+    tool=tool||'';
+    if(/^sketch\.rectangle\./.test(tool))return ['Breite','Höhe'];
+    if(/^sketch\.(line|construction_line)$/.test(tool))return ['Länge','Winkel'];
+    if(/^sketch\.circle\./.test(tool))return ['Durchmesser'];
+    if(/^sketch\.polygon\./.test(tool))return ['Durchmesser','Winkel'];
+    if(/^sketch\.slot\./.test(tool))return ['Länge','Breite'];
+    if(/^sketch\.ellipse/.test(tool))return ['Große Achse','Kleine Achse'];
+    return [];
+  }
   class NativeDraft {
     constructor(bridge,changed=()=>{}){this.bridge=bridge;this.changed=changed;this.editor=null;this.busy=false;this.suppressUntil=0;}
     async begin(info,key,anchor){
@@ -32,7 +43,10 @@
     cancel(){this.editor=null;this.suppressUntil=Date.now()+450;this.changed();}
     key(k){const e=this.editor;if(!e||this.busy)return;if(k==='esc')return this.cancel();if(k==='ok'||k==='tab')return this.commit(k==='tab');if(k==='abc'){e.keyboard=!e.keyboard;this.changed();return;}typeKey(e,k);this.changed();}
     async commit(next=false){
-      const e=this.editor;if(!e||this.busy)return;this.busy=true;
+      const e=this.editor;if(!e||this.busy)return;
+      const fields=FIELDS(e.tool);
+      if(!next&&fields.length>1&&(e.index||0)<fields.length-1&&!e.first)next=true;
+      this.busy=true;
       try{
         const initial=await this.guard(e);
         if(!e.first){if(!e.value.trim())throw Error('Bitte einen Wert eingeben.');await validate(this.bridge,e.value,e.kind);}
@@ -43,7 +57,7 @@
         await this.bridge.request('ui.key',{key:next?'Tab':'Enter'});await this.bridge.settle();
         const info=await this.bridge.request('ui.inspect');
         if(info.status&&info.status.error&&(!next||!initial.status?.error||info.status.text!==initial.status.text))throw Error(info.status.text);
-        if(next){e.value='';e.first=true;e.error='';e.anchor=this.bridge.anchor();}
+        if(next){e.value='';e.first=true;e.error='';e.index=(e.index||0)+1;e.anchor=this.bridge.anchor();}
         else{this.editor=null;this.suppressUntil=Date.now()+450;await this.bridge.confirm();}
       }catch(error){if(this.editor===e)e.error=String(error.message||error);}
       finally{this.busy=false;this.changed();}
@@ -64,7 +78,8 @@
     const {host,pad}=options;const native=new NativeDraft(options,render);
     const style=document.createElement('style');style.textContent=`
 #sc-ipad-ui .kp-native{grid-column:1/-1;font:15px system-ui;color:#e8ebf0}
-#sc-ipad-ui .kp-native input{box-sizing:border-box;width:100%;height:48px;border:1px solid #8ba4c6;border-radius:8px;background:#161c25;color:white;font:22px system-ui;padding:6px}
+#sc-ipad-ui .kp-native .kp-hint{font:12px system-ui;color:#8e9db0}
+#sc-ipad-ui .kp-native input{box-sizing:border-box;width:100%;height:40px;border:1px solid #8ba4c6;border-radius:8px;background:#161c25;color:white;font:22px system-ui;padding:6px}
 #sc-ipad-ui .kp-native p{margin:4px 0;overflow-wrap:anywhere}
 #sc-ipad-ui .kp-error{color:#ffb7aa;font:14px system-ui}
 #sc-ipad-ui .kp-variables{grid-column:1/-1;padding:8px;background:#161c25;border:1px solid #8ba4c6;border-radius:10px;max-height:280px;max-height:min(280px,calc(100vh - 120px));max-height:min(280px,calc(100dvh - 120px));overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;font:15px system-ui}
@@ -74,16 +89,16 @@
 `;
     document.head.append(style);
     const header=document.createElement('div');header.className='kp-native';header.hidden=true;
-    const label=document.createElement('p');label.textContent='Wert am Zeichenfeld';
+    const label=document.createElement('p');label.textContent='Wert am Zeichenfeld';label.className='kp-label';
     const input=document.createElement('input');input.readOnly=true;input.inputMode='none';input.maxLength=256;input.placeholder='Aktueller Wert steht am Element';input.setAttribute('aria-label','Wert für Zeichenfeld');
     const error=document.createElement('p');error.className='kp-error';error.setAttribute('role','alert');
-    const hint=document.createElement('p');hint.textContent='⇥ übernimmt dieses Feld und wechselt weiter. ✓ bestätigt. Esc verwirft die Eingabe.';
+    const hint=document.createElement('p');hint.className='kp-hint';hint.textContent='✓ übernimmt den Wert; beim letzten Feld wird die Form gesetzt. Esc verwirft.';
     header.append(label,input,error,hint);pad.prepend(header);
     const vars=document.createElement('section');vars.className='kp-variables';vars.hidden=true;vars.setAttribute('aria-label','Variablen');pad.append(vars);
     let current=null,shown=false,variableError='';
     function render(){
       const e=native.editor;header.hidden=!e;
-      if(e){input.value=e.value;input.readOnly=!e.keyboard;input.inputMode=e.keyboard?'text':'none';error.textContent=e.error?'Nicht übernommen: '+e.error:'';options.showPad(true);if(e.keyboard&&document.activeElement!==input){input.focus({preventScroll:true});input.select();}}
+      if(e){const fields=FIELDS(e.tool);label.textContent=fields.length?fields[Math.min(e.index||0,fields.length-1)]+(fields.length>1?' ('+(Math.min(e.index||0,fields.length-1)+1)+'/'+fields.length+')':''):'Wert am Zeichenfeld';input.value=e.value;input.readOnly=!e.keyboard;input.inputMode=e.keyboard?'text':'none';error.textContent=e.error?'Nicht übernommen: '+e.error:'';options.showPad(true);if(e.keyboard&&document.activeElement!==input){input.focus({preventScroll:true});input.select();}}
       else if(shown){if(!options.direct())options.showPad(false);vars.hidden=true;}
       shown=!!e;options.changed();
     }
@@ -119,5 +134,5 @@
     for(const type of ['touchstart','touchmove','touchend'])vars.addEventListener(type,e=>e.stopPropagation(),{passive:true});
     return {native,variables,get active(){return !!native.editor;},get editing(){return !!native.editor;},render,cancel:()=>{vars.hidden=true;native.cancel();}};
   }
-  return {NativeDraft,typeKey,validate,definition,mount,same};
+  return {NativeDraft,FIELDS,typeKey,validate,definition,mount,same};
 });

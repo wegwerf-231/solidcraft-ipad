@@ -120,6 +120,15 @@
     const picks = selected(sketch, selection) || [];
     return picks.some(({ item }) => item.type === "sketch_constraint" ? item.id === c.id : item.type === "sketch_curve" ? constraintCurveIndices(c).some((i) => sketch.curves[i] && sketch.curves[i].id === item.id) || constraintPointIndices(c).some((i) => { const curve = sketch.curves.find((v) => v.id === item.id), p = sketch.points[i]; return curve && p && [curve.start, curve.end, curve.center].includes(p.id); }) : constraintPointIndices(c).some((i) => sketch.points[i] && sketch.points[i].id === item.id));
   }
+  // Aus der Fehlermeldung „conflicts with k3, k4, k6“ das eine gebundene Maß derselben Art finden.
+  function drivingDimension(sketch, message, key) {
+    const m = /conflicts with ([^)]*)/.exec(message || "");
+    if (!sketch || !m) return null;
+    const ids = m[1].split(/[,\s]+/).filter(Boolean);
+    const kinds = key === "angle" ? ["angle", "line_angle"] : key === "diameter" ? ["diameter", "radius"] : ["length", "distance", "distance_x", "distance_y", "point_line_distance"];
+    const hits = sketch.constraints.filter((c) => ids.includes(c.id) && c.param && kinds.includes(c.type));
+    return hits.length === 1 ? hits[0] : null;
+  }
   function formatted(value, angular, units = "mm") {
     const factor = { mm: 1, cm: 10, m: 1000, in: 25.4, inch: 25.4, ft: 304.8 }[units] || 1;
     const n = angular ? value : value / factor;
@@ -217,7 +226,18 @@
         if (!e.value.trim()) throw new Error("Bitte einen Wert eingeben.");
         await this.guard(e.context, e.sketch);
         if (e.param) await this.bridge.execute("parameters.change", { name: e.param, expression: e.value });
-        else await this.bridge.execute("sketch.dimension", { sketch: e.sketch, entities: e.choice.entities, type: e.choice.key, value: e.value });
+        else {
+          try {
+            await this.bridge.execute("sketch.dimension", { sketch: e.sketch, entities: e.choice.entities, type: e.choice.key, value: e.value });
+          } catch (error) {
+            // Das Maß ist schon durch ein anderes Maß bestimmt (z. B. die gegenüberliegende Rechteckseite):
+            // dann dieses bestimmende Maß ändern, statt ein überzähliges anzulegen.
+            const driving = drivingDimension(this.snapshot && this.snapshot.sketch, String(error.message || error), e.choice.key);
+            if (!driving) throw error;
+            await this.bridge.execute("parameters.change", { name: driving.param, expression: e.value });
+            this.notice = "Bestimmendes Maß geändert";
+          }
+        }
         this.editor = null; this.error = "";
       } catch (error) { if (this.editor === e) e.error = String(error.message || error); }
       finally { this.busy = false; this.changed(); }
@@ -260,5 +280,5 @@
     }
   }
 
-  return { Controller, selected, linePair, parallel, dimensionChoices, constraintChoices, measureChoice, constraintCurveIndices, constraintPointIndices, anchors, related, formatted, isDimension, curvePoint, point, sameContext, ANGLES };
+  return { Controller, drivingDimension, selected, linePair, parallel, dimensionChoices, constraintChoices, measureChoice, constraintCurveIndices, constraintPointIndices, anchors, related, formatted, isDimension, curvePoint, point, sameContext, ANGLES };
 });
