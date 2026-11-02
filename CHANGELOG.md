@@ -4,7 +4,10 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
-## [0.6.0] - vorbereitet, Geräteabnahme ausstehend
+## [0.6.0] - 2026-11-02
+
+Automatisierte Prüfungen und Desktop-Browserprüfung bestanden; Abnahme des vollständigen
+Release-Stands auf einem physischen iPad noch ausstehend.
 
 Rückmeldung aus dem Gerätetest von 0.5.0 („die Schaltfläche ist immer noch riesig“):
 
