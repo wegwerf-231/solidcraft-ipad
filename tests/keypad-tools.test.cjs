@@ -37,7 +37,7 @@ test('changing document closes the stale native draft without any native key eve
 test('a refusal by the native field keeps the expression and does not confirm the dialog',async()=>{
  const {s,draft,bridge}=fixture(),request=bridge.request;
  bridge.request=async(m,p)=>{if(m==='ui.key'&&p.key==='Enter')s.info.status={error:true,text:'Incompatible units'};return request(m,p);};
- await draft.begin(s.info,'tool',{});draft.key('30 deg');await draft.commit();assert.equal(draft.editor.value,'30 deg');assert.match(draft.editor.error,/units/);assert.equal(s.calls.some(c=>c.confirm),false);
+ await draft.begin(s.info,'tool',{});draft.editor.index=1;draft.key('30 deg');await draft.commit();assert.equal(draft.editor.value,'30 deg');assert.match(draft.editor.error,/units/);assert.equal(s.calls.some(c=>c.confirm),false);
 });
 test('duplicate confirmation sends the expression to the native field exactly once',async()=>{
  const {s,draft}=fixture();await draft.begin(s.info,'tool',{});draft.key('30');await Promise.all([draft.commit(),draft.commit()]);assert.equal(s.calls.filter(c=>c.m==='ui.text').length,1);
@@ -46,4 +46,12 @@ test('rectangle drawing values reject angular units before any native key event'
  const {s,draft,bridge}=fixture(),execute=bridge.execute;
  bridge.execute=async(c,p)=>c==='expr.evaluate'&&p.kind==='length'&&p.expression.endsWith('deg')?{ok:false,error:'Expected a length'}:execute(c,p);
  await draft.begin(s.info,'tool',{});draft.key('30 deg');await draft.commit();assert.match(draft.editor.error,/length/);assert.deepEqual(s.calls,[]);
+});
+test('confirm on the first rectangle field moves to the height field instead of placing a flat rectangle',async()=>{
+ const {s,draft}=fixture();await draft.begin(s.info,'tool',{});draft.key('20');await draft.commit();
+ assert.equal(s.calls.findLast(c=>c.m==='ui.key').p.key,'Tab');assert.ok(draft.editor);assert.equal(draft.editor.index,1);
+ draft.key('16');await draft.commit();assert.equal(s.calls.findLast(c=>c.m==='ui.key').p.key,'Enter');assert.equal(draft.editor,null);
+});
+test('field names follow the drawing tool',()=>{
+ assert.deepEqual(K.FIELDS('sketch.rectangle.center'),['Breite','Höhe']);assert.deepEqual(K.FIELDS('sketch.circle.center'),['Durchmesser']);assert.deepEqual(K.FIELDS('sketch.spline.fit_point'),[]);
 });

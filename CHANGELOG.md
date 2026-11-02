@@ -4,6 +4,26 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.5.0] - vorbereitet, Geräteabnahme ausstehend
+
+Rückmeldung aus dem ersten Gerätetest auf dem iPad:
+
+- Kompaktere Oberfläche: Werkzeugleiste links, Bedingungen-Leiste rechts, Werkzeug-Pille und
+  „Erweitert“ als kleine Knöpfe (32 statt 44 Pixel, Schrift 13 px). Die Leisten beginnen im
+  abgedeckten Bereich der Original-Befehlsleiste; die rechte Leiste deckt die Original-Palette
+  vollständig ab und ordnet die Bedingungen in zwei Spalten.
+- Maß- und Bedingungsetiketten an der Geometrie deutlich kleiner (24 bzw. 22 px).
+- Varianten-Auswahl direkt am Werkzeug: Ein Tipp auf ein Werkzeug mit Varianten (z. B. Rechteck)
+  startet es und klappt daneben die Varianten auf (2 Punkte, Mitte, 3 Punkte, Abgerundet);
+  ein kleines Dreieck kennzeichnet solche Werkzeuge.
+- Behoben: ✓ nach dem ersten Wert eines Rechtecks (Breite) setzte sofort ein flaches Rechteck
+  („the corners must differ“). ✓ wechselt jetzt zum nächsten Feld; das Ziffernfeld nennt das
+  Feld (Breite 1/2, Höhe 2/2).
+- Behoben: Ein Maß an einer bereits bestimmten Kante (z. B. obere Rechteckseite) erzeugte
+  „over-constrain“. Jetzt wird das bestimmende Maß derselben Art auf den Wert gesetzt.
+- Zwei Linien gewählt: Ein Etikett „∠ … festlegen“ bzw. „↔ … festlegen“ erscheint direkt
+  zwischen den Linien und öffnet das Ziffernfeld für Winkel bzw. Abstand.
+
 ## [0.4.0] - vorbereitet, noch nicht veröffentlicht
 
 - AP 2: Eingabeentwürfe für native Zeichen-/Dialogfelder, Validierung über den CAD-Kern, Fehleranzeige und Feldwechsel mit ⇥ ohne vorzeitiges Platzieren.

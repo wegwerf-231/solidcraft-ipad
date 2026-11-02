@@ -11,7 +11,8 @@ Werkzeugfamilie einmal: Linie, Bogen, Rechteck, Kreis, Ellipse, Polygon, Langloc
 Spline, Hilfslinie, Beschneiden und Versatz. Rechts bleiben Maße und Bedingungen.
 Mit dem Pencil lässt sich weiterhin ohne Werkzeugwahl automatisch zeichnen.
 
-Ein linker Werkzeugknopf startet die zuletzt gewählte Variante dieser Familie.
+Ein linker Werkzeugknopf startet die zuletzt gewählte Variante dieser Familie und klappt bei
+Werkzeugen mit Varianten (kleines Dreieck) die Variantenwahl direkt daneben auf.
 Die blaue Pille oben zeigt das aktive Werkzeug mit Variante. Antippen öffnet die
 Variantenwahl; beispielsweise Rechteck → Mitte / 2 Punkte / 3 Punkte / Abgerundet.
 Ohne aktives Werkzeug öffnet die Pille die gesamte Werkzeugauswahl. Ein Variantenwechsel
@@ -33,8 +34,9 @@ Variantenwahl; „Werkzeug beenden“ bedient die native Escape-Logik.
 
 ## Layout und technische Grenze
 
-Alle eigenen neuen Bedienelemente haben mindestens 44 CSS-Pixel Höhe und Breite.
-Die Listen scrollen, statt ihre Knöpfe unter diese Größe zu verkleinern. In schmaler
+Seit 0.5.0 sind die eigenen Knöpfe kompakt (mindestens 32 CSS-Pixel, Etiketten an der
+Geometrie 22 bis 24 Pixel), weil der Pencil präzise trifft und die 44-Pixel-Variante im
+Gerätetest zu viel Platz belegte. Die Listen scrollen weiterhin, statt Knöpfe weiter zu verkleinern.
 Split View erscheinen die linken Werkzeuge als Symbole mit zugänglichen Namen.
 Maß-/Bedingungssymbole vermeiden die eigenen Leisten. Die Maße-/Bedingungen-Aktionen
 werden nicht zusätzlich in der linken Leiste oder einer Kontextleiste angeboten.
@@ -74,7 +76,7 @@ Geprüft im Chromium-In-App-Browser mit dem echten SolidCraft-0.29.0-WASM:
 - Rechteck starten, auf „Mitte“ wechseln, Werkzeugname und Geometrie im Kern prüfen.
 - Erweitert/iPad umschalten: aktives Werkzeug und bereits vorhandene Linie bleiben erhalten.
 - Nach Neuladen bleiben Modus und gewählte Rechteckvariante gespeichert.
-- 768 × 1024 und 512 × 768 CSS-Pixel: keine neuen Knöpfe unter 44 × 44 CSS-Pixel;
+- 768 × 1024 und 512 × 768 CSS-Pixel: keine neuen Knöpfe unter 32 × 32 CSS-Pixel (Etiketten an der Geometrie 22 bis 24);
   linke Leiste bis zum Ende scrollbar, kein seitlicher Überlauf.
 - Direkte Maßbearbeitung über dem neuen Layout: Ziffernfeld öffnen und 30 mm binden;
   der native Parameter d1 besitzt danach den Wert 30 mm. Das Ziffernfeld liegt vor den
