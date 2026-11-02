@@ -6,6 +6,12 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [0.4.0] - vorbereitet, noch nicht veröffentlicht
 
+- AP 2: Eingabeentwürfe für native Zeichen-/Dialogfelder, Validierung über den CAD-Kern, Fehleranzeige und Feldwechsel mit ⇥ ohne vorzeitiges Platzieren.
+- Variablen-Knopf x+: vorhandene Parameter einfügen oder einen Wert bis zur Bestätigung als benannten Parameter vormerken.
+- AP 6: Wackeln schaltet Linie/Bogen um; Spline-Striche übernehmen Druckpunkte (alternativ Verweilen), Abheben beendet den Strich.
+- Langes Halten auf einem Spline durch Punkte fügt einen Punkt ein. Kontrollpunkt-Splines unterstützt der ursprüngliche Kern hierfür noch nicht.
+- Spline-Werkzeug vor der Übergabe gezielt beenden; zwischen Escape-Ereignissen Frames abwarten, damit die aktive Skizze erhalten bleibt.
+
 - AP 7: iPad-Skizzenansicht mit gruppierter Werkzeugleiste links und Werkzeug-Pille mit Varianten oben.
 - Erweitert zeigt die originale Befehlsleiste; die iPad-Werkzeug- und Bedingungen-Leisten werden dabei ausgeblendet. Modus und Variantenwahl werden gespeichert.
 - Im iPad-Modus keine zusätzliche Kontextleiste, keine doppelte Konstruktion/Bemaßung/Löschaktion für Bedingungen und keine zweite Rückgängig-Leiste.

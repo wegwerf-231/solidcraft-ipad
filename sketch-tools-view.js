@@ -204,7 +204,7 @@
       else if (!keyboard) { event.preventDefault(); if (event.key === "Backspace") control.key("back"); else if (/^[0-9.+*/() -]$/.test(event.key)) control.key(event.key); }
     });
     async function stopTool() {
-      for (let i = 0; i < 3; i++) { const info = await options.request("ui.inspect"); if (!info.tool) break; await options.request("ui.key", { key: "Escape" }); }
+      for (let i = 0; i < 3; i++) { const info = await options.request("ui.inspect"); if (!info.tool) break; await options.request("ui.key", { key: "Escape" }); await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); }
       await control.refresh();
     }
     async function act(b) {
@@ -218,6 +218,7 @@
       else if (action === "unlock") await run(() => control.unlock());
       else {
         const record = buttons.get(b.dataset.record); if (!record) return;
+        const r=b.getBoundingClientRect();if(options.anchor)options.anchor({x:r.left+r.width/2,y:r.top+r.height/2});
         if (action === "select-constraint") await run(async () => { await stopTool(); await control.write("select.set", { items: [{ type: "sketch_constraint", id: record.id }] }); });
         else if (action === "free") await run(async () => { if (record.determined) throw new Error("Die Geometrie ist bereits vollständig bestimmt."); await stopTool(); control.begin(record.choice); });
         else if (action === "edit") await run(async () => { await stopTool(); control.edit(record.id); });

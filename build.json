@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0+595b3c4f5f8d1505",
+  "version": "0.4.0+392cf046073938e5",
   "modified_by": "solidcraft-ipad; see FORK-NOTICE.md",
   "files": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "file": "CHANGELOG.md",
-      "sha256": "f3e3c575533fca9c9a329adc39c221185520dbcf04d35fe6cd92f42f5a9a054f"
+      "sha256": "305b86130776166c5e438e4d7609979b35da4e132f0b10c9ac62399291c8f9e3"
     },
     {
       "file": "CONTRIBUTING.md",
@@ -16,7 +16,7 @@
     },
     {
       "file": "FORK-NOTICE.md",
-      "sha256": "fd25ab450964e22beaa3c03ab33733687fd85ff2a7a226f6eaae2581224395d1"
+      "sha256": "7c9578f9e009e67ec252f5373d8ce546a9276e889c7accbeae031dfab7c87d23"
     },
     {
       "file": "IPAD-ANPASSUNG.md",
@@ -36,7 +36,7 @@
     },
     {
       "file": "README.md",
-      "sha256": "f9ba337ff8d477c5c16bb8a0887537678eecf850e6861138c0b8ab603c6d10a8"
+      "sha256": "eccc970266353d2f0abd3a669b475ed3b0955318d7d4340d353aa75174b18e28"
     },
     {
       "file": "THIRD-PARTY-LICENSES.txt",
@@ -45,6 +45,10 @@
     {
       "file": "about.html",
       "sha256": "bfa9a37f0f98aca6665b47bcdc90faf36a37c5165318c6ce0949d9ac2c2ba331"
+    },
+    {
+      "file": "docs/KEYPAD-PENCIL.md",
+      "sha256": "b7d853fe13763cf738eecf34bd27f087e0c9a2ee29ab48706b9b108a6d73e2c6"
     },
     {
       "file": "docs/LEGAL.md",
@@ -61,6 +65,14 @@
     {
       "file": "docs/TOUCH-SHELL.md",
       "sha256": "aac1109d9139d89ece3f75763f7d932fb057e5a9e0e856ac4c1af01311136bdb"
+    },
+    {
+      "file": "docs/screenshots/ap2-error.png",
+      "sha256": "e630fe99bf170559bd45d8a430bbf11fa9e88506b84add912f7aeff0e70cb223"
+    },
+    {
+      "file": "docs/screenshots/ap6-spline.png",
+      "sha256": "dace515d444a0ccfee7fbcc67f7b67a4ee26ba0dc0ed047c96a4a3aa102f2450"
     },
     {
       "file": "docs/screenshots/ap7-advanced.png",
@@ -108,7 +120,11 @@
     },
     {
       "file": "index.html",
-      "sha256": "3a83316698272492b153c808c0202be944f1e9c34e710ffccd2f355caeaa53be"
+      "sha256": "284580e6efdcc3aed6056e6635cac06fdf3b88b12b81a3c692981872e6981b53"
+    },
+    {
+      "file": "keypad-tools.js",
+      "sha256": "798a2669cd279ea03da76cf1396dcb515c364467c7971c1b761531a60b4978db"
     },
     {
       "file": "legal/upstream-files.json",
@@ -135,8 +151,12 @@
       "sha256": "417c55cbb57b892163d93ca29dba599c47b4d610513cce825b39c7fb7fcac4ba"
     },
     {
+      "file": "pencil-gestures.js",
+      "sha256": "41990a0d831525fc79fe917e05bc0d75e69c8f66019dea25836ada2bf4a00e5e"
+    },
+    {
       "file": "pencil-sketch.js",
-      "sha256": "e8abd651ed136dc2aac39d68a51fbf7a3feecbf3c7a20ddaad309a39a02c75fa"
+      "sha256": "ee5e383d7fd499b6058b4e7397de4dd2c7c1cd859a50a39a3867de641970274d"
     },
     {
       "file": "project-version.js",
@@ -148,11 +168,11 @@
     },
     {
       "file": "scripts/release.py",
-      "sha256": "29cca5d745a48ac32cf14c989872b4a2bf6e380d7885421e19e5f5451cd1857f"
+      "sha256": "df1959a1b68d888cab38c58e1b185abc261d9f5bc10531abe6526800c65c3a38"
     },
     {
       "file": "sketch-tools-view.js",
-      "sha256": "fb0beadd92937bbe16c4f57c6cc201ef5b368011a8bb6d119d4bd43c2f407e50"
+      "sha256": "3b476dbcb86d1fc82f02cc6d9836f2611c9af62513d71b1bb1bc3a15fbcc5508"
     },
     {
       "file": "sketch-tools.js",
@@ -163,12 +183,20 @@
       "sha256": "a1766999f27bac22c11e93e18da9bdba4f4a3e01a412803fe179c9559bee858d"
     },
     {
+      "file": "tests/keypad-tools.test.cjs",
+      "sha256": "d6e0c46e06daf139ae42c1898d3e73b528d3abc4a6522d9731f46f1513ad8b9e"
+    },
+    {
+      "file": "tests/pencil-gestures.test.cjs",
+      "sha256": "b0f6169b9eba2a44f839617b18f31c4c428f7108eb0cac1fc50b69defeefbe86"
+    },
+    {
       "file": "tests/pencil-integration.test.cjs",
       "sha256": "3df7ed355e1bc1b91511ecaebb04698deeada2790d2e450ad114665637ce3e4f"
     },
     {
       "file": "tests/sketch-browser.html",
-      "sha256": "05bd5b750e4f1b40240062ba3ad8eace113d1b659b89651bbd9590bbb95304f4"
+      "sha256": "bbb675dac9879d31d5cd99f5e3fa52ff9b8cd885675e31d8c37c1437ff0de7c9"
     },
     {
       "file": "tests/sketch-tools.test.cjs",
@@ -184,7 +212,7 @@
     },
     {
       "file": "touch-nav.js",
-      "sha256": "cbed3eb736bc5325c303968a38c8a7d0e4d78cba69b55d996a6824b352d30e83"
+      "sha256": "0d6c58472b8e308218817132519acf0061da506d2b04fdfa2eaff2963d7edcb3"
     },
     {
       "file": "touch-shell.js",

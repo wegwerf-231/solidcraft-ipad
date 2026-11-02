@@ -26,6 +26,8 @@ jobs:
           node --check touch-nav.js
           node --check touch-shell.js
           node --check pencil-sketch.js
+          node --check pencil-gestures.js
+          node --check keypad-tools.js
           node --check project-version.js
           node --check sw.js
           node --check sketch-tools.js
