@@ -4,6 +4,15 @@ Dieses Changelog beschreibt die iPad-Ausgabe, nicht die Versionsfolge von SolidC
 
 ## [Unreleased]
 
+## [0.4.0] - vorbereitet, noch nicht veröffentlicht
+
+- AP 7: iPad-Skizzenansicht mit gruppierter Werkzeugleiste links und Werkzeug-Pille mit Varianten oben.
+- Erweitert zeigt die originale Befehlsleiste; die iPad-Werkzeug- und Bedingungen-Leisten werden dabei ausgeblendet. Modus und Variantenwahl werden gespeichert.
+- Im iPad-Modus keine zusätzliche Kontextleiste, keine doppelte Konstruktion/Bemaßung/Löschaktion für Bedingungen und keine zweite Rückgängig-Leiste.
+- Eigene Bedienelemente mindestens 44 CSS-Pixel; Werkzeuge und Varianten bleiben in Hochformat und Split View scrollbar erreichbar.
+- Native Canvas-Leisten werden überdeckt; ihr Platz wird ohne Änderung des Originalkerns nicht zurückgewonnen. Zeichenkoordinaten bleiben unverändert.
+- Browser-Zustand beim Wechsel in die erweiterte Ansicht oder beim Verlassen der Skizze wiederherstellen; Tests für Moduswechsel und Varianten ergänzt.
+
 ## [0.3.0] - vorbereitet, Geräteabnahme ausstehend
 
 - AP 3: direkte Maßetiketten mit frei/fest, Längen-/Durchmessermaß und Abstand-/Winkel-Auswahl für zwei Linien.

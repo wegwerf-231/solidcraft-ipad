@@ -71,7 +71,7 @@
     function render() {
       const s = control.snapshot;
       renderEditor();
-      panel.hidden = !s || !!s.info.home;
+      panel.hidden = !s || !!s.info.home || host.dataset.shellMode === "advanced";
       labels.hidden = !s || !!s.info.dialog || !!control.editor;
       if (!s) {
         labels.replaceChildren(); labelKey = "";
@@ -159,7 +159,7 @@
           for(const [tip,s] of [[p,1],[q,-1]])for(const side of [-1,1])line(tip,[tip[0]+u[0]*s*7+v[0]*side*3,tip[1]+u[1]*s*7+v[1]*side*3]);
           return [(p[0]+q[0])/2,(p[1]+q[1])/2];
         };
-        const occupied = [], maxX = open ? Math.min(innerWidth - 6, panel.getBoundingClientRect().left - 6) : innerWidth - 6;
+        const occupied = [], maxX = open && !panel.hidden ? Math.min(innerWidth - 6, panel.getBoundingClientRect().left - 6) : innerWidth - 6;
         records.forEach((record, i) => {
           const pos = record.screen || points[i];
           if (!M.point(pos)) return;

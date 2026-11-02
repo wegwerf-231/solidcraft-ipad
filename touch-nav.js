@@ -51,6 +51,7 @@
   addEventListener("unhandledrejection", (e) => { debug.errors.push("promise: " + String(e.reason).slice(0, 160)); });
 
   let sketchTools = null;
+  let touchShell = null;
   let synthetic = false;
   let lastFingerTime = 0;
   let stylusDown = 0;
@@ -201,7 +202,7 @@
     for (const r of zones.rects) if (x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1) return r.g;
     return null;
   }
-  const isUI = (x, y) => zoneAt(x, y) !== null;
+  const isUI = (x, y) => zoneAt(x, y) !== null || !!(touchShell && touchShell.containsPoint(x,y));
 
   // Menüs (Kontextmenü, Datei-Menü, Aufklappmenüs) melden keine Bedienelemente. Nachdem ein
   // Fingertipp eines geöffnet haben kann, geht der nächste Fingertipp deshalb in jedem Fall an die App.
@@ -972,7 +973,7 @@
         acts = window.SolidCraftSketch.dimensionChoices(sketchTools.controller.snapshot.sketch, sel.selection).filter((c) => c.enabled).map((c) => [c.label, "dimension:" + c.key]);
       }
       buildUI();
-      if (info.home || menuMaybeOpen || !acts.length) { hideBar(); return; }
+      if (info.home || menuMaybeOpen || !acts.length || (touchShell && touchShell.active)) { hideBar(); return; }
       note("auswahl " + (sel.selection || []).map((i) => i.type).join(","));
       const k = JSON.stringify([acts, sel.selection]);
       if (k === barKey && bar.classList.contains("on")) return;
@@ -1056,6 +1057,8 @@
     arc: "M5 19a14 14 0 0 1 14-14",
     rect: "M4 6h16v12H4z",
     circle: "M12 4a8 8 0 1 0 0 16a8 8 0 1 0 0-16zM12 12h.01",
+    ellipse: "M3 12a9 5 0 1 0 18 0a9 5 0 1 0-18 0",
+    slot: "M8 7h8a5 5 0 0 1 0 10H8A5 5 0 0 1 8 7z",
     polygon: "M12 3l8 6-3 10H7L4 9z",
     spline: "M4 18c4 0 4-12 8-12s4 12 8 12",
     dim: "M4 8v8M20 8v8M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3",
@@ -1160,7 +1163,7 @@
   // mit ?rail=1 an der Adresse lässt sie sich zum Ausprobieren einschalten.
   const RAIL_ON = query.get("rail") === "1";
   function renderRail(info, sel) {
-    if (!RAIL_ON) return;
+    if (!RAIL_ON || (touchShell && info.ui && info.ui.tab === "SKETCH")) { if (rail) rail.classList.remove("on"); return; }
     buildRail();
     // Auf dem Startbildschirm von SolidCraft keine eigenen Bedienelemente zeigen.
     if (info.home) {
@@ -1211,7 +1214,7 @@
     const avail = bottomY - top;
     const seps = rail.querySelectorAll(".sep").length;
     const buttons = rail.querySelectorAll(".ri").length + 1;
-    const size = Math.max(32, Math.min(54, Math.floor((avail - seps * 14 - buttons * 5) / buttons)));
+    const size = Math.max(44, Math.min(54, Math.floor((avail - seps * 14 - buttons * 5) / buttons)));
     rail.style.setProperty("--rb", size + "px");
   }
 
@@ -1220,6 +1223,7 @@
     try {
       await refreshZones();
       const [info, sel] = await Promise.all([req("ui.inspect"), req("ui.selection")]);
+      if (touchShell) await touchShell.refresh(info, sel);
       renderRail(info, sel);
     } catch (_) {}
   }
@@ -1281,6 +1285,11 @@
     if (window.SolidCraftSketchView) sketchTools = window.SolidCraftSketchView.mount({
       host: root, pad, request: req, execute: exec, isUI, handles: () => zones.handles || [],
       showPad, changed: scheduleSelectionCheck,
+    });
+    if (window.SolidCraftTouchShell) touchShell = window.SolidCraftTouchShell.mount({
+      host: root, request: req, execute: exec, icon, handles: () => zones.handles || [],
+      editing: () => !!(sketchTools && sketchTools.editing),
+      changed: () => { if (touchShell && touchShell.active) hideBar(); if (sketchTools) sketchTools.refresh(); },
     });
     try {
       // Version 3.0 bis 3.5 hatte den Browser ausgeblendet; einmalig wieder einblenden.
@@ -1381,6 +1390,7 @@
     internal: { hover, press, move, releaseAfterMoves, clickAt, note, pickAt, zoneAt, appState, pollState },
     extension: null, zones, refreshZones, zoneAt, fieldCheck,
     get sketch() { return sketchTools; },
+    get shell() { return touchShell; },
     get padOn() { return !!(pad && pad.classList.contains("on")); },
     get state() { return state; },
   };
